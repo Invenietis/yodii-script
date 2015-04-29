@@ -30,7 +30,7 @@ namespace Yodii.Script
 {
 
     /// <summary>
-    /// Promise of an <see cref="Expr"/>: either a Expression or a <see cref="IDeferredExpr"/>.
+    /// Promise of an <see cref="Expr"/>: either a resolved <see cref="RuntimeObj"/> or a <see cref="IDeferredExpr"/>.
     /// </summary>
     public struct PExpr
     {

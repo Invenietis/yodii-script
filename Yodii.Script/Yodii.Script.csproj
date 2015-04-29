@@ -93,7 +93,7 @@
     <Compile Include="EvalVisitor\JSEvalFunction.cs" />
     <Compile Include="EvalVisitor\PExpr.cs" />
     <Compile Include="EvalVisitor\RefRuntimeObj.cs" />
-    <Compile Include="EvalVisitor\RuntimeBreak.cs" />
+    <Compile Include="EvalVisitor\RuntimeFlowBreaking.cs" />
     <Compile Include="EvalVisitor\RuntimeSignal.cs" />
     <Compile Include="ScriptEngine\BreakpointManager.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Frame.cs" />
@@ -127,6 +127,7 @@
     <Compile Include="ToStringVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="EvalVisitor\RuntimeObj.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -67,6 +67,5 @@ namespace Yodii.Script
         {
             return new IfExprFrame( this, e ).Visit();
         }
-
     }
 }

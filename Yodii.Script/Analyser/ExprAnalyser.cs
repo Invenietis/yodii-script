@@ -258,8 +258,10 @@ namespace Yodii.Script
             return new AssignExpr( location, a, new BinaryExpr( location, left, binaryTokenType, Expression( 0 ) ) );
         }
 
+
         Expr HandleIf()
         {
+            // "if" identifier has already been matched.
             SourceLocation location = _parser.PrevNonCommentLocation;
             Expr c;
             if( !IsCondition( out c ) ) return c;
@@ -281,26 +283,6 @@ namespace Yodii.Script
             return false;
         }
 
-        Expr HandleWhile()
-        {
-            SourceLocation location = _parser.PrevNonCommentLocation;
-            Expr c;
-            if( !IsCondition( out c ) ) return c;
-            Expr code = HandleStatement();
-            return new WhileExpr( location, c, code );
-        }
-
-        Expr HandleDoWhile()
-        {
-            SourceLocation location = _parser.PrevNonCommentLocation;
-            if( !_parser.Match( JSTokeniserToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{'." );
-            Expr code = HandleBlock();
-            if( !_parser.MatchIdentifier( "while" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected 'while'." );
-            Expr c;
-            if( !IsCondition( out c ) ) return c;
-            return new WhileExpr( location, true, c, code );
-        }
-
         Expr HandleStatement()
         {
             if( _parser.Match( JSTokeniserToken.OpenCurly ) ) return HandleBlock();
@@ -313,7 +295,7 @@ namespace Yodii.Script
             List<Expr> statements = new List<Expr>();
             if( first != null && first != NopExpr.Default ) statements.Add( first );
             FillStatements( statements );
-            // Always close the scope.
+            // Always close the scope (even opened by the caller).
             return BlockFromStatements( statements, _scope.CloseScope() );
         }
 
@@ -334,6 +316,28 @@ namespace Yodii.Script
             if( statements.Count == 1 && locals.Count == 0 ) return statements[0];
             return new BlockExpr( statements.ToArray(), locals );
         }
+        
+        Expr HandleWhile()
+        {
+            SourceLocation location = _parser.PrevNonCommentLocation;
+            Expr c;
+            if( !IsCondition( out c ) ) return c;
+            Expr code = HandleStatement();
+            return new WhileExpr( location, c, code );
+        }
+
+        Expr HandleDoWhile()
+        {
+            SourceLocation location = _parser.PrevNonCommentLocation;
+            if( !_parser.Match( JSTokeniserToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{'." );
+            Expr code = HandleBlock();
+            if( !_parser.MatchIdentifier( "while" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected 'while'." );
+            Expr c;
+            if( !IsCondition( out c ) ) return c;
+            return new WhileExpr( location, true, c, code );
+        }
+
+
 
         Expr HandleMember( Expr left )
         {

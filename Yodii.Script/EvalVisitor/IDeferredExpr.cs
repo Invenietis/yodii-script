@@ -56,6 +56,5 @@ namespace Yodii.Script
         /// </summary>
         /// <returns>A promise that may be resolved if all the required code has been executed.</returns>
         PExpr StepIn();
-
     }
 }

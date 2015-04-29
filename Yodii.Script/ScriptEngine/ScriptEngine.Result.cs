@@ -140,7 +140,7 @@ namespace Yodii.Script
             }
 
             /// <summary>
-            /// Resets the current execution. This frees the <see cref="ScriptEngine"/>: new calls to its <see cref="G:Execute"/ > can be made. 
+            /// Resets the current execution. This frees the <see cref="ScriptEngine"/>: new calls to its <see cref="G:ScriptEngine.Execute"/> can be made. 
             /// </summary>
             public void Dispose()
             {

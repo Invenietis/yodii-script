@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Yodii.Script.RefRuntimeObj" Collapsed="true">
+    <Position X="6.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAAAAAAAAAAAwEAAAAAAAAAAAAAAAAAZAgAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RefRuntimeObj.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.RuntimeObj" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="Yodii.Script.RuntimeObj.JSUndefined" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\RuntimeObj.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.RuntimeObj.JSNull" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\RuntimeObj.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AgBAAEAAAAAgAAwAAAAAAAAAAAIAAAAAAZIAAQAAACA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Yodii.Script.RuntimeSignal" Collapsed="true">
+    <Position X="4.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAQEAAAAAAAAAAAAAAAACZAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeSignal.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.RuntimeError" Collapsed="true">
+    <Position X="3.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgQEAAAAAABAAAAAAAAgAAAAIAgAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeError.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.RuntimeFlowBreaking" Collapsed="true">
+    <Position X="5.25" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAACAAgAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeFlowBreaking.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.JSEvalBoolean" Collapsed="true">
+    <Position X="8.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAZgAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\JSEvalBoolean.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.JSEvalNumber" Collapsed="true">
+    <Position X="10" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAIAAAAQEAAAAAAAAAQAIAAAIAZAAAAAAAAg=</HashCode>
+      <FileName>EvalVisitor\JSEvalNumber.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.JSEvalFunction" Collapsed="true">
+    <Position X="11.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAQEAAAAABAAAAAAAAAACZAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\JSEvalFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.JSEvalString" Collapsed="true">
+    <Position X="13.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAQEgAAAAAQAAAAAAIAAAZAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\JSEvalString.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="1.3" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

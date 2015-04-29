@@ -70,12 +70,17 @@ namespace Yodii.Script
         /// Executes a string by first calling <see cref="ExprAnalyser.AnalyseString"/>.
         /// </summary>
         /// <param name="s">The string to execute.</param>
-        /// <returns></returns>
+        /// <returns>A result that may be pending...</returns>
         public Result Execute( string s )
         {
             return Execute( ExprAnalyser.AnalyseString( s ) );
         }
 
+        /// <summary>
+        /// Executes an already analysed script.
+        /// </summary>
+        /// <param name="s">The string to execute.</param>
+        /// <returns>A result that may be pending...</returns>
         public Result Execute( Expr e )
         {
             if( _currentResult != null ) throw new InvalidOperationException();

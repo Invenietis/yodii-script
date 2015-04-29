@@ -44,8 +44,7 @@ namespace Yodii.Script
 
         /// <summary>
         /// Gets whether this is a ternary ?: expression (<see cref="WhenFalse"/> necessarily exists). 
-        /// Otherwise, it is an if statement: <see cref="WhenTrue"/> and WhenFalse are
-        /// Blocks (and WhenFalse may be null).
+        /// Otherwise, it is an if statement: <see cref="WhenTrue"/> and WhenFalse are Blocks (and WhenFalse may be null).
         /// </summary>
         public bool IsTernaryOperator { get; private set; }
 
@@ -61,6 +60,9 @@ namespace Yodii.Script
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease dubugging...
+        /// </summary>
         public override string ToString()
         {
             string s = "if(" + Condition.ToString() + ") then {" + WhenTrue.ToString() + "}";
