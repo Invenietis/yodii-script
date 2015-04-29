@@ -31,9 +31,9 @@ namespace Yodii.Script
 {
     public class ExprAnalyser
     {
-        static readonly int _questionMarkPrecedenceLevel = JSTokeniser.PrecedenceLevel( JSTokeniserToken.QuestionMark );
+        static readonly int _questionMarkPrecedenceLevel = JSTokenizer.PrecedenceLevel( JSTokenizerToken.QuestionMark );
 
-        JSTokeniser _parser;
+        JSTokenizer _parser;
         StaticScope _scope;
 
         /// <summary>
@@ -86,19 +86,19 @@ namespace Yodii.Script
         /// <param name="p">Tokeinzer to analyse.</param>
         /// <param name="allowGlobalUse">False to scope declarations to this analysis.</param>
         /// <returns>The AST (that may be a <see cref="SyntaxErrorExpr"/> or contains such errors).</returns>
-        public Expr Analyse( JSTokeniser p, bool allowGlobalUse = true )
+        public Expr Analyse( JSTokenizer p, bool allowGlobalUse = true )
         {
             _parser = p;
             if( !(allowGlobalUse && _scope.GlobalScope) ) _scope.OpenScope();
             var e = Expression( 0 );
-            _parser.Match( JSTokeniserToken.SemiColon );
+            _parser.Match( JSTokenizerToken.SemiColon );
             return HandleBlock( e );
         }
 
         public static Expr AnalyseString( string s, Config configuration = null)
         {
             ExprAnalyser a = new ExprAnalyser( configuration );
-            return a.Analyse( new JSTokeniser( s ) );
+            return a.Analyse( new JSTokenizer( s ) );
         }
 
         Expr Expression( int rightBindingPower )
@@ -120,7 +120,7 @@ namespace Yodii.Script
             Debug.Assert( !_parser.IsErrorOrEndOfInput );
             if( _parser.IsNumber ) return new ConstantExpr( _parser.Location, _parser.ReadDouble() );
             if( _parser.IsString ) return new ConstantExpr( _parser.Location, _parser.ReadString() );
-            if( _parser.IsUnaryOperatorExtended || _parser.CurrentToken == JSTokeniserToken.Minus ) return HandleUnaryExpr();
+            if( _parser.IsUnaryOperatorExtended || _parser.CurrentToken == JSTokenizerToken.Minus ) return HandleUnaryExpr();
             if( _parser.IsIdentifier )
             {
                 if( _parser.MatchIdentifier( "if" ) ) return HandleIf();
@@ -133,15 +133,15 @@ namespace Yodii.Script
                 if( _parser.MatchIdentifier( "function" ) ) return HandleFunction();
                 return HandleIdentifier();
             }
-            if( _parser.Match( JSTokeniserToken.OpenCurly ) ) return HandleBlock();
-            if( _parser.Match( JSTokeniserToken.OpenPar ) )
+            if( _parser.Match( JSTokenizerToken.OpenCurly ) ) return HandleBlock();
+            if( _parser.Match( JSTokenizerToken.OpenPar ) )
             {
                 SourceLocation location = _parser.PrevNonCommentLocation;
                 Expr e = Expression( 0 );
                 if( e is SyntaxErrorExpr ) return e;
-                return _parser.Match( JSTokeniserToken.ClosePar ) ? e : new SyntaxErrorExpr( _parser.Location, "Expected ')' opened at {0}.", location );
+                return _parser.Match( JSTokenizerToken.ClosePar ) ? e : new SyntaxErrorExpr( _parser.Location, "Expected ')' opened at {0}.", location );
             }
-            if( _parser.Match( JSTokeniserToken.SemiColon ) ) return NopExpr.Default;
+            if( _parser.Match( JSTokenizerToken.SemiColon ) ) return NopExpr.Default;
             return new SyntaxErrorExpr( _parser.Location, "Syntax Error." );
         }
 
@@ -149,21 +149,21 @@ namespace Yodii.Script
         {
             if( _parser.IsBinaryOperator || _parser.IsCompareOperator ) return HandleBinaryExpr( left );
             if( _parser.IsLogical ) return HandleLogicalExpr( left );
-            if( _parser.Match( JSTokeniserToken.Dot ) ) return HandleMember( left );
-            if( _parser.Match( JSTokeniserToken.QuestionMark ) ) return HandleTernaryConditional( left );
-            if( _parser.Match( JSTokeniserToken.OpenPar ) ) return HandleCall( left );
-            if( _parser.Match( JSTokeniserToken.OpenSquare ) ) return HandleIndexer( left );
+            if( _parser.Match( JSTokenizerToken.Dot ) ) return HandleMember( left );
+            if( _parser.Match( JSTokenizerToken.QuestionMark ) ) return HandleTernaryConditional( left );
+            if( _parser.Match( JSTokenizerToken.OpenPar ) ) return HandleCall( left );
+            if( _parser.Match( JSTokenizerToken.OpenSquare ) ) return HandleIndexer( left );
             if( _parser.IsAssignOperator ) return HandleAssign( left );
             if( _parser.IsUnaryOperator 
-                && ( _parser.CurrentToken == JSTokeniserToken.PlusPlus 
-                     || _parser.CurrentToken == JSTokeniserToken.MinusMinus ) ) return HandlePostIncDec( left );
+                && ( _parser.CurrentToken == JSTokenizerToken.PlusPlus 
+                     || _parser.CurrentToken == JSTokenizerToken.MinusMinus ) ) return HandlePostIncDec( left );
             return new SyntaxErrorExpr( _parser.Location, "Syntax Error." );
         }
 
         Expr HandleReturn()
         {
             var loc = _parser.PrevNonCommentLocation;
-            Expr r = _parser.CurrentToken == JSTokeniserToken.SemiColon ? NopExpr.Default : Expression( 0 );
+            Expr r = _parser.CurrentToken == JSTokenizerToken.SemiColon ? NopExpr.Default : Expression( 0 );
             return new FlowBreakingExpr( _parser.PrevNonCommentLocation, r );
         }
 
@@ -174,7 +174,7 @@ namespace Yodii.Script
             _parser.Forward();
             AccessorExpr a = left as AccessorExpr;
             if( a == null ) return new SyntaxErrorExpr( loc, "invalid increment operand." );
-            return new PrePostIncDecExpr( loc, a, t == JSTokeniserToken.PlusPlus, false );
+            return new PrePostIncDecExpr( loc, a, t == JSTokenizerToken.PlusPlus, false );
         }
 
         Expr HandleVar()
@@ -186,12 +186,12 @@ namespace Yodii.Script
                 string name = _parser.ReadIdentifier();
                 if( name == null ) return new SyntaxErrorExpr( location, "Expected identifier (variable name)." );
                 Expr e = _scope.Declare( name, new AccessorDeclVarExpr( location, name ) );
-                if( _parser.Match( JSTokeniserToken.Assign ) ) e = HandleAssign( e, true );
+                if( _parser.Match( JSTokenizerToken.Assign ) ) e = HandleAssign( e, true );
                 location = _parser.Location;
                 multi.Add( e );
                 if( e is SyntaxErrorExpr ) break;
             }
-            while( _parser.Match( JSTokeniserToken.Comma ) );
+            while( _parser.Match( JSTokenizerToken.Comma ) );
             if( multi.Count == 1 ) return multi[0];
             return new ListOfExpr( multi );
         }
@@ -207,7 +207,7 @@ namespace Yodii.Script
                 Expr eRegName = _scope.Declare( name, funcName );
                 if( eRegName is SyntaxErrorExpr ) return eRegName;
             }
-            if( !_parser.Match( JSTokeniserToken.OpenPar ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '('." );
+            if( !_parser.Match( JSTokenizerToken.OpenPar ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '('." );
             // We open a strong scope: access to variables above are tracked.
             _scope.OpenStrongScope();
             Expr error = HandleFuncHeader( name );
@@ -237,10 +237,10 @@ namespace Yodii.Script
                 AccessorDeclVarExpr param = new AccessorDeclVarExpr( _parser.PrevNonCommentLocation, pName );
                 Expr eRegParam = _scope.Declare( pName, param );
                 if( eRegParam is SyntaxErrorExpr ) return eRegParam;
-                if( !_parser.Match( JSTokeniserToken.Comma ) ) break;
+                if( !_parser.Match( JSTokenizerToken.Comma ) ) break;
             }
-            if( !_parser.Match( JSTokeniserToken.ClosePar ) ) return new SyntaxErrorExpr( _parser.Location, "Expected ')'." );
-            if( !_parser.Match( JSTokeniserToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{}'." );
+            if( !_parser.Match( JSTokenizerToken.ClosePar ) ) return new SyntaxErrorExpr( _parser.Location, "Expected ')'." );
+            if( !_parser.Match( JSTokenizerToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{}'." );
             return null;
         }
 
@@ -249,11 +249,11 @@ namespace Yodii.Script
             var location = _parser.Location;
             AccessorExpr a = left as AccessorExpr;
             if( a == null ) return new SyntaxErrorExpr( location, "Invalid assignment left-hand side." );
-            if( pureAssign || _parser.Match( JSTokeniserToken.Assign ) )
+            if( pureAssign || _parser.Match( JSTokenizerToken.Assign ) )
             {
-                return new AssignExpr( location, a, Expression( JSTokeniser.PrecedenceLevel( JSTokeniserToken.Comma ) ) );
+                return new AssignExpr( location, a, Expression( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) ) );
             }
-            JSTokeniserToken binaryTokenType = JSTokeniser.FromAssignOperatorToBinary( _parser.CurrentToken );
+            JSTokenizerToken binaryTokenType = JSTokenizer.FromAssignOperatorToBinary( _parser.CurrentToken );
             _parser.Forward();
             return new AssignExpr( location, a, new BinaryExpr( location, left, binaryTokenType, Expression( 0 ) ) );
         }
@@ -273,11 +273,11 @@ namespace Yodii.Script
 
         bool IsCondition( out Expr c )
         {
-            if( !_parser.Match( JSTokeniserToken.OpenPar ) ) c = new SyntaxErrorExpr( _parser.Location, "Expected '('." );
+            if( !_parser.Match( JSTokenizerToken.OpenPar ) ) c = new SyntaxErrorExpr( _parser.Location, "Expected '('." );
             else
             {
                 c = Expression( 0 );
-                if( _parser.Match( JSTokeniserToken.ClosePar ) ) return true;
+                if( _parser.Match( JSTokenizerToken.ClosePar ) ) return true;
                 c = new SyntaxErrorExpr( _parser.Location, "Expected ')'." );
             }
             return false;
@@ -285,7 +285,7 @@ namespace Yodii.Script
 
         Expr HandleStatement()
         {
-            if( _parser.Match( JSTokeniserToken.OpenCurly ) ) return HandleBlock();
+            if( _parser.Match( JSTokenizerToken.OpenCurly ) ) return HandleBlock();
             return Expression( 0 );
         }
 
@@ -301,10 +301,10 @@ namespace Yodii.Script
 
         void FillStatements( List<Expr> statements )
         {
-            while( !_parser.Match( JSTokeniserToken.CloseCurly ) && !_parser.IsEndOfInput )
+            while( !_parser.Match( JSTokenizerToken.CloseCurly ) && !_parser.IsEndOfInput )
             {
                 Expr e = Expression( 0 );
-                _parser.Match( JSTokeniserToken.SemiColon );
+                _parser.Match( JSTokenizerToken.SemiColon );
                 if( e != NopExpr.Default ) statements.Add( e );
                 if( e is SyntaxErrorExpr ) break;
             }
@@ -329,7 +329,7 @@ namespace Yodii.Script
         Expr HandleDoWhile()
         {
             SourceLocation location = _parser.PrevNonCommentLocation;
-            if( !_parser.Match( JSTokeniserToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{'." );
+            if( !_parser.Match( JSTokenizerToken.OpenCurly ) ) return new SyntaxErrorExpr( _parser.Location, "Expected '{{'." );
             Expr code = HandleBlock();
             if( !_parser.MatchIdentifier( "while" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected 'while'." );
             Expr c;
@@ -351,7 +351,7 @@ namespace Yodii.Script
             SourceLocation loc = _parser.PrevNonCommentLocation;
             Expr i = Expression( 0 );
             if( i is SyntaxErrorExpr ) return i;
-            if( !_parser.Match( JSTokeniserToken.CloseSquare ) )
+            if( !_parser.Match( JSTokenizerToken.CloseSquare ) )
             {
                 return new SyntaxErrorExpr( _parser.Location, "Expected ] opened at {0}.", loc );
             }
@@ -362,19 +362,19 @@ namespace Yodii.Script
         {
             SourceLocation loc = _parser.PrevNonCommentLocation;
             IList<Expr> parameters = null;
-            if( !_parser.Match( JSTokeniserToken.ClosePar ) )
+            if( !_parser.Match( JSTokenizerToken.ClosePar ) )
             {
                 for( ; ; )
                 {
-                    Debug.Assert( JSTokeniser.PrecedenceLevel( JSTokeniserToken.Comma ) == 2 );
+                    Debug.Assert( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) == 2 );
                     Expr e = Expression( 2 );
                     if( e is SyntaxErrorExpr ) return e;
 
                     if( parameters == null ) parameters = new List<Expr>();
                     parameters.Add( e );
 
-                    if( _parser.Match( JSTokeniserToken.ClosePar ) ) break;
-                    if( !_parser.Match( JSTokeniserToken.Comma ) )
+                    if( _parser.Match( JSTokenizerToken.ClosePar ) ) break;
+                    if( !_parser.Match( JSTokenizerToken.Comma ) )
                     {
                         return new SyntaxErrorExpr( _parser.Location, "Expected ) opened at {0}.", loc );
                     }
@@ -401,12 +401,12 @@ namespace Yodii.Script
             var t = _parser.CurrentToken;
             _parser.Forward();
             // Unary operators are JSParserToken.OpLevel14, except Minus that is classified as a binary operator and is associated to JSParserToken.OpLevel12.
-            var right = Expression( JSTokeniser.PrecedenceLevel( JSTokeniserToken.OpLevel14 ) );
-            if( t == JSTokeniserToken.PlusPlus || t == JSTokeniserToken.MinusMinus )
+            var right = Expression( JSTokenizer.PrecedenceLevel( JSTokenizerToken.OpLevel14 ) );
+            if( t == JSTokenizerToken.PlusPlus || t == JSTokenizerToken.MinusMinus )
             {
                 AccessorExpr a = right as AccessorExpr;
                 if( a == null ) return new SyntaxErrorExpr( loc, "invalid increment operand." );
-                return new PrePostIncDecExpr( loc, a, t == JSTokeniserToken.PlusPlus, true );
+                return new PrePostIncDecExpr( loc, a, t == JSTokenizerToken.PlusPlus, true );
             }
             return new UnaryExpr( loc, t, right );
         }
@@ -414,14 +414,14 @@ namespace Yodii.Script
         Expr HandleBinaryExpr( Expr left )
         {
             _parser.Forward();
-            return new BinaryExpr( _parser.PrevNonCommentLocation, left, _parser.PrevNonCommentToken, Expression( JSTokeniser.PrecedenceLevel( _parser.PrevNonCommentToken ) ) );
+            return new BinaryExpr( _parser.PrevNonCommentLocation, left, _parser.PrevNonCommentToken, Expression( JSTokenizer.PrecedenceLevel( _parser.PrevNonCommentToken ) ) );
         }
 
         Expr HandleLogicalExpr( Expr left )
         {
             _parser.Forward();
             // Right associative operators to support short-circuit (hence the -1 on the level).
-            return new BinaryExpr( _parser.PrevNonCommentLocation, left, _parser.PrevNonCommentToken, Expression( JSTokeniser.PrecedenceLevel( _parser.PrevNonCommentToken ) - 1 ) );
+            return new BinaryExpr( _parser.PrevNonCommentLocation, left, _parser.PrevNonCommentToken, Expression( JSTokenizer.PrecedenceLevel( _parser.PrevNonCommentToken ) - 1 ) );
         }
 
         Expr HandleTernaryConditional( Expr left )
@@ -429,7 +429,7 @@ namespace Yodii.Script
             SourceLocation qLoc = _parser.PrevNonCommentLocation;
             Expr whenTrue = Expression( _questionMarkPrecedenceLevel );
             if( whenTrue is SyntaxErrorExpr ) return whenTrue;
-            if( !_parser.Match( JSTokeniserToken.Colon ) ) return new SyntaxErrorExpr( _parser.Location, "Expected colon (:) after ? at {0}.", qLoc );
+            if( !_parser.Match( JSTokenizerToken.Colon ) ) return new SyntaxErrorExpr( _parser.Location, "Expected colon (:) after ? at {0}.", qLoc );
             return new IfExpr( qLoc, true, left, whenTrue, Expression( _questionMarkPrecedenceLevel ) );
         }
 

@@ -105,9 +105,9 @@
     <Compile Include="ScriptEngine\ScriptEngineStatus.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.Result.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.cs" />
-    <Compile Include="Tokeniser\JSTokeniser.cs" />
-    <Compile Include="Tokeniser\JSTokeniserError.cs" />
-    <Compile Include="Tokeniser\JSTokeniserToken.cs" />
+    <Compile Include="Tokenizer\JSTokeniser.cs" />
+    <Compile Include="Tokenizer\JSTokeniserError.cs" />
+    <Compile Include="Tokenizer\JSTokeniserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EvalVisitor\CallFunctionDescriptor.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.cs" />
@@ -122,7 +122,7 @@
     <Compile Include="EvalVisitor\RuntimeError.cs" />
     <Compile Include="EvalVisitor\RuntimeObj.cs" />
     <Compile Include="EvalVisitor\RuntimeObjComparer.cs" />
-    <Compile Include="Tokeniser\SourceLocation.cs" />
+    <Compile Include="Tokenizer\SourceLocation.cs" />
     <Compile Include="Analyser\SyntaxErrorCollector.cs" />
     <Compile Include="ToStringVisitor.cs" />
   </ItemGroup>

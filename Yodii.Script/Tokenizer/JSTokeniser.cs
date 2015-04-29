@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Tokeniser\JSTokeniser.cs) is part of CiviKey. 
+* This file (Yodii.Script\Tokenizer\JSTokenizer.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -33,7 +33,7 @@ namespace Yodii.Script
     /// <summary>
     ///	Small tokenizer to handle javascript based language (ECMAScript).
     /// </summary>
-    public class JSTokeniser
+    public class JSTokenizer
     {
         #region Private fields
 
@@ -57,13 +57,13 @@ namespace Yodii.Script
 
         #endregion
 
-        public JSTokeniser()
+        public JSTokenizer()
         {
             _skipComments = true;
             _buffer = new StringBuilder( 512 );
         }
 
-        public JSTokeniser( string input, string source = SourceLocation.NoSource, int startLineNumber = 0, int startColumnNumber = 0 )
+        public JSTokenizer( string input, string source = SourceLocation.NoSource, int startLineNumber = 0, int startColumnNumber = 0 )
         {
             _skipComments = true;
             _buffer = new StringBuilder( 512 );
@@ -105,7 +105,7 @@ namespace Yodii.Script
         /// to ease the handling of right associative infix operators (this level is even).
         /// </summary>
         /// <remarks>
-        /// This uses <see cref="JSTokeniserToken.OpLevelMask"/> and <see cref="JSTokeniserToken.OpLevelShift"/>.
+        /// This uses <see cref="JSTokenizerToken.OpLevelMask"/> and <see cref="JSTokenizerToken.OpLevelShift"/>.
         /// </remarks>
         public int CurrentPrecedenceLevel
         {
@@ -115,31 +115,31 @@ namespace Yodii.Script
         /// <summary>
         /// Computes the precedence with a provision of 1 bit to ease the handling of right associative infix operators.
         /// </summary>
-        /// <returns>An even precedence level between 30 and 2. 0 if the token has <see cref="JSTokeniserError.IsErrorOrEndOfInput"/> bit set.</returns>
+        /// <returns>An even precedence level between 30 and 2. 0 if the token has <see cref="JSTokenizerError.IsErrorOrEndOfInput"/> bit set.</returns>
         /// <remarks>
-        /// This uses <see cref="JSTokeniserToken.OpLevelMask"/> and <see cref="JSTokeniserToken.OpLevelShift"/>.
+        /// This uses <see cref="JSTokenizerToken.OpLevelMask"/> and <see cref="JSTokenizerToken.OpLevelShift"/>.
         /// </remarks>
-        public static int PrecedenceLevel( JSTokeniserToken t )
+        public static int PrecedenceLevel( JSTokenizerToken t )
         {
-            return t > 0 ? ( ((int)(t & JSTokeniserToken.OpLevelMask)) >> (int)JSTokeniserToken.OpLevelShift ) << 1 : 0;
+            return t > 0 ? ( ((int)(t & JSTokenizerToken.OpLevelMask)) >> (int)JSTokenizerToken.OpLevelShift ) << 1 : 0;
         }
 
         /// <summary>
-        /// Gets the current <see cref="JSTokeniserToken"/> code.
+        /// Gets the current <see cref="JSTokenizerToken"/> code.
         /// </summary>
-        public JSTokeniserToken CurrentToken
+        public JSTokenizerToken CurrentToken
         {
-            get { return (JSTokeniserToken)_token; }
+            get { return (JSTokenizerToken)_token; }
         }
 
         /// <summary>
-        /// Gets the <see cref="JSTokeniserError"/> code if the parser is in error
-        /// (or the end of the input is reached). <see cref="JSTokeniserError.None"/> if
+        /// Gets the <see cref="JSTokenizerError"/> code if the parser is in error
+        /// (or the end of the input is reached). <see cref="JSTokenizerError.None"/> if
         /// no error occured.
         /// </summary>
-        public JSTokeniserError ErrorCode
+        public JSTokenizerError ErrorCode
         {
-            get { return _token < 0 ? (JSTokeniserError)_token : JSTokeniserError.None; }
+            get { return _token < 0 ? (JSTokenizerError)_token : JSTokenizerError.None; }
         }
 
         #region IsErrorOrEndOfInput, IsEndOfInput, IsAssignOperator, ..., IsUnaryOperator
@@ -153,37 +153,37 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// True if <see cref="ErrorCode"/> is <see cref="JSTokeniserError.EndOfInput"/>.
+        /// True if <see cref="ErrorCode"/> is <see cref="JSTokenizerError.EndOfInput"/>.
         /// </summary>
         /// <returns></returns>
         public bool IsEndOfInput
         {
-            get { return _token == (int)JSTokeniserError.EndOfInput; }
+            get { return _token == (int)JSTokenizerError.EndOfInput; }
         }
 
         public bool IsAssignOperator
         {
-            get { return (_token&(int)JSTokeniserToken.IsAssignOperator) != 0; }
+            get { return (_token&(int)JSTokenizerToken.IsAssignOperator) != 0; }
         }
 
         public bool IsBinaryOperator
         {
-            get { return (_token & (int)JSTokeniserToken.IsBinaryOperator) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsBinaryOperator) != 0; }
         }
 
         public bool IsBracket
         {
-            get { return (_token & (int)JSTokeniserToken.IsBracket) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsBracket) != 0; }
         }
 
         public bool IsCompareOperator
         {
-            get { return (_token & (int)JSTokeniserToken.IsCompareOperator) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsCompareOperator) != 0; }
         }
 
         public bool IsComment
         {
-            get { return (_token & (int)JSTokeniserToken.IsComment) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsComment) != 0; }
         }
 
         /// <summary>
@@ -192,12 +192,12 @@ namespace Yodii.Script
         /// </summary>
         public bool IsIdentifier
         {
-            get { return (_token & (int)JSTokeniserToken.IsIdentifier) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsIdentifier) != 0; }
         }
 
         public bool IsLogical
         {
-            get { return (_token & (int)JSTokeniserToken.IsLogical) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsLogical) != 0; }
         }
 
         #region IsNumber, IsNumberFloat and IsNumberInteger
@@ -207,7 +207,7 @@ namespace Yodii.Script
         /// </summary>
         public bool IsNumber
         {
-            get { return (_token & (int)JSTokeniserToken.IsNumber) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsNumber) != 0; }
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Yodii.Script
         /// </summary>
         public bool IsNumberFloat
         {
-            get { return _token == (int)JSTokeniserToken.Float; }
+            get { return _token == (int)JSTokenizerToken.Float; }
         }
 
         /// <summary>
@@ -225,18 +225,18 @@ namespace Yodii.Script
         /// </summary>
         public bool IsNumberInteger
         {
-            get { return (_token & (int)JSTokeniserToken.Integer) == (int)JSTokeniserToken.Integer; }
+            get { return (_token & (int)JSTokenizerToken.Integer) == (int)JSTokenizerToken.Integer; }
         }
         #endregion
 
         public bool IsPunctuation
         {
-            get { return (_token & (int)JSTokeniserToken.IsPunctuation) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsPunctuation) != 0; }
         }
 
         public bool IsRegex
         {
-            get { return (_token & (int)JSTokeniserToken.IsRegex) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsRegex) != 0; }
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Yodii.Script
         /// </summary>
         public bool IsString
         {
-            get { return (_token & (int)JSTokeniserToken.IsString) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsString) != 0; }
         }
 
         /// <summary>
@@ -253,12 +253,12 @@ namespace Yodii.Script
         /// </summary>
         public bool IsUnaryOperator
         {
-            get { return (_token & (int)JSTokeniserToken.IsUnaryOperator) != 0; }
+            get { return (_token & (int)JSTokenizerToken.IsUnaryOperator) != 0; }
         }
         
         public bool IsUnaryOperatorExtended
         {
-            get { return (_token & (int)JSTokeniserToken.OpLevelMask) == (int)JSTokeniserToken.OpLevel14; }
+            get { return (_token & (int)JSTokenizerToken.OpLevelMask) == (int)JSTokenizerToken.OpLevel14; }
         }
         #endregion
 
@@ -300,9 +300,9 @@ namespace Yodii.Script
         /// <summary>
         /// Gets the previous token (ignoring any comments that may have occured).
         /// </summary>
-        public JSTokeniserToken PrevNonCommentToken
+        public JSTokenizerToken PrevNonCommentToken
         {
-            get { return (JSTokeniserToken)_prevNonCommentToken; }
+            get { return (JSTokenizerToken)_prevNonCommentToken; }
         }
 
         /// <summary>
@@ -331,67 +331,67 @@ namespace Yodii.Script
         static string[] _punctuations = { ".", ",", "?", ":", ";" };
         static string[] _specialIdentifiers = { "delete", "new", "typeof", "void" };
         static string[] _unaryOperator = { "!", "~", "--", "++", "delete", "new", "typeof", "void" };
-        static JSTokeniserToken[] _assignBinaryMap = 
+        static JSTokenizerToken[] _assignBinaryMap = 
         { 
-            JSTokeniserToken.BitwiseOr, 
-            JSTokeniserToken.BitwiseAnd, 
-            JSTokeniserToken.BitwiseShiftLeft, 
-            JSTokeniserToken.BitwiseXOr,
-            JSTokeniserToken.BitwiseShiftRight,
-            JSTokeniserToken.BitwiseShiftRightNoSignBit,
-            JSTokeniserToken.Plus,
-            JSTokeniserToken.Minus,
-            JSTokeniserToken.Divide,
-            JSTokeniserToken.Mult,
-            JSTokeniserToken.Modulo
+            JSTokenizerToken.BitwiseOr, 
+            JSTokenizerToken.BitwiseAnd, 
+            JSTokenizerToken.BitwiseShiftLeft, 
+            JSTokenizerToken.BitwiseXOr,
+            JSTokenizerToken.BitwiseShiftRight,
+            JSTokenizerToken.BitwiseShiftRightNoSignBit,
+            JSTokenizerToken.Plus,
+            JSTokenizerToken.Minus,
+            JSTokenizerToken.Divide,
+            JSTokenizerToken.Mult,
+            JSTokenizerToken.Modulo
         };
 
-        static internal JSTokeniserToken FromAssignOperatorToBinary( JSTokeniserToken assignment )
+        static internal JSTokenizerToken FromAssignOperatorToBinary( JSTokenizerToken assignment )
         {
-            Debug.Assert( (assignment & JSTokeniserToken.IsAssignOperator) != 0 && assignment != JSTokeniserToken.Assign );
+            Debug.Assert( (assignment & JSTokenizerToken.IsAssignOperator) != 0 && assignment != JSTokenizerToken.Assign );
             return _assignBinaryMap[((int)assignment & 15)-2];
         }
 
-        public static string Explain( JSTokeniserToken t )
+        public static string Explain( JSTokenizerToken t )
         {
             if( t < 0 )
             {
-                return ((JSTokeniserError)t).ToString();
+                return ((JSTokenizerError)t).ToString();
             }
-            if( (t & JSTokeniserToken.IsAssignOperator) != 0 ) return _assignOperator[((int)t & 15) - 1];
-            if( (t & JSTokeniserToken.IsBinaryOperator) != 0 ) return _binaryOperator[((int)t & 15) - 1];
-            if( (t & JSTokeniserToken.IsCompareOperator) != 0 ) return _compareOperator[((int)t & 15) - 1];
-            if( (t & JSTokeniserToken.IsPunctuation) != 0 ) return _punctuations[((int)t & 15) - 1];
-            if( (t & JSTokeniserToken.IsUnaryOperator) != 0 ) return _unaryOperator[((int)t & 15) - 1];
+            if( (t & JSTokenizerToken.IsAssignOperator) != 0 ) return _assignOperator[((int)t & 15) - 1];
+            if( (t & JSTokenizerToken.IsBinaryOperator) != 0 ) return _binaryOperator[((int)t & 15) - 1];
+            if( (t & JSTokenizerToken.IsCompareOperator) != 0 ) return _compareOperator[((int)t & 15) - 1];
+            if( (t & JSTokenizerToken.IsPunctuation) != 0 ) return _punctuations[((int)t & 15) - 1];
+            if( (t & JSTokenizerToken.IsUnaryOperator) != 0 ) return _unaryOperator[((int)t & 15) - 1];
             
-            if( t == JSTokeniserToken.Identifier ) return "identifier";
-            if( t == JSTokeniserToken.And ) return "&&";
-            if( t == JSTokeniserToken.Or ) return "||";
-            if( t == JSTokeniserToken.PlusPlus ) return "++";
-            if( t == JSTokeniserToken.MinusMinus ) return "--";
+            if( t == JSTokenizerToken.Identifier ) return "identifier";
+            if( t == JSTokenizerToken.And ) return "&&";
+            if( t == JSTokenizerToken.Or ) return "||";
+            if( t == JSTokenizerToken.PlusPlus ) return "++";
+            if( t == JSTokenizerToken.MinusMinus ) return "--";
             
-            if( t == JSTokeniserToken.String ) return "\"string\"";
+            if( t == JSTokenizerToken.String ) return "\"string\"";
 
-            if( t == JSTokeniserToken.Float ) return "6.02214129e+23";
-            if( t == JSTokeniserToken.Integer ) return "42";
-            if( t == JSTokeniserToken.HexNumber ) return "0x00CF12A4";
-            if( t == JSTokeniserToken.NaN ) return "NaN";
-            if( t == JSTokeniserToken.Infinity ) return "Infinity";
+            if( t == JSTokenizerToken.Float ) return "6.02214129e+23";
+            if( t == JSTokenizerToken.Integer ) return "42";
+            if( t == JSTokenizerToken.HexNumber ) return "0x00CF12A4";
+            if( t == JSTokenizerToken.NaN ) return "NaN";
+            if( t == JSTokenizerToken.Infinity ) return "Infinity";
 
-            if( t == JSTokeniserToken.StarComment ) return "/* ... */";
-            if( t == JSTokeniserToken.LineComment ) return "// ..." + Environment.NewLine;
+            if( t == JSTokenizerToken.StarComment ) return "/* ... */";
+            if( t == JSTokenizerToken.LineComment ) return "// ..." + Environment.NewLine;
             
-            if( t == JSTokeniserToken.Regex ) return "/regex/gi";
+            if( t == JSTokenizerToken.Regex ) return "/regex/gi";
 
-            if( t == JSTokeniserToken.OpenPar ) return "(";
-            if( t == JSTokeniserToken.ClosePar ) return ")";
-            if( t == JSTokeniserToken.OpenBracket ) return "[";
-            if( t == JSTokeniserToken.CloseBracket ) return "]";
-            if( t == JSTokeniserToken.OpenCurly ) return "{";
-            if( t == JSTokeniserToken.CloseCurly ) return "}";
+            if( t == JSTokenizerToken.OpenPar ) return "(";
+            if( t == JSTokenizerToken.ClosePar ) return ")";
+            if( t == JSTokenizerToken.OpenBracket ) return "[";
+            if( t == JSTokenizerToken.CloseBracket ) return "]";
+            if( t == JSTokenizerToken.OpenCurly ) return "{";
+            if( t == JSTokenizerToken.CloseCurly ) return "}";
 
 
-            return JSTokeniserToken.None.ToString();
+            return JSTokenizerToken.None.ToString();
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace Yodii.Script
         /// <returns></returns>
         public string ReadComment()
         {
-            return (_token & (int)JSTokeniserToken.IsComment) != 0 ? ReadBuffer() : null;
+            return (_token & (int)JSTokenizerToken.IsComment) != 0 ? ReadBuffer() : null;
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace Yodii.Script
         /// <returns></returns>
         public string ReadString()
         {
-            return _token == (int)JSTokeniserToken.String ? ReadBuffer() : null;
+            return _token == (int)JSTokenizerToken.String ? ReadBuffer() : null;
         }
 
 
@@ -447,7 +447,7 @@ namespace Yodii.Script
             if( id != null )
             {
                 multiId = id;
-                while( _token == (int)JSTokeniserToken.Dot )
+                while( _token == (int)JSTokenizerToken.Dot )
                 {
                     multiId += '.';
                     Forward();
@@ -467,8 +467,8 @@ namespace Yodii.Script
         /// <returns></returns>
         public string ReadExtendedIdentifierAsString()
         {
-            if( (_token & (int)JSTokeniserToken.IsIdentifier) != 0 ) return _identifierValue;
-            if( (_token & (int)(JSTokeniserToken.IsString | JSTokeniserToken.IsNumber)) != 0 ) return ReadBuffer();
+            if( (_token & (int)JSTokenizerToken.IsIdentifier) != 0 ) return _identifierValue;
+            if( (_token & (int)(JSTokenizerToken.IsString | JSTokenizerToken.IsNumber)) != 0 ) return ReadBuffer();
             return null;
         }
 
@@ -479,7 +479,7 @@ namespace Yodii.Script
         /// <returns></returns>
         public bool MatchIdentifier( string identifier )
         {
-            if( (_token & (int)JSTokeniserToken.IsIdentifier) != 0
+            if( (_token & (int)JSTokenizerToken.IsIdentifier) != 0
                 && String.CompareOrdinal( _identifierValue, identifier ) == 0 )
             {
                 Forward();
@@ -507,9 +507,9 @@ namespace Yodii.Script
         /// <summary>
         /// Matches a token. Forwards the head on success.
         /// </summary>
-        /// <param name="token">Must be one of <see cref="JSTokeniserToken"/> value (not an Error one).</param>
+        /// <param name="token">Must be one of <see cref="JSTokenizerToken"/> value (not an Error one).</param>
         /// <returns>True if the given token matches.</returns>
-        public bool Match( JSTokeniserToken token )
+        public bool Match( JSTokenizerToken token )
         {
             if( token < 0 ) throw new ArgumentException( "Token must not be an Error token." );
             if( _token == (int)token )
@@ -526,7 +526,7 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="token">Token to match (must not be an Error one).</param>
         /// <returns>True if the given token matches.</returns>
-        public bool Match( JSTokeniserToken token, bool throwError )
+        public bool Match( JSTokenizerToken token, bool throwError )
         {
             if( !Match( token ) )
             {
@@ -546,7 +546,7 @@ namespace Yodii.Script
         public bool IsDouble( out double d )
         {
             d = 0;
-            if( (_token & (int)JSTokeniserToken.IsNumber) == 0 ) return false;
+            if( (_token & (int)JSTokenizerToken.IsNumber) == 0 ) return false;
             d = ReadDouble();
             return true;
         }
@@ -558,9 +558,9 @@ namespace Yodii.Script
         public double ReadDouble()
         {
             Double d;
-            if( _token == (int)JSTokeniserToken.NaN ) d = Double.NaN;
-            else if( _token == (int)JSTokeniserToken.Infinity ) d = Double.PositiveInfinity;
-            else if( _token == (int)JSTokeniserToken.Float )
+            if( _token == (int)JSTokenizerToken.NaN ) d = Double.NaN;
+            else if( _token == (int)JSTokenizerToken.Infinity ) d = Double.PositiveInfinity;
+            else if( _token == (int)JSTokenizerToken.Float )
             {
                 // This is not compliant with Javascript rules: it returns 0 four huge or very small numbers.
                 // It should return Infinity for huge numbers.
@@ -723,9 +723,9 @@ namespace Yodii.Script
             int ic;
             while( (ic = Read()) != -1 )
             {
-                if( ic == '*' && Read( '/' ) ) return (int)JSTokeniserToken.StarComment;
+                if( ic == '*' && Read( '/' ) ) return (int)JSTokenizerToken.StarComment;
             }
-            return (int)JSTokeniserError.EndOfInput;
+            return (int)JSTokenizerError.EndOfInput;
         }
 
         int HandleLineComment()
@@ -733,9 +733,9 @@ namespace Yodii.Script
             int ic;
             while( (ic = Read()) != -1 )
             {
-                if( ic == '\n' ) return (int)JSTokeniserToken.LineComment;
+                if( ic == '\n' ) return (int)JSTokenizerToken.LineComment;
             }
-            return (int)JSTokeniserError.EndOfInput;
+            return (int)JSTokenizerError.EndOfInput;
         }
 
         int HandleRegex()
@@ -752,10 +752,10 @@ namespace Yodii.Script
                 {
                     while( (ic = Read()) == 'g' || ic == 'i' || ic == 'm' ) ;
                     if( ic == -1 ) break;
-                    return (int)JSTokeniserToken.Regex;
+                    return (int)JSTokenizerToken.Regex;
                 }
             }
-            return (int)JSTokeniserError.ErrorRegexUnterminated;
+            return (int)JSTokenizerError.ErrorRegexUnterminated;
         }
 
         int NextToken2()
@@ -765,7 +765,7 @@ namespace Yodii.Script
                 // Current char position is the end of the previous token.
                 _prevCharPosTokenEnd = _charPos;
 
-                if( (_token & (int)JSTokeniserToken.IsComment) == 0 )
+                if( (_token & (int)JSTokenizerToken.IsComment) == 0 )
                 {
                     // Previous token and token location are preserved.
                     _prevNonCommentLocation = _location;
@@ -776,7 +776,7 @@ namespace Yodii.Script
                 readToken:
 
                 _token = NextTokenLowLevel();
-                if( (_token & (int)JSTokeniserToken.IsComment) != 0 && _skipComments ) goto readToken;
+                if( (_token & (int)JSTokenizerToken.IsComment) != 0 && _skipComments ) goto readToken;
             }
             return _token;
         }
@@ -787,46 +787,46 @@ namespace Yodii.Script
             // Current char position is the beginning of the new current token.
             _charPosTokenBeg = _charPos;
 
-            if( ic == -1 ) return (int)JSTokeniserError.EndOfInput;
+            if( ic == -1 ) return (int)JSTokenizerError.EndOfInput;
             switch( ic )
             {
                 case '\'':
                 case '\"': return ReadString( ic );
-                case '=': return Read( '=' ) ? (Read('=') ? (int)JSTokeniserToken.StrictEqual : (int)JSTokeniserToken.Equal) : (int)JSTokeniserToken.Assign;
-                case '*': return Read( '=' ) ? (int)JSTokeniserToken.MultAssign : (int)JSTokeniserToken.Mult;
-                case '!': return Read( '=' ) ? (Read( '=' ) ? (int)JSTokeniserToken.StrictDifferent : (int)JSTokeniserToken.Different) : (int)JSTokeniserToken.Not;
+                case '=': return Read( '=' ) ? (Read('=') ? (int)JSTokenizerToken.StrictEqual : (int)JSTokenizerToken.Equal) : (int)JSTokenizerToken.Assign;
+                case '*': return Read( '=' ) ? (int)JSTokenizerToken.MultAssign : (int)JSTokenizerToken.Mult;
+                case '!': return Read( '=' ) ? (Read( '=' ) ? (int)JSTokenizerToken.StrictDifferent : (int)JSTokenizerToken.Different) : (int)JSTokenizerToken.Not;
                 case '^':
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseXOrAssign;
-                    return (int)JSTokeniserToken.BitwiseXOr;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseXOrAssign;
+                    return (int)JSTokenizerToken.BitwiseXOr;
                 case '&':
-                    if( Read( '&' ) ) return (int)JSTokeniserToken.And;
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseAndAssign;
-                    return (int)JSTokeniserToken.BitwiseAnd;
+                    if( Read( '&' ) ) return (int)JSTokenizerToken.And;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseAndAssign;
+                    return (int)JSTokenizerToken.BitwiseAnd;
                 case '|':
-                    if( Read( '|' ) ) return (int)JSTokeniserToken.Or;
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseOrAssign;
-                    return (int)JSTokeniserToken.BitwiseOr;
+                    if( Read( '|' ) ) return (int)JSTokenizerToken.Or;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseOrAssign;
+                    return (int)JSTokenizerToken.BitwiseOr;
                 case '>':
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.GreaterOrEqual;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.GreaterOrEqual;
                     if( Read( '>' ) )
                     {
-                        if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseShiftRightAssign;
+                        if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseShiftRightAssign;
                         if( Read( '>' ) )
                         {
-                            if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseShiftRightNoSignBitAssign;
-                            return (int)JSTokeniserToken.BitwiseShiftRightNoSignBit;
+                            if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseShiftRightNoSignBitAssign;
+                            return (int)JSTokenizerToken.BitwiseShiftRightNoSignBit;
                         }
-                        return (int)JSTokeniserToken.BitwiseShiftRight;
+                        return (int)JSTokenizerToken.BitwiseShiftRight;
                     }
-                    return (int)JSTokeniserToken.Greater;
+                    return (int)JSTokenizerToken.Greater;
                 case '<':
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.LessOrEqual;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.LessOrEqual;
                     if( Read( '<' ) )
                     {
-                        if( Read( '=' ) ) return (int)JSTokeniserToken.BitwiseShiftLeftAssign;
-                        return (int)JSTokeniserToken.BitwiseShiftLeft;
+                        if( Read( '=' ) ) return (int)JSTokenizerToken.BitwiseShiftLeftAssign;
+                        return (int)JSTokenizerToken.BitwiseShiftLeft;
                     }
-                    return (int)JSTokeniserToken.Less;
+                    return (int)JSTokenizerToken.Less;
                 case '.':
                     // A number can start with a dot.
                     ic = FromDecDigit( Peek() );
@@ -835,48 +835,48 @@ namespace Yodii.Script
                         Read();
                         return ReadNumber( ic, true );
                     }
-                    return (int)JSTokeniserToken.Dot;
-                case '{': return (int)JSTokeniserToken.OpenCurly;
-                case '}': return (int)JSTokeniserToken.CloseCurly;
-                case '(': return (int)JSTokeniserToken.OpenPar;
-                case ')': return (int)JSTokeniserToken.ClosePar;
-                case '[': return (int)JSTokeniserToken.OpenSquare;
-                case ']': return (int)JSTokeniserToken.CloseSquare;
-                case ':': return (int)JSTokeniserToken.Colon;
-                case ';': return (int)JSTokeniserToken.SemiColon;
-                case ',': return (int)JSTokeniserToken.Comma;
-                case '?': return (int)JSTokeniserToken.QuestionMark;
+                    return (int)JSTokenizerToken.Dot;
+                case '{': return (int)JSTokenizerToken.OpenCurly;
+                case '}': return (int)JSTokenizerToken.CloseCurly;
+                case '(': return (int)JSTokenizerToken.OpenPar;
+                case ')': return (int)JSTokenizerToken.ClosePar;
+                case '[': return (int)JSTokenizerToken.OpenSquare;
+                case ']': return (int)JSTokenizerToken.CloseSquare;
+                case ':': return (int)JSTokenizerToken.Colon;
+                case ';': return (int)JSTokenizerToken.SemiColon;
+                case ',': return (int)JSTokenizerToken.Comma;
+                case '?': return (int)JSTokenizerToken.QuestionMark;
                 case '/':
                     {
                         if( Read( '*' ) ) return HandleStarComment();
                         if( Read( '/' ) ) return HandleLineComment();
-                        if( Read( '=' ) ) return (int)JSTokeniserToken.DivideAssign;
-                        if( (_prevNonCommentToken & (int)(JSTokeniserToken.IsIdentifier | JSTokeniserToken.IsString | JSTokeniserToken.IsNumber)) != 0
-                            || _prevNonCommentToken == (int)JSTokeniserToken.ClosePar
-                            || _prevNonCommentToken == (int)JSTokeniserToken.CloseSquare
-                            || _prevNonCommentToken == (int)JSTokeniserToken.PlusPlus
-                            || _prevNonCommentToken == (int)JSTokeniserToken.MinusMinus ) return (int)JSTokeniserToken.Divide;
+                        if( Read( '=' ) ) return (int)JSTokenizerToken.DivideAssign;
+                        if( (_prevNonCommentToken & (int)(JSTokenizerToken.IsIdentifier | JSTokenizerToken.IsString | JSTokenizerToken.IsNumber)) != 0
+                            || _prevNonCommentToken == (int)JSTokenizerToken.ClosePar
+                            || _prevNonCommentToken == (int)JSTokenizerToken.CloseSquare
+                            || _prevNonCommentToken == (int)JSTokenizerToken.PlusPlus
+                            || _prevNonCommentToken == (int)JSTokenizerToken.MinusMinus ) return (int)JSTokenizerToken.Divide;
                         return HandleRegex();
                     }
                 case '-':
-                    if( Read( '-' ) ) return (int)JSTokeniserToken.MinusMinus;
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.MinusAssign;
-                    return (int)JSTokeniserToken.Minus;
+                    if( Read( '-' ) ) return (int)JSTokenizerToken.MinusMinus;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.MinusAssign;
+                    return (int)JSTokenizerToken.Minus;
                 case '+':
-                    if( Read( '+' ) ) return (int)JSTokeniserToken.PlusPlus;
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.PlusAssign;
-                    return (int)JSTokeniserToken.Plus;
+                    if( Read( '+' ) ) return (int)JSTokenizerToken.PlusPlus;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.PlusAssign;
+                    return (int)JSTokenizerToken.Plus;
                 case '%':
-                    if( Read( '=' ) ) return (int)JSTokeniserToken.ModuloAssign;
-                    return (int)JSTokeniserToken.Modulo;
+                    if( Read( '=' ) ) return (int)JSTokenizerToken.ModuloAssign;
+                    return (int)JSTokenizerToken.Modulo;
                 case '~':
-                    return (int)JSTokeniserToken.BitwiseNot;
+                    return (int)JSTokenizerToken.BitwiseNot;
                 default:
                     {
                         int digit = FromDecDigit( ic );
                         if( digit >= 0 ) return ReadAllKindOfNumber( digit );
                         if( IsIdentifierStartChar( ic ) ) return ReadIdentifier( ic );
-                        return (int)JSTokeniserError.ErrorInvalidChar;
+                        return (int)JSTokenizerError.ErrorInvalidChar;
                     }
             }
         }
@@ -892,9 +892,9 @@ namespace Yodii.Script
         {
             ulong uValue;
             int nbD = IsPositiveHexNumber( out uValue, -1 );
-            if( nbD == 0 ) return (int)JSTokeniserError.ErrorNumberUnterminatedValue;
+            if( nbD == 0 ) return (int)JSTokenizerError.ErrorNumberUnterminatedValue;
             _integerValue = (int)uValue;
-            return (int)JSTokeniserToken.HexNumber;
+            return (int)JSTokenizerToken.HexNumber;
         }
 
         /// <summary>
@@ -968,23 +968,23 @@ namespace Yodii.Script
                         nextRequired = 2;
                         continue;
                     }
-                    return (int)JSTokeniserError.ErrorNumberIdentifierStartsImmediately;
+                    return (int)JSTokenizerError.ErrorNumberIdentifierStartsImmediately;
                 }
 
-                if( nextRequired == 1 ) return (int)JSTokeniserError.ErrorNumberUnterminatedValue;
+                if( nextRequired == 1 ) return (int)JSTokenizerError.ErrorNumberUnterminatedValue;
                 // To be valid, the number must be followed by an operator, a punctuation or a statement separator (the ';')
                 // or a line ending (recall that awful javascript "feature": lines without ending ';' 
                 // are automagically corrected if 'needed').
                 // We do not handle all cases here, except the 45DD.
-                if( IsIdentifierStartChar( ic ) ) return (int)JSTokeniserError.ErrorNumberIdentifierStartsImmediately;
+                if( IsIdentifierStartChar( ic ) ) return (int)JSTokenizerError.ErrorNumberIdentifierStartsImmediately;
                 break;
             }
             if( hasDot )
             {
                 // Consider number terminated by dot as integer.
-                if( nextRequired != 2 ) return (int)JSTokeniserToken.Float;
+                if( nextRequired != 2 ) return (int)JSTokenizerToken.Float;
             }
-            return (int)JSTokeniserToken.Integer;
+            return (int)JSTokenizerToken.Integer;
         }
 
         private int ReadString( int quote )
@@ -994,7 +994,7 @@ namespace Yodii.Script
             for( ; ; )
             {
                 int ic = Read();
-                if( ic == -1 ) return (int)JSTokeniserError.ErrorStringUnterminated;
+                if( ic == -1 ) return (int)JSTokenizerError.ErrorStringUnterminated;
                 if( ic == quote ) break;
                 else if( ic == '\\' )
                 {
@@ -1019,7 +1019,7 @@ namespace Yodii.Script
                                 for( int x = 0; x < 4; ++x )
                                 {
                                     vHex = FromHexDigit( Peek() );
-                                    if( vHex < 0 ) return (int)JSTokeniserError.ErrorStringEmbeddedUnicodeValue;
+                                    if( vHex < 0 ) return (int)JSTokenizerError.ErrorStringEmbeddedUnicodeValue;
                                     Debug.Assert( vHex < 16 );
                                     icu *= 16;
                                     icu += (uint)vHex;
@@ -1030,26 +1030,26 @@ namespace Yodii.Script
                             break;
                         case 'x':
                             // Allow only \xNN (2 digits): this is the norm.
-                            if( IsPositiveHexNumber( out icu, 2 ) != 2 ) return (int)JSTokeniserError.ErrorStringEmbeddedHexaValue;
+                            if( IsPositiveHexNumber( out icu, 2 ) != 2 ) return (int)JSTokenizerError.ErrorStringEmbeddedHexaValue;
                             ic = (int)icu;
                             break;
                         case '\r':  // Read transforms Line Separator '\u2028' and Paragraph Separator '\u2029' in '\n' 
                             // New JS (1.5?) supports the \ as a line continuation: we can just continue our loop...
                             // If a \n follows, we eat it. If no '\n' follows, this is an error.
-                            if( !Read( '\n' ) ) return (int)JSTokeniserError.ErrorStringUnexpectedCRInLineContinuation;
+                            if( !Read( '\n' ) ) return (int)JSTokenizerError.ErrorStringUnexpectedCRInLineContinuation;
                             ic = '\n';
                             break;
                         case '\n':
                             // Read transforms Line Separator '\u2028' and Paragraph Separator '\u2029' in '\n' 
                             // New JS (1.5?) supports the \ as a line continuation: we can just continue our loop...
                             break;
-                        case -1: return (int)JSTokeniserError.ErrorStringUnterminated;
+                        case -1: return (int)JSTokenizerError.ErrorStringUnterminated;
                         default: break;
                     }
                 }
                 _buffer.Append( (char)ic );
             }
-            return (int)JSTokeniserToken.String;
+            return (int)JSTokenizerToken.String;
         }
 
         private int ReadIdentifier( int ic )
@@ -1065,15 +1065,15 @@ namespace Yodii.Script
             _identifierValue = _buffer.ToString();
             switch( _identifierValue )
             {
-                case "instanceof": return (int)JSTokeniserToken.InstanceOf;
-                case "delete": return (int)JSTokeniserToken.Delete;
-                case "new": return (int)JSTokeniserToken.New;
-                case "typeof": return (int)JSTokeniserToken.TypeOf;
-                case "void": return (int)JSTokeniserToken.Void;
-                case "NaN": return (int)JSTokeniserToken.NaN;
-                case "Infinity": return (int)JSTokeniserToken.Infinity;
+                case "instanceof": return (int)JSTokenizerToken.InstanceOf;
+                case "delete": return (int)JSTokenizerToken.Delete;
+                case "new": return (int)JSTokenizerToken.New;
+                case "typeof": return (int)JSTokenizerToken.TypeOf;
+                case "void": return (int)JSTokenizerToken.Void;
+                case "NaN": return (int)JSTokenizerToken.NaN;
+                case "Infinity": return (int)JSTokenizerToken.Infinity;
             }
-            return (int)JSTokeniserToken.Identifier;
+            return (int)JSTokenizerToken.Identifier;
         }
 
         public override string ToString()

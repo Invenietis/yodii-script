@@ -48,8 +48,8 @@ namespace Yodii.Script
                 if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
 
                 // Do not evaluate right expression if it is useless: short-circuit boolean evaluation.
-                if( (Expr.BinaryOperatorToken == JSTokeniserToken.And && !_left.Result.ToBoolean())
-                    || (Expr.BinaryOperatorToken == JSTokeniserToken.Or && _left.Result.ToBoolean()) )
+                if( (Expr.BinaryOperatorToken == JSTokenizerToken.And && !_left.Result.ToBoolean())
+                    || (Expr.BinaryOperatorToken == JSTokenizerToken.Or && _left.Result.ToBoolean()) )
                 {
                     return SetResult( _left.Result );
                 }
@@ -62,50 +62,50 @@ namespace Yodii.Script
                 // Right value is the result for And and Or.
                 RuntimeObj result = right;
 
-                if( Expr.BinaryOperatorToken != JSTokeniserToken.And && Expr.BinaryOperatorToken != JSTokeniserToken.Or )
+                if( Expr.BinaryOperatorToken != JSTokenizerToken.And && Expr.BinaryOperatorToken != JSTokenizerToken.Or )
                 {
-                    if( (Expr.BinaryOperatorToken & JSTokeniserToken.IsCompareOperator) != 0 )
+                    if( (Expr.BinaryOperatorToken & JSTokenizerToken.IsCompareOperator) != 0 )
                     {
                         #region ==, <, >, <=, >=, !=, === and !==
                         int compareValue;
                         switch( (int)Expr.BinaryOperatorToken & 15 )
                         {
-                            case (int)JSTokeniserToken.StrictEqual & 15:
+                            case (int)JSTokenizerToken.StrictEqual & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.StrictDifferent & 15:
+                            case (int)JSTokenizerToken.StrictDifferent & 15:
                                 {
                                     result = Global.CreateBoolean( !new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Greater & 15:
+                            case (int)JSTokenizerToken.Greater & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue > 0 );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.GreaterOrEqual & 15:
+                            case (int)JSTokenizerToken.GreaterOrEqual & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue >= 0 );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Less & 15:
+                            case (int)JSTokenizerToken.Less & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue < 0 );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.LessOrEqual & 15:
+                            case (int)JSTokenizerToken.LessOrEqual & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue <= 0 );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Equal & 15:
+                            case (int)JSTokenizerToken.Equal & 15:
                                 {
                                     result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).AreEqual( Global ) );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Different & 15:
+                            case (int)JSTokenizerToken.Different & 15:
                                 {
                                     result = Global.CreateBoolean( !new RuntimeObjComparer( left, right ).AreEqual( Global ) );
                                     break;
@@ -114,12 +114,12 @@ namespace Yodii.Script
                         }
                         #endregion
                     }
-                    else if( (Expr.BinaryOperatorToken & JSTokeniserToken.IsBinaryOperator) != 0 )
+                    else if( (Expr.BinaryOperatorToken & JSTokenizerToken.IsBinaryOperator) != 0 )
                     {
                         #region |, ^, &, >>, <<, >>>, +, -, /, * and %.
                         switch( (int)Expr.BinaryOperatorToken & 15 )
                         {
-                            case (int)JSTokeniserToken.Plus & 15:
+                            case (int)JSTokenizerToken.Plus & 15:
                                 {
                                     RuntimeObj l = left.ToPrimitive( Global );
                                     RuntimeObj rO = right.ToPrimitive( Global );
@@ -134,22 +134,22 @@ namespace Yodii.Script
                                     }
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Minus & 15:
+                            case (int)JSTokenizerToken.Minus & 15:
                                 {
                                     result = Global.CreateNumber( left.ToDouble() - right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Mult & 15:
+                            case (int)JSTokenizerToken.Mult & 15:
                                 {
                                     result = Global.CreateNumber( left.ToDouble() * right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Divide & 15:
+                            case (int)JSTokenizerToken.Divide & 15:
                                 {
                                     result = Global.CreateNumber( left.ToDouble() / right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.Modulo & 15:
+                            case (int)JSTokenizerToken.Modulo & 15:
                                 {
                                     if( right == JSEvalNumber.Zero || left == JSEvalNumber.NegativeInfinity || left == JSEvalNumber.Infinity )
                                     {
@@ -165,38 +165,38 @@ namespace Yodii.Script
                                     }
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseAnd & 15:
+                            case (int)JSTokenizerToken.BitwiseAnd & 15:
                                 {
                                     Int64 l = JSSupport.ToInt64( left.ToDouble() );
                                     Int64 rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = Global.CreateNumber( l & rO );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseOr & 15:
+                            case (int)JSTokenizerToken.BitwiseOr & 15:
                                 {
                                     Int64 l = JSSupport.ToInt64( left.ToDouble() );
                                     Int64 rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = Global.CreateNumber( l | rO );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseXOr & 15:
+                            case (int)JSTokenizerToken.BitwiseXOr & 15:
                                 {
                                     Int64 l = JSSupport.ToInt64( left.ToDouble() );
                                     Int64 rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = Global.CreateNumber( l ^ rO );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseShiftLeft & 15:
+                            case (int)JSTokenizerToken.BitwiseShiftLeft & 15:
                                 {
                                     result = BitwiseShift( left, right, false );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseShiftRight & 15:
+                            case (int)JSTokenizerToken.BitwiseShiftRight & 15:
                                 {
                                     result = BitwiseShift( left, right, true );
                                     break;
                                 }
-                            case (int)JSTokeniserToken.BitwiseShiftRightNoSignBit & 15:
+                            case (int)JSTokenizerToken.BitwiseShiftRightNoSignBit & 15:
                                 {
                                     result = BitwiseShiftRightUnsigned( left, right );
                                     break;
@@ -212,7 +212,7 @@ namespace Yodii.Script
 
             CKException UnsupportedOperatorException()
             {
-                return new CKException( "Unsupported binary operator: '{0}' ({1}).", JSTokeniser.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
+                return new CKException( "Unsupported binary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
             }
 
             RuntimeObj BitwiseShift( RuntimeObj val, RuntimeObj shift, bool right )

@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Tokeniser\JSTokeniserToken.cs) is part of CiviKey. 
+* This file (Yodii.Script\Tokenizer\JSTokenizerToken.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -50,25 +50,25 @@ namespace Yodii.Script
     ///  1  ,                                       Multiple evaluation
     /// </remarks>
     [Flags]
-    public enum JSTokeniserToken
+    public enum JSTokenizerToken
     {
         None = 0,
 
         #region JSParserError values bits n°31 to 26.
-        IsErrorOrEndOfInput = JSTokeniserError.IsErrorOrEndOfInput,
-        EndOfInput = JSTokeniserError.EndOfInput,
-        ErrorMask = JSTokeniserError.ErrorMask,
-        ErrorInvalidChar = JSTokeniserError.ErrorInvalidChar,
-        ErrorStringMask = JSTokeniserError.ErrorStringMask,
-        ErrorNumberMask = JSTokeniserError.ErrorNumberMask,
-        ErrorRegexMask = JSTokeniserError.ErrorRegexMask,
-        ErrorStringUnterminated = JSTokeniserError.ErrorStringUnterminated,
-        ErrorStringEmbeddedUnicodeValue = JSTokeniserError.ErrorStringEmbeddedUnicodeValue,
-        ErrorStringEmbeddedHexaValue = JSTokeniserError.ErrorStringEmbeddedHexaValue,
-        ErrorStringUnexpectedCRInLineContinuation = JSTokeniserError.ErrorStringUnexpectedCRInLineContinuation,
-        ErrorNumberUnterminatedValue = JSTokeniserError.ErrorNumberUnterminatedValue,
-        ErrorNumberValue = JSTokeniserError.ErrorNumberValue,
-        ErrorRegexUnterminated = JSTokeniserError.ErrorRegexUnterminated,
+        IsErrorOrEndOfInput = JSTokenizerError.IsErrorOrEndOfInput,
+        EndOfInput = JSTokenizerError.EndOfInput,
+        ErrorMask = JSTokenizerError.ErrorMask,
+        ErrorInvalidChar = JSTokenizerError.ErrorInvalidChar,
+        ErrorStringMask = JSTokenizerError.ErrorStringMask,
+        ErrorNumberMask = JSTokenizerError.ErrorNumberMask,
+        ErrorRegexMask = JSTokenizerError.ErrorRegexMask,
+        ErrorStringUnterminated = JSTokenizerError.ErrorStringUnterminated,
+        ErrorStringEmbeddedUnicodeValue = JSTokenizerError.ErrorStringEmbeddedUnicodeValue,
+        ErrorStringEmbeddedHexaValue = JSTokenizerError.ErrorStringEmbeddedHexaValue,
+        ErrorStringUnexpectedCRInLineContinuation = JSTokenizerError.ErrorStringUnexpectedCRInLineContinuation,
+        ErrorNumberUnterminatedValue = JSTokenizerError.ErrorNumberUnterminatedValue,
+        ErrorNumberValue = JSTokenizerError.ErrorNumberValue,
+        ErrorRegexUnterminated = JSTokenizerError.ErrorRegexUnterminated,
         #endregion
 
         #region Operator precedence bits n°25 to 21 (levels from 0 to 15).

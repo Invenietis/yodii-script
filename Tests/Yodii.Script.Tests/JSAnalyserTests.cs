@@ -37,7 +37,7 @@ namespace Yodii.Script.Tests
         public void EmptyParsing()
         {
             ExprAnalyser a = new ExprAnalyser();
-            JSTokeniser p = new JSTokeniser();
+            JSTokenizer p = new JSTokenizer();
             {
                 p.Reset( "" );
                 Assert.That( p.IsEndOfInput );
@@ -56,57 +56,57 @@ namespace Yodii.Script.Tests
         public void BadNumbers()
         {
             ExprAnalyser a = new ExprAnalyser();
-            JSTokeniser p = new JSTokeniser();
+            JSTokenizer p = new JSTokenizer();
 
             {
                 p.Reset( "45DD" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( "45.member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( ".45.member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( "45.01member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( ".45.member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( ".45.01member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
             {
                 p.Reset( "45.01e23member" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokeniserError.ErrorNumberIdentifierStartsImmediately ) );
+                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
             }
         }
 
         [Test]
         public void RoundtripParsing()
         {
-            JSTokeniser p = new JSTokeniser();
-            Assert.That( JSTokeniser.Explain( JSTokeniserToken.Integer ), Is.EqualTo( "42" ) );
+            JSTokenizer p = new JSTokenizer();
+            Assert.That( JSTokenizer.Explain( JSTokenizerToken.Integer ), Is.EqualTo( "42" ) );
 
             string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x === z !== x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
             p.Reset( s );
             string recompose = "";
             while( !p.IsEndOfInput )
             {
-                recompose += " " + JSTokeniser.Explain( p.CurrentToken );
+                recompose += " " + JSTokenizer.Explain( p.CurrentToken );
                 p.Forward();
             }
             s = s.Replace( "if", "identifier" )
@@ -122,7 +122,7 @@ namespace Yodii.Script.Tests
         public void SimpleExpression()
         {
             ExprAnalyser a = new ExprAnalyser();
-            JSTokeniser p = new JSTokeniser();
+            JSTokenizer p = new JSTokenizer();
 
             {
                 p.Reset( "value" );
@@ -137,7 +137,7 @@ namespace Yodii.Script.Tests
                 Expr e = a.Analyse( p );
                 Assert.That( e is UnaryExpr );
                 UnaryExpr u = e as UnaryExpr;
-                Assert.That( u.TokenType == JSTokeniserToken.Not );
+                Assert.That( u.TokenType == JSTokenizerToken.Not );
                 Assert.That( u.Expression is SyntaxErrorExpr );
                 Assert.That( SyntaxErrorCollector.Collect( e, null ).Count == 1 );
             }
@@ -146,7 +146,7 @@ namespace Yodii.Script.Tests
                 Expr e = a.Analyse( p );
                 Assert.That( e is UnaryExpr );
                 UnaryExpr u = e as UnaryExpr;
-                Assert.That( u.TokenType == JSTokeniserToken.Not );
+                Assert.That( u.TokenType == JSTokenizerToken.Not );
                 Assert.That( u.Expression is AccessorExpr );
                 Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
             }
@@ -155,11 +155,11 @@ namespace Yodii.Script.Tests
                 Expr e = a.Analyse( p );
                 Assert.That( e is BinaryExpr );
                 BinaryExpr and = e as BinaryExpr;
-                Assert.That( and.BinaryOperatorToken == JSTokeniserToken.And );
+                Assert.That( and.BinaryOperatorToken == JSTokenizerToken.And );
                 IsConstant( and.Left, 0.12e43 );
                 Assert.That( and.Right is UnaryExpr );
                 UnaryExpr u = and.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokeniserToken.BitwiseNot );
+                Assert.That( u.TokenType == JSTokenizerToken.BitwiseNot );
                 Assert.That( u.Expression is AccessorExpr );
 
                 Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
@@ -169,11 +169,11 @@ namespace Yodii.Script.Tests
                 Expr e = a.Analyse( p );
                 Assert.That( e is BinaryExpr );
                 BinaryExpr or = e as BinaryExpr;
-                Assert.That( or.BinaryOperatorToken == JSTokeniserToken.Or );
+                Assert.That( or.BinaryOperatorToken == JSTokenizerToken.Or );
                 Assert.That( or.Left is UnaryExpr );
                 Assert.That( or.Right is UnaryExpr );
                 UnaryExpr u = or.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokeniserToken.BitwiseNot );
+                Assert.That( u.TokenType == JSTokenizerToken.BitwiseNot );
                 IsConstant( u.Expression, "x" );
 
                 Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
@@ -191,7 +191,7 @@ namespace Yodii.Script.Tests
                 IsConstant( b.Left, 3 );
                 Assert.That( b.Right is UnaryExpr );
                 UnaryExpr u = b.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokeniserToken.TypeOf );
+                Assert.That( u.TokenType == JSTokenizerToken.TypeOf );
                 IsConstant( u.Expression, "x" );
 
                 Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
@@ -212,7 +212,7 @@ namespace Yodii.Script.Tests
         public void ArraySupport()
         {
             ExprAnalyser a = new ExprAnalyser();
-            JSTokeniser p = new JSTokeniser();
+            JSTokenizer p = new JSTokenizer();
             {
                 p.Reset( "a[9]" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.False );

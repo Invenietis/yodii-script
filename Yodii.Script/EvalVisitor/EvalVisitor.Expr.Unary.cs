@@ -48,11 +48,11 @@ namespace Yodii.Script
                 RuntimeObj result = _expression.Result;
                 // Minus and Plus are classified as a binary operator.
                 // Handle those special cases here.
-                if( Expr.TokenType == JSTokeniserToken.Minus )
+                if( Expr.TokenType == JSTokenizerToken.Minus )
                 {
                     result = Global.CreateNumber( -result.ToDouble() );
                 }
-                else if( Expr.TokenType == JSTokeniserToken.Plus )
+                else if( Expr.TokenType == JSTokenizerToken.Plus )
                 {
                     result = Global.CreateNumber( result.ToDouble() );
                 }
@@ -60,29 +60,29 @@ namespace Yodii.Script
                 {
                     switch( (int)Expr.TokenType & 15 )
                     {
-                        case (int)JSTokeniserToken.Not & 15:
+                        case (int)JSTokenizerToken.Not & 15:
                             {
                                 result = Global.CreateBoolean( !result.ToBoolean() );
                                 break;
                             }
-                        case (int)JSTokeniserToken.BitwiseNot & 15:
+                        case (int)JSTokenizerToken.BitwiseNot & 15:
                             {
                                 result = Global.CreateNumber( ~JSSupport.ToInt64( result.ToDouble() ) );
                                 break;
                             }
-                        case (int)JSTokeniserToken.TypeOf & 15:
+                        case (int)JSTokenizerToken.TypeOf & 15:
                             {
                                 // Well known Javascript bug: typeof null === "object".
                                 if( result == RuntimeObj.Null ) result = Global.CreateString( RuntimeObj.TypeObject );
                                 else result = Global.CreateString( result.Type );
                                 break;
                             }
-                        case (int)JSTokeniserToken.Void & 15:
+                        case (int)JSTokenizerToken.Void & 15:
                             {
                                 result = RuntimeObj.Undefined;
                                 break;
                             }
-                        default: throw new CKException( "Unsupported unary operator: '{0}' ({1}).", JSTokeniser.Explain( Expr.TokenType ), (int)Expr.TokenType );
+                        default: throw new CKException( "Unsupported unary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.TokenType ), (int)Expr.TokenType );
                     }
                 }
                 return SetResult( result );

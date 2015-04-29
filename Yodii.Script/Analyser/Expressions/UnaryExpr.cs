@@ -31,14 +31,14 @@ namespace Yodii.Script
 {
     public class UnaryExpr : Expr
     {
-        public UnaryExpr( SourceLocation location, JSTokeniserToken type, Expr e )
+        public UnaryExpr( SourceLocation location, JSTokenizerToken type, Expr e )
             : base( location )
         {
             TokenType = type;
             Expression = e;
         }
 
-        public JSTokeniserToken TokenType { get; private set; }
+        public JSTokenizerToken TokenType { get; private set; }
 
         public Expr Expression { get; private set; }
 
@@ -50,7 +50,7 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return JSTokeniser.Explain( TokenType ) + Expression.ToString();
+            return JSTokenizer.Explain( TokenType ) + Expression.ToString();
         }
     }
 }

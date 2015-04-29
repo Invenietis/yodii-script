@@ -94,7 +94,7 @@ namespace Yodii.Script
         {
             _b.Append( _exprPrefix );
             VisitExpr( e.Left );
-            _b.Append( JSTokeniser.Explain( e.BinaryOperatorToken ) );
+            _b.Append( JSTokenizer.Explain( e.BinaryOperatorToken ) );
             VisitExpr( e.Right );
             _b.Append( _exprSuffix );
             return e;
@@ -132,7 +132,7 @@ namespace Yodii.Script
         public override Expr Visit( UnaryExpr e )
         {
             _b.Append( _exprPrefix );
-            _b.Append( JSTokeniser.Explain( e.TokenType ) );
+            _b.Append( JSTokenizer.Explain( e.TokenType ) );
             _b.Append( ' ' );
             VisitExpr( e.Expression );
             _b.Append( _exprSuffix );

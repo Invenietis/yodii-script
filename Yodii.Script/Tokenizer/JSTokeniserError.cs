@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Tokeniser\JSTokeniserError.cs) is part of CiviKey. 
+* This file (Yodii.Script\Tokenizer\JSTokenizerError.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -27,7 +27,7 @@ using System.Text;
 
 namespace Yodii.Script
 {
-    public enum JSTokeniserError
+    public enum JSTokenizerError
     {
         None = 0,
 
