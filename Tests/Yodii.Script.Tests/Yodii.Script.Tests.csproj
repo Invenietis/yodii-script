@@ -18,7 +18,7 @@
     </TargetFrameworkProfile>
     <StartAction>Program</StartAction>
     <StartProgram>$(SolutionDir)\packages\NUnit.Runners.2.6.3\tools\nunit.exe</StartProgram>
-    <StartArguments>CK.Javascript.Tests.dll</StartArguments>
+    <StartArguments>Yodii.Script.Tests.dll</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,9 +69,6 @@
     <Compile Include="WithGlobalContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\License.licenseheader">
-      <Link>License.licenseheader</Link>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

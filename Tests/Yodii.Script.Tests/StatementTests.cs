@@ -304,7 +304,21 @@ namespace Yodii.Script.Tests
             Assert.IsInstanceOf<JSEvalString>( o );
             Assert.That( o.ToString(), Is.EqualTo( "a string1234" ) );
         }
-        
+
+        [Test]
+        public void lexical_scope_is_enough_with_curly()
+        {
+            string s = @"
+                        var i = 0, j = 'a';
+                        {
+                            var i = 't'; 
+                        }
+                        i+j;";
+            RuntimeObj o = ScriptEngine.Evaluate( s );
+            Assert.IsInstanceOf<JSEvalString>( o );
+            Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+        }
+
 
     }
 }

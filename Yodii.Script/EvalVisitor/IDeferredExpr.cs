@@ -49,7 +49,7 @@ namespace Yodii.Script
         /// Executes the required code until this expression is resolved.
         /// </summary>
         /// <returns>A promise that may not be resolved if a breakpoint is met.</returns>
-        PExpr StepOut();
+        PExpr StepOver();
 
         /// <summary>
         /// Executes only one step.

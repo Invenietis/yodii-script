@@ -68,7 +68,7 @@ namespace Yodii.Script
                 get { return Result != null; }
             }
 
-            public PExpr StepOut()
+            public PExpr StepOver()
             {
                 return _result == null ? DoVisit() : new PExpr( _result );
             }
@@ -76,7 +76,7 @@ namespace Yodii.Script
             public PExpr StepIn()
             {
                 _visitor.BreakOnNext = true;
-                return StepOut();
+                return StepOver();
             }
 
             internal PExpr Visit()
@@ -114,7 +114,7 @@ namespace Yodii.Script
             {
                 if( current.IsResolved ) return false;
                 if( current.IsUnknown ) current = _visitor.VisitExpr( e );
-                else current = current.Deferred.StepOut();
+                else current = current.Deferred.StepOver();
                 return current.IsPendingOrSignal;
             }
 

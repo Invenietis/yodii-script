@@ -72,7 +72,7 @@ namespace Yodii.Script
                 if( _status != ScriptEngineStatus.IsPending ) throw new InvalidOperationException();
                 if( _ev.FirstFrame != null )
                 {
-                    UpdateStatus( _ev.FirstFrame.StepOut() );
+                    UpdateStatus( _ev.FirstFrame.StepOver() );
                 }
             }
 
