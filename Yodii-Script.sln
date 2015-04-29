@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script", "Yodii.Script\Yodii.Script.csproj", "{388870E4-CF4E-45B5-BBEC-EC6FAD2E7490}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0453B444-D4D8-402E-A2CB-B5E0821B071C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Tests", "Tests\Yodii.Script.Tests\Yodii.Script.Tests.csproj", "{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{9BF04424-0B74-43A0-A324-9BB83E5197D6}"
+	ProjectSection(SolutionItems) = preProject
+		License.licenseheader = License.licenseheader
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4BFD09D0-AAD1-4343-B7E2-89A891379139}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{388870E4-CF4E-45B5-BBEC-EC6FAD2E7490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{388870E4-CF4E-45B5-BBEC-EC6FAD2E7490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{388870E4-CF4E-45B5-BBEC-EC6FAD2E7490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{388870E4-CF4E-45B5-BBEC-EC6FAD2E7490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC} = {0453B444-D4D8-402E-A2CB-B5E0821B071C}
+	EndGlobalSection
+EndGlobal
