@@ -103,7 +103,8 @@ namespace Yodii.Script
         public abstract double ToDouble();
 
         /// <summary>
-        /// Only <see cref="RefRuntimeObject"/> overrides this method.
+        /// Resolves a potential reference: only <see cref="RefRuntimeObject"/> overrides this method, by default all runtime objects 
+        /// are their own value.
         /// </summary>
         /// <returns>This object or the referenced object if this is a reference.</returns>
         public virtual RuntimeObj ToValue()

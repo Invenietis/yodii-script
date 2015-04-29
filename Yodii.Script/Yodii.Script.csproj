@@ -102,8 +102,8 @@
     <Compile Include="Analyser\ExprVisitor.cs" />
     <Compile Include="Analyser\IExprVisitor.cs" />
     <Compile Include="JSSupport.cs" />
-    <Compile Include="ScriptEngine\IScriptEngineResult.cs" />
-    <Compile Include="ScriptEngine\ScriptEngine.EvaluationResult.cs" />
+    <Compile Include="ScriptEngine\ScriptEngineStatus.cs" />
+    <Compile Include="ScriptEngine\ScriptEngine.Result.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.cs" />
     <Compile Include="Tokeniser\JSTokeniser.cs" />
     <Compile Include="Tokeniser\JSTokeniserError.cs" />
@@ -127,9 +127,6 @@
     <Compile Include="ToStringVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\License.licenseheader">
-      <Link>License.licenseheader</Link>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

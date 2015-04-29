@@ -28,13 +28,21 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+
+    /// <summary>
+    /// Main object of the evaluation processus.
+    /// </summary>
     public partial class ScriptEngine
     {
         readonly BreakpointManager _breakpoints;
         readonly EvalVisitor _evaluator;
         readonly GlobalContext _globalContext;
-        EvaluationResult _currentResult;
+        Result _currentResult;
 
+        /// <summary>
+        /// Initializes a new <see cref="ScriptEngine"/>, optionally bound to an existing <see cref="GlobalContext"/>.
+        /// </summary>
+        /// <param name="ctx">Optional global context to use.</param>
         public ScriptEngine( GlobalContext ctx = null )
         {
             _breakpoints = new BreakpointManager();
@@ -42,31 +50,42 @@ namespace Yodii.Script
             _evaluator = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak );
         }
 
+        /// <summary>
+        /// Gets the breakpoint manager that will be used.
+        /// </summary>
         public BreakpointManager Breakpoints
         {
             get { return _breakpoints; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="GlobalContext"/>.
+        /// </summary>
         public GlobalContext Context
         {
             get { return _globalContext; }
         }
 
-        public IScriptEngineResult Execute( string s )
+        /// <summary>
+        /// Executes a string by first calling <see cref="ExprAnalyser.AnalyseString"/>.
+        /// </summary>
+        /// <param name="s">The string to execute.</param>
+        /// <returns></returns>
+        public Result Execute( string s )
         {
             return Execute( ExprAnalyser.AnalyseString( s ) );
         }
 
-        public IScriptEngineResult Execute( Expr e )
+        public Result Execute( Expr e )
         {
             if( _currentResult != null ) throw new InvalidOperationException();
-            _currentResult = new EvaluationResult( this );
+            _currentResult = new Result( this );
             _currentResult.UpdateStatus( _evaluator.VisitExpr( e ) );
             return _currentResult;
         }
 
         /// <summary>
-        /// Simple helper to evaluate a string (typically a pure expression without side effects).
+        /// Simple static helper to evaluate a string (typically a pure expression without side effects).
         /// </summary>
         /// <param name="s">The string to evaluate.</param>
         /// <param name="ctx">The <see cref="GlobalContext"/>. When null, a new default GlobalContext is used.</param>

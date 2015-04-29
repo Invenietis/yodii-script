@@ -36,13 +36,4 @@ namespace Yodii.Script
         IsError = 4
     }
 
-    public interface IScriptEngineResult : IDisposable
-    {
-        RuntimeObj Result { get; }
-
-        ScriptEngineStatus Status { get; }
-
-        void Continue();
-
-    }
 }

@@ -126,7 +126,7 @@ namespace Yodii.Script.Tests
 
             ScriptEngine engine = new ScriptEngine( ctx );
             engine.Breakpoints.BreakAlways = true;
-            using( IScriptEngineResult rAsync = engine.Execute( s ) )
+            using( ScriptEngine.Result rAsync = engine.Execute( s ) )
             {
                 int nbStep = 0;
                 while( rAsync.Status == ScriptEngineStatus.IsPending )
@@ -135,7 +135,7 @@ namespace Yodii.Script.Tests
                     rAsync.Continue();
                 }
                 Assert.That( rAsync.Status, Is.EqualTo( ScriptEngineStatus.IsFinished ) );
-                Assert.That( new RuntimeObjComparer( rAsync.Result, syncResult ).AreEqualStrict( engine.Context ) );
+                Assert.That( new RuntimeObjComparer( rAsync.CurrentResult, syncResult ).AreEqualStrict( engine.Context ) );
                 Console.WriteLine( "String '{0}' = {1} evaluated in {2} steps.", s, syncResult.ToString(), nbStep );
             }
         }

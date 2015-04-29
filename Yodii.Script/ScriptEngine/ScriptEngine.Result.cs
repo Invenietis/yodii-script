@@ -33,7 +33,12 @@ namespace Yodii.Script
 {
     public partial class ScriptEngine
     {
-        class EvaluationResult : IScriptEngineResult
+
+        /// <summary>
+        /// Result of the <see cref="G:Execute"/> methods. Exposes a <see cref="Status"/> and an observable list of the stack. 
+        /// Offers a simple <see cref="Continue"/> method whenever the Status is <see cref="ScriptEngineStatus.IsPending"/>.
+        /// </summary>
+        public class Result : IDisposable
         {
             ScriptEngine _engine;
             readonly EvalVisitor _ev;
@@ -42,30 +47,42 @@ namespace Yodii.Script
             ScriptEngineStatus _status;
 
             class FrameStack : ObservableCollection<IDeferredExpr>, IObservableReadOnlyList<IDeferredExpr> {}
-            FrameStack _frameStack;
+            FrameStack _rawFrameStack;
 
-
-            public EvaluationResult( ScriptEngine e )
+            internal Result( ScriptEngine e )
             {
                 _engine = e;
                 _ev = e._evaluator;
             }
 
-            public RuntimeObj Result
+            /// <summary>
+            /// Gets the result of the execution. When stepping, this is the result of the top frame that has just been resolved.
+            /// </summary>
+            public RuntimeObj CurrentResult
             {
                 get { return _result; }
             }
 
+            /// <summary>
+            /// Gets the error that stopped the execution if any.
+            /// </summary>
             public RuntimeError Error
             {
                 get { return _error; }
             }
 
+            /// <summary>
+            /// Gets the current engine status. When <see cref="ScriptEngineStatus.IsPending"/>, <see cref="Continue"/> can be called.
+            /// </summary>
             public ScriptEngineStatus Status
             {
                 get { return _status; }
             }
 
+            /// <summary>
+            /// Continue the execution of the script. Must be called only when <see cref="Status"/> is <see cref="ScriptEngineStatus.IsPending"/> otherwise
+            /// an exception is thrown.
+            /// </summary>
             public void Continue()
             {
                 if( _engine == null ) throw new ObjectDisposedException( "EvaluationResult" );
@@ -76,28 +93,55 @@ namespace Yodii.Script
                 }
             }
 
-            public void UpdateStatus( PExpr r )
+            internal void UpdateStatus( PExpr r )
             {
                 _error = (_result = r.Result) as RuntimeError;
                 _status = ScriptEngineStatus.None;
                 if( r.IsErrorResult ) _status |= ScriptEngineStatus.IsError;
                 if( r.IsPending ) _status |= ScriptEngineStatus.IsPending;
                 else _status |= ScriptEngineStatus.IsFinished;
-            }
-
-            public IObservableReadOnlyList<IDeferredExpr> EnsureFrameStack()
-            {
-                if( _frameStack == null )
+                if( _rawFrameStack != null )
                 {
-                    _frameStack = new FrameStack();
+                    int i = 0;
                     foreach( var f in _ev.Frames )
                     {
-                        _frameStack.Add( f );
+                        if( i >= _rawFrameStack.Count ) _rawFrameStack.Add( f );
+                        else if( _rawFrameStack[i] != f )
+                        {
+                            do
+                            {
+                                _rawFrameStack.RemoveAt( i++ );
+                            }
+                            while( _rawFrameStack.Count > i );
+                        }
+                    }
+                    while( _rawFrameStack.Count > i )
+                    {
+                        _rawFrameStack.RemoveAt( i );
                     }
                 }
-                return _frameStack;
             }
 
+            /// <summary>
+            /// Gets the raw frame stack as an observable list: the stack of all current <see cref="IDeferredExpr"/> beeing evaluated.
+            /// </summary>
+            /// <returns>An observable list that will be dynamically updated.</returns>
+            public IObservableReadOnlyList<IDeferredExpr> EnsureRawFrameStack()
+            {
+                if( _rawFrameStack == null )
+                {
+                    _rawFrameStack = new FrameStack();
+                    foreach( var f in _ev.Frames )
+                    {
+                        _rawFrameStack.Add( f );
+                    }
+                }
+                return _rawFrameStack;
+            }
+
+            /// <summary>
+            /// Resets the current execution. This frees the <see cref="ScriptEngine"/>: new calls to its <see cref="G:Execute"/ > can be made. 
+            /// </summary>
             public void Dispose()
             {
                 if( _engine != null )
