@@ -70,7 +70,7 @@ namespace Yodii.Script.Tests
                             { 
                               return function(a,b) { return a+b; };
                             }
-                            var f = gen();
+                            let f = gen();
                             f( 'x', 'y' );
                         ";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -84,10 +84,10 @@ namespace Yodii.Script.Tests
             string s = @"
                         function next( s ) 
                         { 
-                          var _seed = s; 
+                          let _seed = s; 
                           return function() { return ++_seed; };
                         }
-                        var f = next(0);
+                        let f = next(0);
                         f(0) + f(0) + f(0);
                         ";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -101,13 +101,13 @@ namespace Yodii.Script.Tests
             string s = @"
                         function next( s ) 
                         { 
-                            var _seed = s; 
+                            let _seed = s; 
                             function oneMore() {
                                 return function() { return ++_seed; };
                             }
                             return oneMore();
                         }
-                        var f = next(0);
+                        let f = next(0);
                         f(0) + f(0) + f(0);
                         f = next(0);
                         f(0) + f(0) + f(0) + f(0);
@@ -121,7 +121,7 @@ namespace Yodii.Script.Tests
         public void closure_and_immediately_invoked_function_expression_IIFE()
         {
             string s = @"
-                        var i = 10, j = 10; 
+                        let i = 10, j = 10; 
                         (function() { 
                           i = j + i; 
                         })();

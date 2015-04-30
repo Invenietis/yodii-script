@@ -58,6 +58,10 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Analyser\Expressions\AccessorIndexerExpr.cs" />
+    <Compile Include="Analyser\Expressions\AccessorCallExpr.cs" />
+    <Compile Include="Analyser\Expressions\AccessorLetExpr.cs" />
+    <Compile Include="Analyser\Expressions\AccessorMemberExpr.cs" />
     <Compile Include="Analyser\Expressions\FlowBreakingExpr.cs" />
     <Compile Include="Analyser\Expressions\FunctionExpr.cs" />
     <Compile Include="Analyser\Expressions\ListOfExpr.cs" />

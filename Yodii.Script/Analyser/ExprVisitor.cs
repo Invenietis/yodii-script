@@ -116,7 +116,7 @@ namespace Yodii.Script
         public virtual Expr Visit( BlockExpr e )
         {
             var sV = Visit( e.List );
-            var lV = (IReadOnlyList<AccessorDeclVarExpr>)Visit( e.Locals );
+            var lV = (IReadOnlyList<AccessorLetExpr>)Visit( e.Locals );
             return sV == e.List && lV == e.Locals ? e : new BlockExpr( sV, lV );
         }
 
@@ -127,7 +127,7 @@ namespace Yodii.Script
             return lV == e.Left && rV == e.Right ? e : new AssignExpr( e.Location, lV, rV );
         }
 
-        public virtual Expr Visit( AccessorDeclVarExpr e )
+        public virtual Expr Visit( AccessorLetExpr e )
         {
             return e;
         }
@@ -158,10 +158,10 @@ namespace Yodii.Script
 
         public virtual Expr Visit( FunctionExpr e )
         {
-            var nV = (AccessorDeclVarExpr)(e.Name != null ? Visit( e.Name ) : null);
-            var pV = (IReadOnlyList<AccessorDeclVarExpr>)Visit( e.Parameters );
+            var nV = (AccessorLetExpr)(e.Name != null ? Visit( e.Name ) : null);
+            var pV = (IReadOnlyList<AccessorLetExpr>)Visit( e.Parameters );
             var bV = VisitExpr( e.Body );
-            var cV = (IReadOnlyList<AccessorDeclVarExpr>)Visit( e.Closures );
+            var cV = (IReadOnlyList<AccessorLetExpr>)Visit( e.Closures );
             return nV == e.Name && pV == e.Parameters && bV == e.Body && cV == e.Closures ? e : new FunctionExpr( e.Location, pV, bV, cV, nV );
         }
 

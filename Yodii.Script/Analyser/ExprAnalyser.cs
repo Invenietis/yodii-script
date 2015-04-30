@@ -124,7 +124,7 @@ namespace Yodii.Script
             if( _parser.IsIdentifier )
             {
                 if( _parser.MatchIdentifier( "if" ) ) return HandleIf();
-                if( _parser.MatchIdentifier( "var" ) ) return HandleVar();
+                if( _parser.MatchIdentifier( "let" ) ) return HandleLet();
                 if( _parser.MatchIdentifier( "while" ) ) return HandleWhile();
                 if( _parser.MatchIdentifier( "break" ) ) return new FlowBreakingExpr( _parser.PrevNonCommentLocation, false );
                 if( _parser.MatchIdentifier( "continue" ) ) return new FlowBreakingExpr( _parser.PrevNonCommentLocation, true );
@@ -177,7 +177,7 @@ namespace Yodii.Script
             return new PrePostIncDecExpr( loc, a, t == JSTokenizerToken.PlusPlus, false );
         }
 
-        Expr HandleVar()
+        Expr HandleLet()
         {
             SourceLocation location = _parser.PrevNonCommentLocation;
             var multi = new List<Expr>();
@@ -185,7 +185,7 @@ namespace Yodii.Script
             {
                 string name = _parser.ReadIdentifier();
                 if( name == null ) return new SyntaxErrorExpr( location, "Expected identifier (variable name)." );
-                Expr e = _scope.Declare( name, new AccessorDeclVarExpr( location, name ) );
+                Expr e = _scope.Declare( name, new AccessorLetExpr( location, name ) );
                 if( _parser.Match( JSTokenizerToken.Assign ) ) e = HandleAssign( e, true );
                 location = _parser.Location;
                 multi.Add( e );
@@ -200,10 +200,10 @@ namespace Yodii.Script
         {
             var funcLocation = _parser.PrevNonCommentLocation;
             string name = _parser.ReadIdentifier();
-            AccessorDeclVarExpr funcName = null;
+            AccessorLetExpr funcName = null;
             if( name != null )
             {
-                funcName = new AccessorDeclVarExpr( _parser.PrevNonCommentLocation, name );
+                funcName = new AccessorLetExpr( _parser.PrevNonCommentLocation, name );
                 Expr eRegName = _scope.Declare( name, funcName );
                 if( eRegName is SyntaxErrorExpr ) return eRegName;
             }
@@ -234,7 +234,7 @@ namespace Yodii.Script
             string pName;
             while( (pName = _parser.ReadIdentifier()) != null )
             {
-                AccessorDeclVarExpr param = new AccessorDeclVarExpr( _parser.PrevNonCommentLocation, pName );
+                AccessorLetExpr param = new AccessorLetExpr( _parser.PrevNonCommentLocation, pName );
                 Expr eRegParam = _scope.Declare( pName, param );
                 if( eRegParam is SyntaxErrorExpr ) return eRegParam;
                 if( !_parser.Match( JSTokenizerToken.Comma ) ) break;
@@ -310,7 +310,7 @@ namespace Yodii.Script
             }
         }
 
-        static Expr BlockFromStatements( List<Expr> statements, IReadOnlyList<AccessorDeclVarExpr> locals )
+        static Expr BlockFromStatements( List<Expr> statements, IReadOnlyList<AccessorLetExpr> locals )
         {
             if( statements.Count == 0 ) return NopExpr.Default;
             if( statements.Count == 1 && locals.Count == 0 ) return statements[0];

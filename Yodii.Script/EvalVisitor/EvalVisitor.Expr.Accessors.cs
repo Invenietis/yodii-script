@@ -33,14 +33,14 @@ namespace Yodii.Script
 
     public partial class EvalVisitor
     {
-        class FrameStateBase : IReadOnlyList<RuntimeObj>
+        class ArgumentResolver : IReadOnlyList<RuntimeObj>
         {
             protected readonly Frame Frame;
             readonly IReadOnlyList<Expr> _arguments;
             readonly PExpr[] _args;
             int _rpCount;
 
-            public FrameStateBase( Frame frame, IReadOnlyList<Expr> arguments )
+            public ArgumentResolver( Frame frame, IReadOnlyList<Expr> arguments )
             {
                 Frame = frame;
                 _arguments = arguments;
@@ -83,9 +83,14 @@ namespace Yodii.Script
             #endregion
         }      
         
+        /// <summary>
+        /// This frame applies to Indexer and Call. 
+        /// AccessorMemberFrame specializes it to lookup the GlobalContext if the member is unbound.
+        /// For let, there is no frame: visiting a let accessor simply does the lookup in the dynamic scope.
+        /// </summary>
         internal class AccessorFrame : Frame<AccessorExpr>, IAccessorFrame
         {
-            class FrameState : FrameStateBase, IAccessorFrameState
+            class FrameState : ArgumentResolver, IAccessorFrameState
             {
                 readonly Func<IAccessorFrame, RuntimeObj, PExpr> _indexCode;
                 readonly Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> _callCode;
@@ -305,5 +310,9 @@ namespace Yodii.Script
             return new AccessorFrame( this, e ).Visit();
         }
 
+        public PExpr Visit( AccessorLetExpr e )
+        {
+            return new PExpr( _dynamicScope.FindRegistered( e ) );
+        }
     }
 }

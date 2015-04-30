@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\BlockExpr.cs) is part of CiviKey. 
+* This file (Yodii.Script\Analyser\Expressions\AccessorExpr.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,24 +22,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 using CK.Core;
-using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public class BlockExpr : ListOfExpr
+
+    public class AccessorIndexerExpr : AccessorExpr
     {
-        public BlockExpr( IReadOnlyList<Expr> statements, IReadOnlyList<AccessorLetExpr> locals )
-            : base( statements )
+        CKReadOnlyListMono<Expr> _args;
+
+        /// <summary>
+        /// Creates a new <see cref="AccessorIndexerExpr"/>. 
+        /// One [Expr] index is enough.
+        /// </summary>
+        /// <param name="left">Left scope. Must not be null.</param>
+        /// <param name="index">Index for the indexer.</param>
+        public AccessorIndexerExpr( SourceLocation location, Expr left, Expr index )
+            : base( location, left, true )
         {
-            if( locals == null ) throw new ArgumentNullException( "locals" );
-            Locals = locals;
+            _args = new CKReadOnlyListMono<Expr>( index );
         }
 
-        public IReadOnlyList<AccessorLetExpr> Locals { get; private set; }
+        /// <summary>
+        /// Gets the expression of the index.
+        /// </summary>
+        public Expr Index { get { return _args[0]; } }
 
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
@@ -47,11 +58,19 @@ namespace Yodii.Script
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// Gets a one-sized argument list that contains the <see cref="Index"/>.
+        /// </summary>
+        public override IReadOnlyList<Expr> Arguments
+        {
+            get { return _args; }
+        }
+
         public override string ToString()
         {
-            return '{' + String.Join( " ", List.Select( s => s.ToString() ) ) + '}';
+            return Left.ToString() + '[' + Index.ToString() + ']';
         }
-    }
 
+    }
 
 }

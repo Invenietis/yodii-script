@@ -38,7 +38,7 @@ namespace Yodii.Script
             public readonly Scope StrongScope;
             NameEntry _firstNamed;
             int _count;
-            HashSet<AccessorDeclVarExpr> _closures;
+            HashSet<AccessorLetExpr> _closures;
 
             public Scope( Scope next, Scope currentStrongScope )
             {
@@ -60,12 +60,12 @@ namespace Yodii.Script
                 ++_count;
             }
 
-            internal IReadOnlyList<AccessorDeclVarExpr> RetrieveValues( StaticScope container, bool close, int skipCount = 0 )
+            internal IReadOnlyList<AccessorLetExpr> RetrieveValues( StaticScope container, bool close, int skipCount = 0 )
             {
                 if( skipCount < 0 ) throw new ArgumentException( "skipCount" );
                 int i = _count - skipCount;
-                if( i <= 0 ) return Util.EmptyArray<AccessorDeclVarExpr>.Empty;
-                var all = new AccessorDeclVarExpr[i];
+                if( i <= 0 ) return Util.EmptyArray<AccessorLetExpr>.Empty;
+                var all = new AccessorLetExpr[i];
                 NameEntry first = _firstNamed;
                 do
                 {
@@ -79,15 +79,15 @@ namespace Yodii.Script
                 return all;
             }
 
-            internal void AddClosure( AccessorDeclVarExpr a )
+            internal void AddClosure( AccessorLetExpr a )
             {
-                if( _closures == null ) _closures = new HashSet<AccessorDeclVarExpr>();
+                if( _closures == null ) _closures = new HashSet<AccessorLetExpr>();
                 _closures.Add( a );
             }
 
-            internal IReadOnlyList<AccessorDeclVarExpr> GetClosures()
+            internal IReadOnlyList<AccessorLetExpr> GetClosures()
             {
-                return _closures != null ? _closures.ToArray() : Util.EmptyArray<AccessorDeclVarExpr>.Empty;
+                return _closures != null ? _closures.ToArray() : Util.EmptyArray<AccessorLetExpr>.Empty;
             }
         }
 
@@ -106,14 +106,14 @@ namespace Yodii.Script
             /// <summary>
             /// The declared expression. Null if first declaration has been scoped out.
             /// </summary>
-            public AccessorDeclVarExpr E;
+            public AccessorLetExpr E;
 
             /// <summary>
             /// This is unfortunately required to support AllowLocalRedefinition = false in O(1).
             /// </summary>
             public Scope Scope;
 
-            public NameEntry( NameEntry next, AccessorDeclVarExpr e )
+            public NameEntry( NameEntry next, AccessorLetExpr e )
             {
                 Next = next;
                 E = e;
@@ -195,7 +195,7 @@ namespace Yodii.Script
         /// <param name="name">Name of the expression.</param>
         /// <param name="e">The expression to register.</param>
         /// <returns>The expression to register or a syntax error if it can not be registered.</returns>
-        public Expr Declare( string name, AccessorDeclVarExpr e )
+        public Expr Declare( string name, AccessorLetExpr e )
         {
             if( _firstScope == null ) return new SyntaxErrorExpr( e.Location, "Invalid declaration (a scope must be opened first)." );
             if( _disallowRegistration ) return new SyntaxErrorExpr( e.Location, "Invalid declaration." );
@@ -273,7 +273,7 @@ namespace Yodii.Script
         /// Closes the current scope and returns all the declared variables in the order of their declarations, optionnaly skipping the first ones.
         /// </summary>
         /// <returns>The declared expressions (an empty list if nothing has been declared or skipCount is too big).</returns>
-        public IReadOnlyList<AccessorDeclVarExpr> CloseScope( int skipCount = 0 )
+        public IReadOnlyList<AccessorLetExpr> CloseScope( int skipCount = 0 )
         {
             if( _firstScope == null ) throw new InvalidOperationException( "No Scope opened." );
             if( _firstScope != null && _firstScope.NextScope == null && _globalScope ) throw new InvalidOperationException( "The GlobalScope can not be closed." );
@@ -299,22 +299,22 @@ namespace Yodii.Script
         /// If the current one is not a strong one, an exception is thrown.
         /// </summary>
         /// <returns>The declared expressions (an empty list if nothing has been declared).</returns>
-        public KeyValuePair<IReadOnlyList<AccessorDeclVarExpr>, IReadOnlyList<AccessorDeclVarExpr>> CloseStrongScope( int skipLocalCount = 0 )
+        public KeyValuePair<IReadOnlyList<AccessorLetExpr>, IReadOnlyList<AccessorLetExpr>> CloseStrongScope( int skipLocalCount = 0 )
         {
             if( _firstScope == null ) throw new InvalidOperationException( "No Scope opened." );
             var curScope = _firstScope.NextScope ?? _firstScope;
             if( !curScope.IsStrong ) throw new InvalidOperationException( "The scope is not a strong one." );
             var closures = curScope.GetClosures();
-            return new KeyValuePair<IReadOnlyList<AccessorDeclVarExpr>, IReadOnlyList<AccessorDeclVarExpr>>( closures, CloseScope( skipLocalCount ) );
+            return new KeyValuePair<IReadOnlyList<AccessorLetExpr>, IReadOnlyList<AccessorLetExpr>>( closures, CloseScope( skipLocalCount ) );
         }
 
         /// <summary>
         /// Gets the global scope content.
         /// </summary>
         /// <returns>The global scope. Empty if GlobalScope is false (or if nothing has been declared at the global scope).</returns>
-        public IReadOnlyList<AccessorDeclVarExpr> Globals
+        public IReadOnlyList<AccessorLetExpr> Globals
         {
-            get { return _firstScope == null ? CKReadOnlyListEmpty<AccessorDeclVarExpr>.Empty : _firstScope.RetrieveValues( this, false ); }
+            get { return _firstScope == null ? CKReadOnlyListEmpty<AccessorLetExpr>.Empty : _firstScope.RetrieveValues( this, false ); }
         }
 
         /// <summary>
@@ -323,7 +323,7 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="name">Name in the scope.</param>
         /// <returns>Null if not found.</returns>
-        public AccessorDeclVarExpr Find( string name )
+        public AccessorLetExpr Find( string name )
         {
             NameEntry t;
             if( _vars.TryGetValue( name, out t ) ) return (t.Next ?? t).E;
@@ -336,7 +336,7 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="name">Name in the scope.</param>
         /// <returns>Null if not found.</returns>
-        public AccessorDeclVarExpr FindAndRegisterClosure( string name )
+        public AccessorLetExpr FindAndRegisterClosure( string name )
         {
             NameEntry t;
             if( _vars.TryGetValue( name, out t ) )
@@ -354,9 +354,9 @@ namespace Yodii.Script
         /// <summary>
         /// Gets the variables registered in the current scope so far, optionnaly skipping the first ones.
         /// </summary>
-        public IReadOnlyList<AccessorDeclVarExpr> GetCurrent( int skipCount = 0 )
+        public IReadOnlyList<AccessorLetExpr> GetCurrent( int skipCount = 0 )
         {
-            return _firstScope == null ? CKReadOnlyListEmpty<AccessorDeclVarExpr>.Empty : (_firstScope.NextScope ?? _firstScope).RetrieveValues( this, false, skipCount );
+            return _firstScope == null ? CKReadOnlyListEmpty<AccessorLetExpr>.Empty : (_firstScope.NextScope ?? _firstScope).RetrieveValues( this, false, skipCount );
         }
     }
 

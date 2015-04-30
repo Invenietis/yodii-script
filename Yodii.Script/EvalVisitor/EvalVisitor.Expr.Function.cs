@@ -34,14 +34,14 @@ namespace Yodii.Script
     {
         internal class FunctionExprFrame : Frame<FunctionExpr>
         {
-            readonly FrameStateBase _arguments;
+            readonly ArgumentResolver _arguments;
             readonly IReadOnlyList<Closure> _closures;
             PExpr _body;
 
             public FunctionExprFrame( AccessorFrame callFrame, FunctionExpr e, IReadOnlyList<Closure> closures )
                 : base( callFrame._visitor, e )
             {
-                _arguments = new FrameStateBase( this, callFrame.Expr.Arguments );
+                _arguments = new ArgumentResolver( this, callFrame.Expr.Arguments );
                 _closures = closures;
             }
 

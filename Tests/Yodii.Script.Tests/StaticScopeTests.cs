@@ -51,7 +51,7 @@ namespace Yodii.Script.Tests
         {
             StaticScope s = new StaticScope();
 
-            var v = new AccessorDeclVarExpr( SourceLocation.Empty, "V" );
+            var v = new AccessorLetExpr( SourceLocation.Empty, "V" );
             Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( "toto", v ) );
             
             s.OpenScope();
@@ -67,10 +67,10 @@ namespace Yodii.Script.Tests
         {
             StaticScope s = new StaticScope();
 
-            var v = new AccessorDeclVarExpr( SourceLocation.Empty, "V" );
-            var v1 = new AccessorDeclVarExpr( SourceLocation.Empty, "V (redefined)" );
-            var v2 = new AccessorDeclVarExpr( SourceLocation.Empty, "V (redefined again)" );
-            var vFailed = new AccessorDeclVarExpr( SourceLocation.Empty, "V (failed)" );
+            var v = new AccessorLetExpr( SourceLocation.Empty, "V" );
+            var v1 = new AccessorLetExpr( SourceLocation.Empty, "V (redefined)" );
+            var v2 = new AccessorLetExpr( SourceLocation.Empty, "V (redefined again)" );
+            var vFailed = new AccessorLetExpr( SourceLocation.Empty, "V (failed)" );
 
             s.OpenScope();
 
@@ -93,9 +93,9 @@ namespace Yodii.Script.Tests
             StaticScope s = new StaticScope();
 
             s.OpenScope();
-            s.Declare( "V1", new AccessorDeclVarExpr( SourceLocation.Empty, "V1 from scope n°1" ) );
-            s.Declare( "V2", new AccessorDeclVarExpr( SourceLocation.Empty, "V2 from scope n°1" ) );
-            s.Declare( "V3", new AccessorDeclVarExpr( SourceLocation.Empty, "V3 from scope n°1" ) );
+            s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°1" ) );
+            s.Declare( "V2", new AccessorLetExpr( SourceLocation.Empty, "V2 from scope n°1" ) );
+            s.Declare( "V3", new AccessorLetExpr( SourceLocation.Empty, "V3 from scope n°1" ) );
 
             CheckDeclVarName( s, "V1", "V1 from scope n°1" );
             CheckDeclVarName( s, "V2", "V2 from scope n°1" );
@@ -103,22 +103,22 @@ namespace Yodii.Script.Tests
 
             s.OpenScope();
             {
-                s.Declare( "V1", new AccessorDeclVarExpr( SourceLocation.Empty, "V1 from scope n°2" ) );
+                s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°2" ) );
                 CheckDeclVarName( s, "V1", "V1 from scope n°2" );
                 CheckDeclVarName( s, "V2", "V2 from scope n°1" );
                 CheckDeclVarName( s, "V3", "V3 from scope n°1" );
 
                 s.OpenScope();
                 {
-                    s.Declare( "V1", new AccessorDeclVarExpr( SourceLocation.Empty, "V1 from scope n°3" ) );
-                    s.Declare( "V2", new AccessorDeclVarExpr( SourceLocation.Empty, "V2 from scope n°3" ) );
+                    s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°3" ) );
+                    s.Declare( "V2", new AccessorLetExpr( SourceLocation.Empty, "V2 from scope n°3" ) );
                     CheckDeclVarName( s, "V1", "V1 from scope n°3" );
                     CheckDeclVarName( s, "V2", "V2 from scope n°3" );
                     CheckDeclVarName( s, "V3", "V3 from scope n°1" );
 
                     s.OpenScope();
                     {
-                        s.Declare( "V3", new AccessorDeclVarExpr( SourceLocation.Empty, "V3 from scope n°4" ) );
+                        s.Declare( "V3", new AccessorLetExpr( SourceLocation.Empty, "V3 from scope n°4" ) );
                         CheckDeclVarName( s, "V1", "V1 from scope n°3" );
                         CheckDeclVarName( s, "V2", "V2 from scope n°3" );
                         CheckDeclVarName( s, "V3", "V3 from scope n°4" );
@@ -127,8 +127,8 @@ namespace Yodii.Script.Tests
                     CheckDeclVarName( s, "V1", "V1 from scope n°3" );
                     CheckDeclVarName( s, "V2", "V2 from scope n°3" );
                     CheckDeclVarName( s, "V3", "V3 from scope n°1" );
-                    s.Declare( "V4", new AccessorDeclVarExpr( SourceLocation.Empty, "V4" ) );
-                    s.Declare( "V5", new AccessorDeclVarExpr( SourceLocation.Empty, "V5" ) );
+                    s.Declare( "V4", new AccessorLetExpr( SourceLocation.Empty, "V4" ) );
+                    s.Declare( "V5", new AccessorLetExpr( SourceLocation.Empty, "V5" ) );
                     CheckClose( s.CloseScope(), "V1 from scope n°3", "V2 from scope n°3", "V4", "V5" );
                 }
                 Assert.IsNull( s.Find( "V4" ) );
@@ -141,12 +141,12 @@ namespace Yodii.Script.Tests
 
         static void CheckClose( IReadOnlyList<Expr> close, params string[] names )
         {
-            CollectionAssert.AreEqual( names, close.Cast<AccessorDeclVarExpr>().Select( e => e.Name ).ToArray() );
+            CollectionAssert.AreEqual( names, close.Cast<AccessorLetExpr>().Select( e => e.Name ).ToArray() );
         }
 
         static void CheckDeclVarName( StaticScope s, string varName, string name )
         {
-            Assert.That( ((AccessorDeclVarExpr)s.Find( varName )).Name == name );
+            Assert.That( ((AccessorLetExpr)s.Find( varName )).Name == name );
         }
 
     }

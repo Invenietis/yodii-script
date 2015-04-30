@@ -33,7 +33,7 @@ namespace Yodii.Script
 
     public class FunctionExpr : Expr
     {
-        public FunctionExpr( SourceLocation location, IReadOnlyList<AccessorDeclVarExpr> parameters, Expr body, IReadOnlyList<AccessorDeclVarExpr> closures, AccessorDeclVarExpr name = null )
+        public FunctionExpr( SourceLocation location, IReadOnlyList<AccessorLetExpr> parameters, Expr body, IReadOnlyList<AccessorLetExpr> closures, AccessorLetExpr name = null )
             : base( location, false )
         {
             if( parameters == null ) throw new ArgumentNullException();
@@ -47,11 +47,11 @@ namespace Yodii.Script
 
         public Expr Body { get; private set; }
 
-        public AccessorDeclVarExpr Name { get; private set; }
+        public AccessorLetExpr Name { get; private set; }
 
-        public IReadOnlyList<AccessorDeclVarExpr> Parameters { get; private set; }
+        public IReadOnlyList<AccessorLetExpr> Parameters { get; private set; }
 
-        public IReadOnlyList<AccessorDeclVarExpr> Closures { get; private set; }
+        public IReadOnlyList<AccessorLetExpr> Closures { get; private set; }
 
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )

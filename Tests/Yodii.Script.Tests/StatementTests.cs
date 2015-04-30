@@ -51,8 +51,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void local_variables_definition_and_assignments()
         {
-            string s = @"var i;
-                         var j;
+            string s = @"let i;
+                         let j;
                          i = 37;
                          j = i*100+12;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -63,8 +63,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void declaring_a_local_variables_do_not_evaluate_to_undefined_like_in_javascript()
         {
-            string s = @"var i = 37;
-                         var j = i*100+12;";
+            string s = @"let i = 37;
+                         let j = i*100+12;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<JSEvalNumber>( o );
             Assert.AreEqual( o.ToString(), "3712" );
@@ -73,8 +73,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void variables_evaluate_to_RefRuntimeObj_objects()
         {
-            string s = @"var i = 37;
-                         var j = i*100+12;
+            string s = @"let i = 37;
+                         let j = i*100+12;
                          j;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<RefRuntimeObj>( o );
@@ -85,8 +85,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void number_assignment_operators_are_supported()
         {
-            string s = @"   var i = 0;
-                            var bug = '';
+            string s = @"   let i = 0;
+                            let bug = '';
 
                             i += 0+1; i *= 2*1; i <<= 1<<0; i -= 7-6;
                             if( i !== (((0+1)*(2*1))<<(1<<0))-(7-6) ) bug = 'Bug in +, *, << or -';
@@ -137,8 +137,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void simple_if_block()
         {
-            string s = @"var i = 37;
-                         var j;
+            string s = @"let i = 37;
+                         let j;
                          if( i == 37 ) 
                          {
                             j = 3712;
@@ -154,8 +154,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void comparing_to_undefined_keyword_works()
         {
-            string s = @"var ResultAsRefRuntimeObject = 8;
-                         var X;
+            string s = @"let ResultAsRefRuntimeObject = 8;
+                         let X;
                          if( X === undefined ) ResultAsRefRuntimeObject;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<RefRuntimeObj>( o );
@@ -165,7 +165,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void post_incrementation_works()
         {
-            string s = @"var i = 0;
+            string s = @"let i = 0;
                          if( i++ == 0 && i++ == 1 && i++ == 2 ) i;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<RefRuntimeObj>( o );
@@ -175,7 +175,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void pre_incrementation_works()
         {
-            string s = @"var i = 0;
+            string s = @"let i = 0;
                          if( ++i == 1 && ++i == 2 && ++i == 3 && ++i == 4 ) i;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<RefRuntimeObj>( o );
@@ -186,7 +186,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void while_loop_works()
         {
-            string s = @"var i = 0;
+            string s = @"let i = 0;
                          while( i < 10 ) i++;
                          i;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -196,7 +196,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void while_loop_with_empty_block_works()
         {
-            string s = @"var i = 0;
+            string s = @"let i = 0;
                          while( i++ < 10 );
                          i;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -207,8 +207,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void while_loop_with_block_works()
         {
-            string s = @"var i = 0;
-                         var j = 0;
+            string s = @"let i = 0;
+                         let j = 0;
                          while( i < 10 ) { 
                             i++;
                             if( i%2 == 0 ) j += 10;
@@ -222,8 +222,8 @@ namespace Yodii.Script.Tests
         [Test]
         public void do_while_loop_with_block_works()
         {
-            string s = @"var i = 0;
-                         var j = 0;
+            string s = @"let i = 0;
+                         let j = 0;
                          do
                          { 
                             i++;
@@ -239,7 +239,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void do_while_loop_expects_a_block()
         {
-            string s = @"var i = 0;
+            string s = @"let i = 0;
                          do i++; while( i < 10 );
                          i;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
@@ -250,7 +250,7 @@ namespace Yodii.Script.Tests
         public void while_loop_support_break_statement()
         {
             string s = @"
-                        var i = 0, j = '';
+                        let i = 0, j = '';
                         while( true )
                         {
                             if( i++ >= 5 ) break;
@@ -266,7 +266,7 @@ namespace Yodii.Script.Tests
         public void while_loop_support_continue_statement()
         {
             string s = @"
-                        var i = 0, j = '';
+                        let i = 0, j = '';
                         while( ++i < 10 )
                         {
                             if( i%2 == 0 ) continue;
@@ -282,7 +282,7 @@ namespace Yodii.Script.Tests
         public void do_while_loop_support_break_statement()
         {
             string s = @"
-                        var i = 0, j = '';
+                        let i = 0, j = '';
                         do
                         {
                             if( i++ >= 4 ) break;
@@ -298,7 +298,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void multiple_variables_declaration_is_supported_and_they_can_reference_previous_ones()
         {
-            string s = @"var i = 1, j = i*200+34, k = 'a string';
+            string s = @"let i = 1, j = i*200+34, k = 'a string';
                          k+i+j;";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<JSEvalString>( o );
@@ -309,9 +309,9 @@ namespace Yodii.Script.Tests
         public void lexical_scope_is_enough_with_curly()
         {
             string s = @"
-                        var i = 0, j = 'a';
+                        let i = 0, j = 'a';
                         {
-                            var i = 't'; 
+                            let i = 't'; 
                         }
                         i+j;";
             RuntimeObj o = ScriptEngine.Evaluate( s );

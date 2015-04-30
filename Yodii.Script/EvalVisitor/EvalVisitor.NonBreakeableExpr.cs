@@ -47,11 +47,6 @@ namespace Yodii.Script
             return new PExpr( _global.CreateRuntimeError( e, e.ErrorMessage ) );
         }
 
-        public PExpr Visit( AccessorDeclVarExpr e )
-        {
-            return new PExpr( _dynamicScope.FindRegistered( e ) );
-        }
-
         public PExpr Visit( NopExpr e )
         {
             return new PExpr( RuntimeObj.Undefined );

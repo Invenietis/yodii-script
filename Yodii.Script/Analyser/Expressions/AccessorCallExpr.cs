@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\BlockExpr.cs) is part of CiviKey. 
+* This file (Yodii.Script\Analyser\Expressions\AccessorExpr.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,24 +22,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 using CK.Core;
-using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public class BlockExpr : ListOfExpr
+    public class AccessorCallExpr : AccessorExpr
     {
-        public BlockExpr( IReadOnlyList<Expr> statements, IReadOnlyList<AccessorLetExpr> locals )
-            : base( statements )
+        IReadOnlyList<Expr> _args;
+
+        /// <summary>
+        /// Creates a new <see cref="AccessorCallExpr"/>: 0 or n arguments can be provided.
+        /// </summary>
+        /// <param name="left">Left scope. Must not be null.</param>
+        /// <param name="arguments">When null, it is normalized to an empty list.</param>
+        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments = null )
+            : base( location, left, true )
         {
-            if( locals == null ) throw new ArgumentNullException( "locals" );
-            Locals = locals;
+            _args = arguments ?? CKReadOnlyListEmpty<Expr>.Empty;
         }
 
-        public IReadOnlyList<AccessorLetExpr> Locals { get; private set; }
+        public override IReadOnlyList<Expr> Arguments { get { return _args; } }
 
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
@@ -49,9 +55,18 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return '{' + String.Join( " ", List.Select( s => s.ToString() ) ) + '}';
+            StringBuilder b = new StringBuilder( Left.ToString() );
+            b.Append( '(' );
+            bool first = true;
+            foreach( var e in Arguments )
+            {
+                if( first ) first = false;
+                else b.Append( ',' );
+                b.Append( e.ToString() );
+            }
+            b.Append( ')' );
+            return b.ToString();
         }
     }
-
 
 }

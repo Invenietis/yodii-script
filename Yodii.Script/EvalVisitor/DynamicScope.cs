@@ -43,14 +43,14 @@ namespace Yodii.Script
                 O = o ?? new RefRuntimeObj();
             }
         }
-        readonly Dictionary<AccessorDeclVarExpr,Entry> _vars;
+        readonly Dictionary<AccessorLetExpr,Entry> _vars;
 
         public DynamicScope()
         {
-            _vars = new Dictionary<AccessorDeclVarExpr, Entry>();
+            _vars = new Dictionary<AccessorLetExpr, Entry>();
         }
 
-        public RefRuntimeObj Register( AccessorDeclVarExpr local )
+        public RefRuntimeObj Register( AccessorLetExpr local )
         {
             Entry e;
             if( _vars.TryGetValue( local, out e ) )
@@ -76,7 +76,7 @@ namespace Yodii.Script
             return c.Ref;
         }
 
-        public void Unregister( AccessorDeclVarExpr local )
+        public void Unregister( AccessorLetExpr local )
         {
             Entry e;
             if( _vars.TryGetValue( local, out e ) )
@@ -95,7 +95,7 @@ namespace Yodii.Script
             throw new InvalidOperationException( String.Format( "Unregistering non registered '{0}'.", local.Name ) );
         }
         
-        public RefRuntimeObj FindRegistered( AccessorDeclVarExpr r )
+        public RefRuntimeObj FindRegistered( AccessorLetExpr r )
         {
             Entry e;
             if( _vars.TryGetValue( r, out e ) ) return (e.Next ?? e).O;

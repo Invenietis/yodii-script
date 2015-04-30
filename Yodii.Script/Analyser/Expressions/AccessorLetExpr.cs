@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\Closure.cs) is part of CiviKey. 
+* This file (Yodii.Script\Analyser\Expressions\AccessorExpr.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,21 +22,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CK.Core;
 
 namespace Yodii.Script
 {
-    struct Closure
-    {
-        public readonly AccessorLetExpr Variable;
-        public readonly RefRuntimeObj Ref;
 
-        public Closure( AccessorLetExpr v, RefRuntimeObj r )
+    public class AccessorLetExpr : AccessorExpr
+    {
+        public AccessorLetExpr( SourceLocation location, string name )
+            : base( location, null, false )
         {
-            Variable = v;
-            Ref = r;
+            if( name == null ) throw new ArgumentNullException();
+            Name = name;
+        }
+
+        public string Name { get; private set; }
+
+        [DebuggerStepThrough]
+        internal protected override T Accept<T>( IExprVisitor<T> visitor )
+        {
+            return visitor.Visit( this );
+        }
+
+        public override string ToString()
+        {
+            return "var " + Name;
         }
     }
 

@@ -43,7 +43,7 @@ namespace Yodii.Script
         T Visit( ListOfExpr e );
         T Visit( BlockExpr e );
         T Visit( AssignExpr e );
-        T Visit( AccessorDeclVarExpr e );
+        T Visit( AccessorLetExpr e );
         T Visit( NopExpr e );
         T Visit( PrePostIncDecExpr e );
         T Visit( WhileExpr e );

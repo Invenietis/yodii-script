@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\BlockExpr.cs) is part of CiviKey. 
+* This file (Yodii.Script\Analyser\Expressions\AccessorExpr.cs) is part of CiviKey. 
 *  
 * CiviKey is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,24 +22,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 using CK.Core;
-using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public class BlockExpr : ListOfExpr
+    public class AccessorMemberExpr : AccessorExpr
     {
-        public BlockExpr( IReadOnlyList<Expr> statements, IReadOnlyList<AccessorLetExpr> locals )
-            : base( statements )
+        /// <summary>
+        /// Creates a new <see cref="AccessorMemberExpr"/> for a field or a variable.
+        /// </summary>
+        /// <param name="left">Left scope. Can be null for unbound reference.</param>
+        /// <param name="fieldOrVariableName">Field, variable or function name.</param>
+        public AccessorMemberExpr( SourceLocation location, Expr left, string fieldOrVariableName )
+            : base( location, left, false )
         {
-            if( locals == null ) throw new ArgumentNullException( "locals" );
-            Locals = locals;
+            Name = fieldOrVariableName;
         }
 
-        public IReadOnlyList<AccessorLetExpr> Locals { get; private set; }
+        public string Name { get; private set; }
+
+        public bool IsUnbound { get { return Left == null; } }
+
+        public override bool IsMember( string memberName )
+        {
+            return memberName == Name;
+        }
 
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
@@ -49,9 +60,8 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return '{' + String.Join( " ", List.Select( s => s.ToString() ) ) + '}';
+            return Left == null ? Name : Left.ToString() + '.' + Name;
         }
+
     }
-
-
 }
