@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -38,6 +38,12 @@ namespace Yodii.Script
     /// </summary>
     public abstract class AccessorExpr : Expr
     {
+        /// <summary>
+        /// Initializes a new <see cref="AccessorExpr"/>.
+        /// </summary>
+        /// <param name="location">Location of this expression.</param>
+        /// <param name="left">Left access.</param>
+        /// <param name="isbreakable">True to allow breaking on this type of expession.</param>
         protected AccessorExpr( SourceLocation location, Expr left, bool isBreakable )
             : base( location, isBreakable )
         {

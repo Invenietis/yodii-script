@@ -41,6 +41,12 @@ namespace Yodii.Script
 
         public object Value { get; private set; }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {

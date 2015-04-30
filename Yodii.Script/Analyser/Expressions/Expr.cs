@@ -28,18 +28,43 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Abstract base class of <see cref="ExprAnalysis"/> production.
+    /// </summary>
     public abstract class Expr
     {
+        /// <summary>
+        /// Empty array of <see cref="Expr"/>.
+        /// </summary>
+        public static readonly Expr[] EmptyArray = new Expr[0];
+
+        /// <summary>
+        /// Initializes a new <see cref="Expr"/>.
+        /// </summary>
+        /// <param name="location">Location of this expression.</param>
+        /// <param name="isbreakable">True to allow breaking on this type of expession.</param>
         protected Expr( SourceLocation location, bool isbreakable = false )
         {
             Location = location;
             IsBreakable = isbreakable;
         }
 
+        /// <summary>
+        /// Gets whether this expression is breakable.
+        /// </summary>
         public readonly bool IsBreakable;
 
+        /// <summary>
+        /// Gets the location of this expression.
+        /// </summary>
         public readonly SourceLocation Location;
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         internal protected abstract T Accept<T>( IExprVisitor<T> visitor );
     }
 }

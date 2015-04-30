@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -99,7 +99,7 @@ namespace Yodii.Script
         {
             Entry e;
             if( _vars.TryGetValue( r, out e ) ) return (e.Next ?? e).O;
-            throw new CKException( "Unregistered variable '{0}'.", r.Name );
+            throw new ArgumentException( String.Format( "Unregistered variable '{0}'.", r.Name ) );
         }
     }
 }

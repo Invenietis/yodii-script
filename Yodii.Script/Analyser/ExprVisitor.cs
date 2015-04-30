@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -72,7 +72,7 @@ namespace Yodii.Script
                     newMulti[i] = sp;
                 }
             }
-            if( newMulti != null ) multi = newMulti.ToReadOnlyList();
+            if( newMulti != null ) multi = newMulti.ToArray();
             return multi;
         }
 

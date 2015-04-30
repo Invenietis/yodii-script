@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -44,7 +44,7 @@ namespace Yodii.Script
         {
             List<SyntaxErrorExpr> collector = new List<SyntaxErrorExpr>();
             new SyntaxErrorCollector( collector.Add, unboundCollector ).VisitExpr( e );
-            return collector.ToReadOnlyList();
+            return collector.ToArray();
         }
 
         public override Expr Visit( AccessorMemberExpr e )

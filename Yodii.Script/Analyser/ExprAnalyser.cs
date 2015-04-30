@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -380,7 +380,7 @@ namespace Yodii.Script
                     }
                 }
             }
-            var arguments = parameters != null ? parameters.ToReadOnlyList() : CKReadOnlyListEmpty<Expr>.Empty;
+            var arguments = parameters != null ? parameters.ToArray() : Expr.EmptyArray;
             return new AccessorCallExpr( loc, left, arguments );
         }
 

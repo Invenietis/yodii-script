@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CK.Core;
+
 using System.Globalization;
 
 namespace Yodii.Script
@@ -33,7 +33,7 @@ namespace Yodii.Script
     {
         public static readonly object Undefined = DBNull.Value;
 
-        public static readonly DateTime JSEpoch = Util.UnixEpoch;
+        public static readonly DateTime JSEpoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
         public static readonly long TicksPerMillisecond = 10000;
         public static readonly string TrueString = "true";
         public static readonly string FalseString = "false";

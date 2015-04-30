@@ -46,10 +46,6 @@
     <AssemblyOriginatorKeyFile>..\SharedKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CK.Core, Version=4.1.0.0, Culture=neutral, PublicKeyToken=edfa2f62fc978217, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\CK.Core.4.1.0\lib\net45\CK.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -99,6 +95,8 @@
     <Compile Include="EvalVisitor\RefRuntimeObj.cs" />
     <Compile Include="EvalVisitor\RuntimeFlowBreaking.cs" />
     <Compile Include="EvalVisitor\RuntimeSignal.cs" />
+    <Compile Include="Misc\IObservableReadOnlyCollection.cs" />
+    <Compile Include="Misc\IObservableReadOnlyList.cs" />
     <Compile Include="ScriptEngine\BreakpointManager.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Frame.cs" />
     <Compile Include="Analyser\Expressions\IfExpr.cs" />

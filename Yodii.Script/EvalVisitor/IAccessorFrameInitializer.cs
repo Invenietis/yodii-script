@@ -25,12 +25,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
     
-    public interface IAccessorFrameInitializer : IFluentInterface
+    public interface IAccessorFrameInitializer
     {
 
         /// <summary>

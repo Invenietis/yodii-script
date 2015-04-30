@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-using CK.Core;
+
 using System.Diagnostics;
 
 namespace Yodii.Script
@@ -52,6 +52,12 @@ namespace Yodii.Script
 
         public Expr Code { get; private set; }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {

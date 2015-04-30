@@ -21,7 +21,6 @@
 #endregion
 
 using System;
-using CK.Core;
 
 namespace Yodii.Script
 {

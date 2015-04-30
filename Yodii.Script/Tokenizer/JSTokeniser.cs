@@ -24,7 +24,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.IO;
-using CK.Core;
+
 using System.Globalization;
 
 namespace Yodii.Script
@@ -489,22 +489,6 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Match identifier. Forward the head on success and can throw an exception
-        /// if not found.
-        /// </summary>
-        public bool MatchIdentifier( string identifier, bool throwError )
-        {
-            if( !MatchIdentifier( identifier ) )
-            {
-                if( throwError )
-                    throw new CKException( "Identifier '{0}' expected. {1}.", identifier, _location );
-                return false;
-            }
-            return true;
-        }
-
-
-        /// <summary>
         /// Matches a token. Forwards the head on success.
         /// </summary>
         /// <param name="token">Must be one of <see cref="JSTokenizerToken"/> value (not an Error one).</param>
@@ -518,23 +502,6 @@ namespace Yodii.Script
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Matches a token. Forwards the head on success and can throw an error
-        /// if token does not match.
-        /// </summary>
-        /// <param name="token">Token to match (must not be an Error one).</param>
-        /// <returns>True if the given token matches.</returns>
-        public bool Match( JSTokenizerToken token, bool throwError )
-        {
-            if( !Match( token ) )
-            {
-                if( throwError )
-                    throw new CKException( "Token {0} expected. {1}.", token.ToString(), _location );
-                return false;
-            }
-            return true;
         }
 
         /// <summary>

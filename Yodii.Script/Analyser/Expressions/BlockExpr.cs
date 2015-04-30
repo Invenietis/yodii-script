@@ -25,13 +25,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-using CK.Core;
+
 using System.Diagnostics;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Modelizes a list of expressions (that should actually be statements) and a list of locally declared variables.
+    /// </summary>
     public class BlockExpr : ListOfExpr
     {
+        /// <summary>
+        /// Initializes a new <see cref="BlockExpr"/>.
+        /// </summary>
+        /// <param name="statements"></param>
+        /// <param name="locals"></param>
         public BlockExpr( IReadOnlyList<Expr> statements, IReadOnlyList<AccessorLetExpr> locals )
             : base( statements )
         {
@@ -39,14 +47,27 @@ namespace Yodii.Script
             Locals = locals;
         }
 
+        /// <summary>
+        /// Gets the list of declared variables local to this block.
+        /// </summary>
         public IReadOnlyList<AccessorLetExpr> Locals { get; private set; }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
             return '{' + String.Join( " ", List.Select( s => s.ToString() ) ) + '}';

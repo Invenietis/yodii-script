@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -52,12 +52,22 @@ namespace Yodii.Script
             return memberName == Name;
         }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
             return Left == null ? Name : Left.ToString() + '.' + Name;

@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using CK.Core;
+
 using System.Collections.ObjectModel;
 
 namespace Yodii.Script
@@ -210,9 +210,10 @@ namespace Yodii.Script
                 return SetResult( result );
             }
 
-            CKException UnsupportedOperatorException()
+            NotSupportedException UnsupportedOperatorException()
             {
-                return new CKException( "Unsupported binary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
+                string msg = String.Format( "Unsupported binary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
+                return new NotSupportedException( msg );
             }
 
             RuntimeObj BitwiseShift( RuntimeObj val, RuntimeObj shift, bool right )

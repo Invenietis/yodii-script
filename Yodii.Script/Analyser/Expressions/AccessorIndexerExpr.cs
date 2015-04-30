@@ -26,25 +26,28 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
-
+    /// <summary>
+    /// Accessor that captures an indexed access.
+    /// </summary>
     public class AccessorIndexerExpr : AccessorExpr
     {
-        CKReadOnlyListMono<Expr> _args;
+        Expr[] _args;
 
         /// <summary>
         /// Creates a new <see cref="AccessorIndexerExpr"/>. 
         /// One [Expr] index is enough.
         /// </summary>
+        /// <param name="location">Location of this expression.</param>
         /// <param name="left">Left scope. Must not be null.</param>
         /// <param name="index">Index for the indexer.</param>
         public AccessorIndexerExpr( SourceLocation location, Expr left, Expr index )
             : base( location, left, true )
         {
-            _args = new CKReadOnlyListMono<Expr>( index );
+            _args = new Expr[]{ index };
         }
 
         /// <summary>
@@ -52,6 +55,12 @@ namespace Yodii.Script
         /// </summary>
         public Expr Index { get { return _args[0]; } }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {
@@ -66,6 +75,10 @@ namespace Yodii.Script
             get { return _args; }
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
             return Left.ToString() + '[' + Index.ToString() + ']';

@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
@@ -40,7 +40,9 @@ namespace Yodii.Script
 
         public override int GetHashCode()
         {
-            return Util.Hash.Combine( Util.Hash.StartValue, Source, Line, Column ).GetHashCode();
+            Int64 hash = 5381 ^ Source.GetHashCode();
+            hash = ((hash << 5) + hash) ^ Line;
+            return (((hash << 5) + hash) ^ Column).GetHashCode();
         }
 
         public override bool Equals( object obj )

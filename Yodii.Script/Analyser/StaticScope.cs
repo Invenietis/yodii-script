@@ -26,10 +26,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
+
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Manages variables scopes during analysis.
+    /// Declaration and retrieving are O(1).
+    /// </summary>
     public class StaticScope
     {
         class Scope
@@ -64,7 +68,7 @@ namespace Yodii.Script
             {
                 if( skipCount < 0 ) throw new ArgumentException( "skipCount" );
                 int i = _count - skipCount;
-                if( i <= 0 ) return Util.EmptyArray<AccessorLetExpr>.Empty;
+                if( i <= 0 ) return AccessorLetExpr.EmptyArray;
                 var all = new AccessorLetExpr[i];
                 NameEntry first = _firstNamed;
                 do
@@ -87,7 +91,7 @@ namespace Yodii.Script
 
             internal IReadOnlyList<AccessorLetExpr> GetClosures()
             {
-                return _closures != null ? _closures.ToArray() : Util.EmptyArray<AccessorLetExpr>.Empty;
+                return _closures != null ? _closures.ToArray() : AccessorLetExpr.EmptyArray;
             }
         }
 
@@ -248,7 +252,6 @@ namespace Yodii.Script
         /// <summary>
         /// Opens a new scope (a weak one): any <see cref="Declare"/> will be done in this new scope.
         /// </summary>
-        /// <param name="strongScope">True to open a strong scope: any access to a variable declared above will require a closure.</param>
         public void OpenScope()
         {
             if( _firstScope == null ) _currentStrongScope = _firstScope = new Scope( null, null );
@@ -298,6 +301,7 @@ namespace Yodii.Script
         /// Closes the current strong scope and returns the closures (in the key) and all the declared expressions in the order of their declarations (in the value).
         /// If the current one is not a strong one, an exception is thrown.
         /// </summary>
+        /// <param name="skipLocalCount">Number of locals to skip (typically already obtained and handled thanks to a previous call to <see cref="GetCurrent"/>).</param>
         /// <returns>The declared expressions (an empty list if nothing has been declared).</returns>
         public KeyValuePair<IReadOnlyList<AccessorLetExpr>, IReadOnlyList<AccessorLetExpr>> CloseStrongScope( int skipLocalCount = 0 )
         {
@@ -314,7 +318,7 @@ namespace Yodii.Script
         /// <returns>The global scope. Empty if GlobalScope is false (or if nothing has been declared at the global scope).</returns>
         public IReadOnlyList<AccessorLetExpr> Globals
         {
-            get { return _firstScope == null ? CKReadOnlyListEmpty<AccessorLetExpr>.Empty : _firstScope.RetrieveValues( this, false ); }
+            get { return _firstScope == null ? AccessorLetExpr.EmptyArray : _firstScope.RetrieveValues( this, false ); }
         }
 
         /// <summary>
@@ -356,7 +360,7 @@ namespace Yodii.Script
         /// </summary>
         public IReadOnlyList<AccessorLetExpr> GetCurrent( int skipCount = 0 )
         {
-            return _firstScope == null ? CKReadOnlyListEmpty<AccessorLetExpr>.Empty : (_firstScope.NextScope ?? _firstScope).RetrieveValues( this, false, skipCount );
+            return _firstScope == null ? AccessorLetExpr.EmptyArray : (_firstScope.NextScope ?? _firstScope).RetrieveValues( this, false, skipCount );
         }
     }
 

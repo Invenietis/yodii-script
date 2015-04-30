@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using CK.Core;
+
 using System.Collections.ObjectModel;
 
 namespace Yodii.Script
@@ -112,7 +112,7 @@ namespace Yodii.Script
                     PExpr args = VisitArguments();
                     if( args.IsPendingOrSignal ) return args;
                     var r = _indexCode != null ? _indexCode( f, ResolvedParameters[0] ) : _callCode( f, this );
-                    if( !r.IsResolved && r.Deferred != Frame ) throw new CKException( "Implementations must call either SetResult, SetError, or PendigOrSignal frame's method." );
+                    if( !r.IsResolved && r.Deferred != Frame ) throw new InvalidOperationException( "Implementations must call either SetResult, SetError, or PendigOrSignal frame's method." );
                     return r;
                 }
             }
@@ -189,7 +189,7 @@ namespace Yodii.Script
                 if( Result != null ) return new PExpr( Result );
 
                 Debug.Assert( _left.Result != null, "We are not pendig..." );
-                var left = _left.Result.ToValue();
+                var left = _left.Result;
                 Debug.Assert( !_result.IsResolved );
                 if( (_result = left.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _result );
                 return ReentrantSetResult( _result.Result );

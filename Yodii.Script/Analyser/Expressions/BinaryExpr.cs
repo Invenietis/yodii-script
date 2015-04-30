@@ -45,12 +45,22 @@ namespace Yodii.Script
 
         public Expr Right { get; private set; }
 
+        /// <summary>
+        /// Parametrized implementation of the visitor's double dispatch.
+        /// </summary>
+        /// <typeparam name="T">Type of the visitor's returned data.</typeparam>
+        /// <param name="visitor">visitor.</param>
+        /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor )
         {
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
             return Left.ToString() + JSTokenizer.Explain( BinaryOperatorToken ) + Right.ToString();

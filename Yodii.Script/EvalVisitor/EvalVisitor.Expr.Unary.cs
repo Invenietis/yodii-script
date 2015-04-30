@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using CK.Core;
+
 using System.Collections.ObjectModel;
 
 namespace Yodii.Script
@@ -82,12 +82,20 @@ namespace Yodii.Script
                                 result = RuntimeObj.Undefined;
                                 break;
                             }
-                        default: throw new CKException( "Unsupported unary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.TokenType ), (int)Expr.TokenType );
+                        default: throw UnsupportedOperatorException();
                     }
                 }
                 return SetResult( result );
             }
+
+            NotSupportedException UnsupportedOperatorException()
+            {
+                string msg = String.Format( "Unsupported unary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.TokenType ), (int)Expr.TokenType );
+                return new NotSupportedException( msg );
+            }
+
         }
+
 
         public PExpr Visit( UnaryExpr e )
         {
