@@ -17,7 +17,7 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <StartAction>Program</StartAction>
-    <StartProgram>$(SolutionDir)\packages\NUnit.Runners.2.6.3\tools\nunit.exe</StartProgram>
+    <StartProgram>$(SolutionDir)packages\NUnit.Runners.2.6.4\tools\nunit.exe</StartProgram>
     <StartArguments>Yodii.Script.Tests.dll</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
