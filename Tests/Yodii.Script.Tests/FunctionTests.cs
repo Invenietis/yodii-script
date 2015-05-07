@@ -99,18 +99,18 @@ namespace Yodii.Script.Tests
         public void closure_with_two_levels()
         {
             string s = @"
-                        function next( s ) 
+                        function next() 
                         { 
-                            let _seed = s; 
+                            let _seed = 0; 
                             function oneMore() {
                                 return function() { return ++_seed; };
                             }
                             return oneMore();
                         }
-                        let f = next(0);
-                        f(0) + f(0) + f(0);
-                        f = next(0);
-                        f(0) + f(0) + f(0) + f(0);
+                        let f = next();
+                        f() + f() + f();
+                        f = next();
+                        f() + f() + f() + f();
                         ";
             RuntimeObj o = ScriptEngine.Evaluate( s );
             Assert.IsInstanceOf<JSEvalNumber>( o );
