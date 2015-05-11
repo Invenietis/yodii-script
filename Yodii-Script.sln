@@ -23,6 +23,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4BFD09
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Debugger", "Yodii.Script.Debugger\Yodii.Script.Debugger.csproj", "{576274A5-5FBF-4803-91DB-96EFFCF4159A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Debugger.Tests", "Yodii.Script.Debugger.Tests\Yodii.Script.Debugger.Tests.csproj", "{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +41,20 @@ Global
 		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{576274A5-5FBF-4803-91DB-96EFFCF4159A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{576274A5-5FBF-4803-91DB-96EFFCF4159A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{576274A5-5FBF-4803-91DB-96EFFCF4159A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{576274A5-5FBF-4803-91DB-96EFFCF4159A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC} = {0453B444-D4D8-402E-A2CB-B5E0821B071C}
+		{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7} = {0453B444-D4D8-402E-A2CB-B5E0821B071C}
 	EndGlobalSection
 EndGlobal
