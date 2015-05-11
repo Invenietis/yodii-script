@@ -32,7 +32,7 @@ namespace Yodii.Script
     /// <summary>
     /// Main object of the evaluation processus.
     /// </summary>
-    public partial class ScriptEngine : IDynamicScope
+    public partial class ScriptEngine : IVariablesList
     {
         readonly BreakpointManager _breakpoints;
         readonly EvalVisitor _evaluator;
@@ -102,12 +102,17 @@ namespace Yodii.Script
             return v.VisitExpr( e ).Result;
         }
 
-        public IReadOnlyDictionary<string, RuntimeObj> Vars
+        public IReadOnlyList<Variable> Vars
         {
             get
             {
                 return _evaluator.Vars;
             }
+        }
+
+        public Variable FindByName( string name )
+        {
+            return _evaluator.FindByName( name );
         }
     }
 }

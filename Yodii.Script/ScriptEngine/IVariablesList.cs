@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
-    public interface IDynamicScope
+    public interface IVariablesList
     {
-        IReadOnlyDictionary<string, RuntimeObj> Vars { get; }
+        IReadOnlyList<Variable> Vars { get;}
+        Variable FindByName( string name );
+
     }
 }

@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace Yodii.Script
 {
 
-    class DynamicScope : IDynamicScope
+    class DynamicScope : IVariablesList
     {
         class Entry
         {
@@ -44,10 +44,12 @@ namespace Yodii.Script
             }
         }
         readonly Dictionary<AccessorLetExpr,Entry> _vars;
+        readonly List<Variable> _variables;
 
         public DynamicScope()
         {
             _vars = new Dictionary<AccessorLetExpr, Entry>();
+            _variables = new List<Variable>();
         }
 
         public RefRuntimeObj Register( AccessorLetExpr local )
@@ -59,7 +61,11 @@ namespace Yodii.Script
                 else if( e.Next == null ) e = e.Next = new Entry( null );
                 else e = e.Next = new Entry( e.Next );
             }
-            else _vars.Add( local, e = new Entry( null ) );
+            else
+            {
+                _vars.Add( local, e = new Entry( null ) );
+                _variables.Add( new Variable( local.Name, (e.Next ?? e).O ) );
+            } 
             return e.O;
         }
 
@@ -98,20 +104,25 @@ namespace Yodii.Script
         public RefRuntimeObj FindRegistered( AccessorLetExpr r )
         {
             Entry e;
-            if( _vars.TryGetValue( r, out e ) ) return (e.Next ?? e).O;
+            if( _vars.TryGetValue( r, out e ) )
+            {
+                int index =  _variables.FindIndex( v => v.Name == r.Name );
+                _variables[index].Object = (e.Next ?? e).O;
+                return (e.Next ?? e).O;
+            }
             throw new ArgumentException( String.Format( "Unregistered variable '{0}'.", r.Name ) );
         }
-
-        public IReadOnlyDictionary<string, RuntimeObj> Vars
+        public IReadOnlyList<Variable> Vars
         {
-            get {
-                Dictionary<string,RuntimeObj> _variables = new Dictionary<string, RuntimeObj>();
-                foreach( KeyValuePair<AccessorLetExpr,Entry> pair in _vars )
-                {
-                    _variables.Add( pair.Key.Name, pair.Value.O );
-                }
-                return _variables;           
+            get
+            {
+                return _variables;
             }
+        }
+
+        public Variable FindByName( string name )
+        {
+            return _variables.Find( v => v.Name == name );            
         }
     }
 }

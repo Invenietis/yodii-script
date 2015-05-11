@@ -104,10 +104,11 @@
     <Compile Include="Analyser\ExprVisitor.cs" />
     <Compile Include="Analyser\IExprVisitor.cs" />
     <Compile Include="JSSupport.cs" />
-    <Compile Include="ScriptEngine\IDynamicScope.cs" />
+    <Compile Include="ScriptEngine\IVariablesList.cs" />
     <Compile Include="ScriptEngine\ScriptEngineStatus.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.Result.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.cs" />
+    <Compile Include="ScriptEngine\Variable.cs" />
     <Compile Include="Tokenizer\JSTokeniser.cs" />
     <Compile Include="Tokenizer\JSTokeniserError.cs" />
     <Compile Include="Tokenizer\JSTokeniserToken.cs" />

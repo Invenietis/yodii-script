@@ -66,13 +66,43 @@ namespace Yodii.Script.Debugger.Tests
            
             engine.Breakpoints.AddBreakpoint( bkv.BreakableExprs[0] );
             engine.Breakpoints.AddBreakpoint( bkv.BreakableExprs[1] );
+            
             using( var r2 = engine.Execute( exp ) )
             {
-                Assert.That( engine.Vars["a"].Type, Is.EqualTo( RuntimeObj.TypeUndefined) );
+                Assert.That( engine.FindByName("a").Object.Type, Is.EqualTo( RuntimeObj.TypeUndefined) );
                 r2.Continue();
-                Assert.That( engine.Vars["a"].ToDouble(), Is.EqualTo( 0.0 ) );
+                Assert.That( engine.FindByName( "a" ).Object.ToDouble(), Is.EqualTo( 0.0 ) );
+                r2.Continue();
+               
+            }
+            Assert.That( engine.FindByName( "b" ).Object.ToString(), Is.EqualTo( "chaine" ) );
+            Assert.That(engine.FindByName( "c" ).Object.Type, Is.EqualTo( RuntimeObj.TypeUndefined ));
+        }
+        [Test]
+        public void show_vars_from_closure()
+        {
+            ScriptEngine engine = new ScriptEngine();
+            string script = @"let a = 0;
+                              let b = 1;
+                              function testfunc(){
+                                let b = 2;
+                                a+=1;
+                                a+=1;
+                               }
+                              testfunc();";
+
+            Expr exp = ExprAnalyser.AnalyseString( script );
+
+            BreakableVisitor bkv = new BreakableVisitor();
+            bkv.VisitExpr( exp );
+            engine.Breakpoints.AddBreakpoint( bkv.BreakableExprs[5] );
+            using( var r2 = engine.Execute( exp ) )
+            {
+                Assert.That( engine.FindByName( "a" ).Object.ToDouble(), Is.EqualTo( 1.0 ) );
+                Assert.That( engine.FindByName( "b" ).Object.ToDouble(), Is.EqualTo( 2.0 ) );
                 r2.Continue();
             }
+            
         }
     }
 }
