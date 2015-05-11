@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script.Debugger
 {
+    /// <summary>
+    /// Basic class parsing an <see cref="Expr"/> into a list of atomic breakable <see cref="Expr"/>
+    /// </summary>
     public class BreakableVisitor : ExprVisitor
     {
         readonly List<Expr> _breakableExprs = new List<Expr>();
