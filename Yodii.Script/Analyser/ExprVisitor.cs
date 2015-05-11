@@ -122,7 +122,7 @@ namespace Yodii.Script
 
         public virtual Expr Visit( AssignExpr e )
         {
-            var lV = (AccessorMemberExpr)VisitExpr( e.Left );
+            var lV = (AccessorExpr)VisitExpr( e.Left );
             var rV = VisitExpr( e.Right );
             return lV == e.Left && rV == e.Right ? e : new AssignExpr( e.Location, lV, rV );
         }
