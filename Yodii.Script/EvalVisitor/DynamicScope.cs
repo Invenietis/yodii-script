@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace Yodii.Script
 {
 
-    class DynamicScope
+    class DynamicScope : IDynamicScope
     {
         class Entry
         {
@@ -100,6 +100,18 @@ namespace Yodii.Script
             Entry e;
             if( _vars.TryGetValue( r, out e ) ) return (e.Next ?? e).O;
             throw new ArgumentException( String.Format( "Unregistered variable '{0}'.", r.Name ) );
+        }
+
+        public IReadOnlyDictionary<string, RuntimeObj> Vars
+        {
+            get {
+                Dictionary<string,RuntimeObj> _variables = new Dictionary<string, RuntimeObj>();
+                foreach( KeyValuePair<AccessorLetExpr,Entry> pair in _vars )
+                {
+                    _variables.Add( pair.Key.Name, pair.Value.O );
+                }
+                return _variables;           
+            }
         }
     }
 }

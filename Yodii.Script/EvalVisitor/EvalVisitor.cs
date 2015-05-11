@@ -30,7 +30,7 @@ using System.Diagnostics;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor : IExprVisitor<PExpr>, IEvalVisitor
+    public partial class EvalVisitor : IExprVisitor<PExpr>, IEvalVisitor, IDynamicScope
     {
         readonly GlobalContext _global;
         readonly Func<Expr,bool> _breakpoints;
@@ -86,6 +86,13 @@ namespace Yodii.Script
         public GlobalContext Global 
         {
             get { return _global; }
+        }
+        public IReadOnlyDictionary<string, RuntimeObj> Vars
+        {
+            get
+            {
+                return _dynamicScope.Vars;
+            }
         }
 
     }
