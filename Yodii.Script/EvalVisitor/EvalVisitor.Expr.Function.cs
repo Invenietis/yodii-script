@@ -1,21 +1,21 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.Function.cs) is part of CiviKey. 
+* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.Function.cs) is part of Yodii-Script. 
 *  
-* CiviKey is free software: you can redistribute it and/or modify 
+* Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
 * by the Free Software Foundation, either version 3 of the License, or 
 * (at your option) any later version. 
 *  
-* CiviKey is distributed in the hope that it will be useful, 
+* Yodii-Script is distributed in the hope that it will be useful, 
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 * GNU Lesser General Public License for more details. 
 * You should have received a copy of the GNU Lesser General Public License 
-* along with CiviKey.  If not, see <http://www.gnu.org/licenses/>. 
+* along with Yodii-Script. If not, see <http://www.gnu.org/licenses/>. 
 *  
 * Copyright © 2007-2015, 
-*     Invenietis <http://www.invenietis.com>,
+*     Invenietis <http://www.invenietis.com>, IN'TECH INFO <http://www.intechinfo.fr>
 * All rights reserved. 
 *-----------------------------------------------------------------------------*/
 #endregion
@@ -54,14 +54,14 @@ namespace Yodii.Script
                 int iParam = 0;
                 foreach( var parameter in Expr.Parameters )
                 {
-                    var r = _visitor._dynamicScope.Register( parameter );
+                    var r = _visitor.ScopeManager.Register( parameter );
                     if( iParam < _arguments.ResolvedParameters.Count ) r.Value = _arguments.ResolvedParameters[iParam];
                     ++iParam;
                 }
                 // Registering closed variables.
                 foreach( var c in _closures )
                 {
-                    _visitor._dynamicScope.Register( c );
+                    _visitor.ScopeManager.Register( c );
                 }
 
                 if( IsPendingOrSignal( ref _body, Expr.Body ) )
@@ -83,11 +83,11 @@ namespace Yodii.Script
             {
                 foreach( var local in Expr.Parameters )
                 {
-                    _visitor._dynamicScope.Unregister( local );
+                    _visitor.ScopeManager.Unregister( local );
                 }
                 foreach( var c in _closures )
                 {
-                    _visitor._dynamicScope.Unregister( c.Variable );
+                    _visitor.ScopeManager.Unregister( c.Variable );
                 }
             }
         }
@@ -98,7 +98,7 @@ namespace Yodii.Script
             for( int i = 0; i < c.Length; ++i )
             {
                 var v = e.Closures[i];
-                c[i] = new Closure( v, _dynamicScope.FindRegistered( v ) );
+                c[i] = new Closure( v, ScopeManager.FindRegistered( v ) );
             }
             return new PExpr( new JSEvalFunction( e, c ) );
         }

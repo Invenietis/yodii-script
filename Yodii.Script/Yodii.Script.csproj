@@ -95,8 +95,6 @@
     <Compile Include="EvalVisitor\RefRuntimeObj.cs" />
     <Compile Include="EvalVisitor\RuntimeFlowBreaking.cs" />
     <Compile Include="EvalVisitor\RuntimeSignal.cs" />
-    <Compile Include="Misc\IObservableReadOnlyCollection.cs" />
-    <Compile Include="Misc\IObservableReadOnlyList.cs" />
     <Compile Include="ScriptEngine\BreakpointManager.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Frame.cs" />
     <Compile Include="Analyser\Expressions\IfExpr.cs" />

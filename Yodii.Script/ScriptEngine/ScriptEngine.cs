@@ -1,34 +1,29 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\ScriptEngine\ScriptEngine.cs) is part of CiviKey. 
+* This file (Yodii.Script\ScriptEngine\ScriptEngine.cs) is part of Yodii-Script. 
 *  
-* CiviKey is free software: you can redistribute it and/or modify 
+* Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
 * by the Free Software Foundation, either version 3 of the License, or 
 * (at your option) any later version. 
 *  
-* CiviKey is distributed in the hope that it will be useful, 
+* Yodii-Script is distributed in the hope that it will be useful, 
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 * GNU Lesser General Public License for more details. 
 * You should have received a copy of the GNU Lesser General Public License 
-* along with CiviKey.  If not, see <http://www.gnu.org/licenses/>. 
+* along with Yodii-Script. If not, see <http://www.gnu.org/licenses/>. 
 *  
 * Copyright © 2007-2015, 
-*     Invenietis <http://www.invenietis.com>,
+*     Invenietis <http://www.invenietis.com>, IN'TECH INFO <http://www.intechinfo.fr>
 * All rights reserved. 
 *-----------------------------------------------------------------------------*/
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
-
     /// <summary>
     /// Main object of the evaluation processus.
     /// </summary>
@@ -43,19 +38,29 @@ namespace Yodii.Script
         /// Initializes a new <see cref="ScriptEngine"/>, optionally bound to an existing <see cref="GlobalContext"/>.
         /// </summary>
         /// <param name="ctx">Optional global context to use.</param>
-        public ScriptEngine( GlobalContext ctx = null )
+        /// <param name="breakPointManager">Optional <see cref="BreakpointManager"/> instance to use.</param>
+        /// <param name="scopeManager">Optional <see cref="DynamicScope"/> to use.</param>
+        public ScriptEngine( GlobalContext ctx = null, BreakpointManager breakPointManager = null, DynamicScope scopeManager = null )
         {
-            _breakpoints = new BreakpointManager();
+            _breakpoints = breakPointManager ?? new BreakpointManager();
             _globalContext = ctx ?? new GlobalContext();
-            _evaluator = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak );
+            _evaluator = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak, scopeManager );
         }
 
         /// <summary>
-        /// Gets the breakpoint manager that will be used.
+        /// Gets the breakpoint manager that is used by this engine.
         /// </summary>
         public BreakpointManager Breakpoints
         {
             get { return _breakpoints; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DynamicScope"/>.
+        /// </summary>
+        protected DynamicScope ScopeManager
+        {
+            get { return _evaluator.ScopeManager; }
         }
 
         /// <summary>
@@ -64,6 +69,14 @@ namespace Yodii.Script
         public GlobalContext Context
         {
             get { return _globalContext; }
+        }
+
+        /// <summary>
+        /// Gets whether this engine is currently executing a script.
+        /// </summary>
+        public bool IsExecuting
+        {
+            get { return _currentResult != null; }
         }
 
         /// <summary>
@@ -84,9 +97,42 @@ namespace Yodii.Script
         public Result Execute( Expr e )
         {
             if( _currentResult != null ) throw new InvalidOperationException();
-            _currentResult = new Result( this );
+            _currentResult = StartExecution();
             _currentResult.UpdateStatus( _evaluator.VisitExpr( e ) );
             return _currentResult;
+        }
+
+        /// <summary>
+        /// Gets the inner <see cref="EvalVisitor"/> object.
+        /// </summary>
+        protected EvalVisitor EvalVisitor
+        {
+            get { return _evaluator; }
+        }
+
+        /// <summary>
+        /// Starts a new execution: this creates a <see cref="Result"/> object (or a specialization of it) that will
+        /// enable interactions during execution.
+        /// </summary>
+        /// <returns>A <see cref="Result"/> object for this engine.</returns>
+        protected virtual Result StartExecution()
+        {
+            return new Result( this );
+        }
+
+        internal void StopExecution()
+        {
+            OnStopExecution();
+            if( _currentResult == null ) throw new InvalidOperationException();
+            _evaluator.ResetCurrentEvaluation();
+            _currentResult = null;
+        }
+
+        /// <summary>
+        /// Called before the execution stops.
+        /// </summary>
+        protected virtual void OnStopExecution()
+        {
         }
 
         /// <summary>
