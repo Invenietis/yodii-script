@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Tests", "Tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{9BF04424-0B74-43A0-A324-9BB83E5197D6}"
 	ProjectSection(SolutionItems) = preProject
-		License.licenseheader = License.licenseheader
+		licenseFileHeader.txt = licenseFileHeader.txt
 		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
 EndProject
