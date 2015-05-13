@@ -58,7 +58,7 @@ namespace Yodii.Script
 
         /// <summary>
         /// Registers a local variable or a function parameter.
-        /// It must not be already registered. 
+        /// Registering multiple times the same locals or parameters means that recursion is at work. 
         /// </summary>
         /// <param name="local">The local or parameter to register.</param>
         /// <returns>The unitialized <see cref="RefRuntimeObj"/> (undefined).</returns>
@@ -67,8 +67,8 @@ namespace Yodii.Script
             Entry e;
             if( _vars.TryGetValue( local, out e ) )
             {
-                if( e.O != null ) throw new InvalidOperationException( String.Format( "Duplicate Registering '{0}'.", local.Name ) );
-                e.O = new RefRuntimeObj();
+                if( e.O == null ) e.O = new RefRuntimeObj();
+                else e = e.Next = new Entry( e.Next, new RefRuntimeObj() );
             }
             else _vars.Add( local, e = new Entry( null, new RefRuntimeObj() ) );
             return e.O;
@@ -86,7 +86,6 @@ namespace Yodii.Script
             if( _vars.TryGetValue( c.Variable, out e ) )
             {
                 if( e.O == null ) e.O = c.Ref;
-                else if( e.Next == null ) e.Next = new Entry( null, c.Ref );
                 else e = e.Next = new Entry( e.Next, c.Ref );
             }
             else _vars.Add( c.Variable, new Entry( null, c.Ref ) );

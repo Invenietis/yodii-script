@@ -30,7 +30,7 @@ namespace Yodii.Script
     public partial class ScriptEngine
     {
         readonly BreakpointManager _breakpoints;
-        readonly EvalVisitor _evaluator;
+        readonly EvalVisitor _visitor;
         readonly GlobalContext _globalContext;
         Result _currentResult;
 
@@ -44,7 +44,7 @@ namespace Yodii.Script
         {
             _breakpoints = breakPointManager ?? new BreakpointManager();
             _globalContext = ctx ?? new GlobalContext();
-            _evaluator = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak, scopeManager );
+            _visitor = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak, scopeManager );
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Yodii.Script
         /// </summary>
         protected DynamicScope ScopeManager
         {
-            get { return _evaluator.ScopeManager; }
+            get { return _visitor.ScopeManager; }
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Yodii.Script
         {
             if( _currentResult != null ) throw new InvalidOperationException();
             _currentResult = StartExecution();
-            _currentResult.UpdateStatus( _evaluator.VisitExpr( e ) );
+            _currentResult.UpdateStatus( _visitor.VisitExpr( e ) );
             return _currentResult;
         }
 
@@ -107,7 +107,7 @@ namespace Yodii.Script
         /// </summary>
         protected EvalVisitor EvalVisitor
         {
-            get { return _evaluator; }
+            get { return _visitor; }
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Yodii.Script
         {
             OnStopExecution();
             if( _currentResult == null ) throw new InvalidOperationException();
-            _evaluator.ResetCurrentEvaluation();
+            _visitor.ResetCurrentEvaluation();
             _currentResult = null;
         }
 

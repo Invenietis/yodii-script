@@ -47,6 +47,11 @@ namespace Yodii.Script
                 _args = new PExpr[_arguments.Count];
             }
 
+            public bool IsArgumentsResolved
+            {
+                get { return _rpCount == _args.Length; }
+            }
+
             public PExpr VisitArguments()
             {
                 while( _rpCount < _args.Length )
@@ -242,9 +247,9 @@ namespace Yodii.Script
                 if( Result != null )
                 {
                     Debug.Assert( Result == sub.Result );
-                    return new PExpr( Result );
+                    return sub;
                 }
-                return sub.IsErrorResult ? SetResult( sub.Result ) : new PExpr( this );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this );
             }
 
             protected PExpr ReentrantSetResult( RuntimeObj result )

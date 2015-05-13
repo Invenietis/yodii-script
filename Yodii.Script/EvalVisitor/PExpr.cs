@@ -53,27 +53,41 @@ namespace Yodii.Script
             Result = resultOrSignal;
         }
 
+        /// <summary>
+        /// Gets whether this is an unitialized PExpr: its <see cref="Result"/> and <see cref="Deferred"/> are both null.
+        /// </summary>
         public bool IsUnknown { get { return Result == null && Deferred == null; } }
 
+        /// <summary>
+        /// Gets whether this PExpr is resolved and <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
+        /// </summary>
         public bool IsSignal { get { return Result is RuntimeSignal; } }
 
+        /// <summary>
+        /// Gets whether the resolved <see cref="Result"/> is a <see cref="RuntimeError"/> (a RuntimeError is a <see cref="RuntimeSignal"/>).
+        /// </summary>
         public bool IsErrorResult { get { return Result is RuntimeError; } }
 
+        /// <summary>
+        /// Gets whether the <see cref="Deferred"/> is not null (and the <see cref="Result"/> is null).
+        /// </summary>
         public bool IsPending { get { return Deferred != null; } }
         
+        /// <summary>
+        /// Gets whether a <see cref="Result"/> exists (it can be a <see cref="RuntimeSignal"/>).
+        /// </summary>
         public bool IsResolved { get { return Result != null; } }
 
+        /// <summary>
+        /// Gets whether this PExpr is pending (<see cref="Deferred"/> is not null) or <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
+        /// </summary>
         public bool IsPendingOrSignal { get { return Deferred != null || IsSignal; } }
-
-        public bool IsValidResult { get { return Result != null && !IsSignal; } }
 
         public override string ToString()
         {
-            string sP = Deferred != null ? String.Format( "Deferred = {0}", Deferred.Expr ) : null;
-            string sR = Result != null ? String.Format( "Result = {0}", Result ) : null;
-            if( sP == null ) return sR != null ? sR : "(Unknown)";
-            if( sR == null ) return sP;
-            return sP + ", " + sR;
+            string sP = Deferred != null ? String.Format( "({0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr ) : null;
+            string sR = Result != null ? String.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
+            return sP ?? sR ?? "(Unknown)";
         }
     }
 

@@ -38,15 +38,10 @@ namespace Yodii.Script
             public BlockExprFrame( EvalVisitor evaluator, BlockExpr e )
                 : base( evaluator, e )
             {
-            }
-
-            protected override PExpr DoVisit()
-            {
                 foreach( var local in ((BlockExpr)Expr).Locals )
                 {
                     _visitor.ScopeManager.Register( local );
                 }
-                return base.DoVisit();
             }
 
             protected override void OnDispose()

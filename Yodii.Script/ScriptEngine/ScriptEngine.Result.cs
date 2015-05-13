@@ -40,7 +40,7 @@ namespace Yodii.Script
         public class Result : IDisposable
         {
             readonly ScriptEngine _engine;
-            EvalVisitor _ev;
+            EvalVisitor _visitor;
             RuntimeObj _result;
             RuntimeError _error;
             ScriptEngineStatus _status;
@@ -48,7 +48,7 @@ namespace Yodii.Script
             internal Result( ScriptEngine e )
             {
                 _engine = e;
-                _ev = e._evaluator;
+                _visitor = e._visitor;
             }
 
             /// <summary>
@@ -57,7 +57,7 @@ namespace Yodii.Script
             /// </summary>
             protected EvalVisitor EvalVisitor
             {
-                get { return _ev; }
+                get { return _visitor; }
             }
 
             /// <summary>
@@ -93,9 +93,9 @@ namespace Yodii.Script
             {
                 if( _engine == null ) throw new ObjectDisposedException( "EvaluationResult" );
                 if( _status != ScriptEngineStatus.IsPending ) throw new InvalidOperationException();
-                if( _ev.FirstFrame != null )
+                if( _visitor.FirstFrame != null )
                 {
-                    UpdateStatus( _ev.FirstFrame.StepOver() );
+                    UpdateStatus( _visitor.FirstFrame.StepOver() );
                 }
             }
 
@@ -117,13 +117,13 @@ namespace Yodii.Script
             /// </summary>
             public void Dispose()
             {
-                if( _ev != null )
+                if( _visitor != null )
                 {
                     _engine.StopExecution();
                     _error = null;
                     _result = null;
                     _status = ScriptEngineStatus.None;
-                    _ev = null;
+                    _visitor = null;
                 }
             }
         }

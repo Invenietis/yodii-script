@@ -66,6 +66,7 @@
     <Compile Include="JSAnalyserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticScopeTests.cs" />
+    <Compile Include="TestHelper.cs" />
     <Compile Include="WithGlobalContext.cs" />
   </ItemGroup>
   <ItemGroup>

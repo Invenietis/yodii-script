@@ -57,10 +57,17 @@ namespace Yodii.Script
                         if( _code.IsSignal )
                         {
                             RuntimeFlowBreaking b = _code.Result as RuntimeFlowBreaking;
-                            if( b != null && b.Expr.Type == FlowBreakingExpr.BreakingType.Continue )
+                            if( b != null )
                             {
-                                _condition = _code = new PExpr();
-                                continue;
+                                if( b.Expr.Type == FlowBreakingExpr.BreakingType.Continue )
+                                {
+                                    _condition = _code = new PExpr();
+                                    continue;
+                                }
+                                if( b.Expr.Type == FlowBreakingExpr.BreakingType.Break )
+                                {
+                                    return SetResult( RuntimeObj.Undefined );
+                                }
                             }
                         }
                         return PendingOrSignal( _code );
@@ -78,17 +85,9 @@ namespace Yodii.Script
             protected override bool OnSignal( ref RuntimeObj result )
             {
                 RuntimeFlowBreaking b = result as RuntimeFlowBreaking;
-                if( b != null )
+                if( b != null && b.Expr.Type == FlowBreakingExpr.BreakingType.Return )
                 {
-                    if( b.Expr.Type ==  FlowBreakingExpr.BreakingType.Break )
-                    {
-                        result = RuntimeObj.Undefined;
-                        return true;
-                    }
-                    if( b.Expr.Type == FlowBreakingExpr.BreakingType.Return )
-                    {
-                        return true;
-                    }
+                    return true;
                 }
                 return base.OnSignal( ref result );
             }

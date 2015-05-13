@@ -35,17 +35,21 @@ namespace Yodii.Script.Tests
         [Test]
         public void evaluating_basic_numbers_expressions()
         {
-            RuntimeObj o;
+            TestHelper.RunNormalAndStepByStep( "6;7+3", o =>
             {
-                o = ScriptEngine.Evaluate( "6;7+3" );
                 Assert.IsInstanceOf<JSEvalNumber>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
-            }
+            } );
+            TestHelper.RunNormalAndStepByStep( "1+2*(3+1)", o =>
             {
-                o = ScriptEngine.Evaluate( "6;7+3;typeof 6 == 'number' ? 2173 : 3712" );
+                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 9 ) );
+            } );
+            TestHelper.RunNormalAndStepByStep( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", o =>
+            {
                 Assert.IsInstanceOf<JSEvalNumber>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 2173 ) );
-            }
+            } );
         }
 
         [Test]
@@ -55,9 +59,11 @@ namespace Yodii.Script.Tests
                          let j;
                          i = 37;
                          j = i*100+12;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalNumber>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+            } );
         }
 
         [Test]
@@ -65,9 +71,11 @@ namespace Yodii.Script.Tests
         {
             string s = @"let i = 37;
                          let j = i*100+12;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalNumber>( o );
-            Assert.AreEqual( o.ToString(), "3712" );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.AreEqual( o.ToString(), "3712" );
+            } );
         }
 
         [Test]
@@ -76,9 +84,11 @@ namespace Yodii.Script.Tests
             string s = @"let i = 37;
                          let j = i*100+12;
                          j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+            } );
         }
 
 
@@ -129,9 +139,11 @@ namespace Yodii.Script.Tests
                         
                             bug.toString();
 ";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalString>( o );
-            Assert.That( o.ToString(), Is.EqualTo( String.Empty ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( String.Empty ) );
+            } );
         }
 
         [Test]
@@ -146,9 +158,11 @@ namespace Yodii.Script.Tests
                          }
                          // i = 0: the 0 value is the result;
                          if( j > 3000 ) i = 0;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalNumber>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 0 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 0 ) );
+            } );
         }
 
         [Test]
@@ -157,9 +171,11 @@ namespace Yodii.Script.Tests
             string s = @"let ResultAsRefRuntimeObject = 8;
                          let X;
                          if( X === undefined ) ResultAsRefRuntimeObject;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 8 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 8 ) );
+            } );
         }
 
         [Test]
@@ -167,9 +183,11 @@ namespace Yodii.Script.Tests
         {
             string s = @"let i = 0;
                          if( i++ == 0 && i++ == 1 && i++ == 2 ) i;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 3 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 3 ) );
+            } );
         }
 
         [Test]
@@ -177,9 +195,11 @@ namespace Yodii.Script.Tests
         {
             string s = @"let i = 0;
                          if( ++i == 1 && ++i == 2 && ++i == 3 && ++i == 4 ) i;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 4 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 4 ) );
+            } );
         }
 
 
@@ -189,9 +209,11 @@ namespace Yodii.Script.Tests
             string s = @"let i = 0;
                          while( i < 10 ) i++;
                          i;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
+            } );
         }
         [Test]
         public void while_loop_with_empty_block_works()
@@ -199,9 +221,11 @@ namespace Yodii.Script.Tests
             string s = @"let i = 0;
                          while( i++ < 10 );
                          i;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 11 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 11 ) );
+            } );
         }
 
         [Test]
@@ -214,9 +238,11 @@ namespace Yodii.Script.Tests
                             if( i%2 == 0 ) j += 10;
                          }
                          j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+            } );
         }
 
         [Test]
@@ -231,9 +257,11 @@ namespace Yodii.Script.Tests
                          }
                          while( i < 10 );
                          j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+            } );
         }
 
         [Test]
@@ -242,8 +270,10 @@ namespace Yodii.Script.Tests
             string s = @"let i = 0;
                          do i++; while( i < 10 );
                          i;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RuntimeError>( o );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RuntimeError>( o );
+            } );
         }
 
         [Test]
@@ -257,9 +287,11 @@ namespace Yodii.Script.Tests
                             j += 'a';
                         }
                         j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+            } );
         }
 
         [Test]
@@ -273,9 +305,11 @@ namespace Yodii.Script.Tests
                             j += 'a';
                         }
                         j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+            } );
         }
 
         [Test]
@@ -290,9 +324,11 @@ namespace Yodii.Script.Tests
                         }
                         while( i < 1000 );
                         j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<RefRuntimeObj>( o );
-            Assert.That( o.ToString(), Is.EqualTo( "aaaa" ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RefRuntimeObj>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "aaaa" ) );
+            } );
         }
 
         [Test]
@@ -300,9 +336,11 @@ namespace Yodii.Script.Tests
         {
             string s = @"let i = 1, j = i*200+34, k = 'a string';
                          k+i+j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalString>( o );
-            Assert.That( o.ToString(), Is.EqualTo( "a string1234" ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "a string1234" ) );
+            } );
         }
 
         [Test]
@@ -314,9 +352,11 @@ namespace Yodii.Script.Tests
                             let i = 't'; 
                         }
                         i+j;";
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalString>( o );
-            Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+            } );
         }
 
 

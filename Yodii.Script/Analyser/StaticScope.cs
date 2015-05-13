@@ -68,10 +68,10 @@ namespace Yodii.Script
             {
                 if( skipCount < 0 ) throw new ArgumentException( "skipCount" );
                 int i = _count - skipCount;
-                if( i <= 0 ) return AccessorLetExpr.EmptyArray;
-                var all = new AccessorLetExpr[i];
+                if( i <= 0 && !close ) return AccessorLetExpr.EmptyArray;
+                var all = i > 0 ? new AccessorLetExpr[i] : AccessorLetExpr.EmptyArray;
                 NameEntry first = _firstNamed;
-                do
+                while( first != null )
                 {
                     NameEntry e = first.Next ?? first;
                     Debug.Assert( e.E != null );
@@ -79,7 +79,6 @@ namespace Yodii.Script
                     if( close ) container.Unregister( first );
                     first = e.NextInScope;
                 }
-                while( first != null );
                 return all;
             }
 

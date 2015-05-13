@@ -45,8 +45,8 @@ namespace Yodii.Script
 
             protected override PExpr DoVisit()
             {
-                if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
                 if( IsPendingOrSignal( ref _right, Expr.Right ) ) return PendingOrSignal( _right );
+                if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
                 RefRuntimeObj r = _left.Result as RefRuntimeObj;
                 if( r == null ) return SetResult( Global.CreateRuntimeError( Expr.Left, "Invalid assignment left-hand side." ) );
                 r.Value = _right.Result;

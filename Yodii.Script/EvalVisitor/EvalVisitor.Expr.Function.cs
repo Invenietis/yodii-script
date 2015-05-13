@@ -43,25 +43,29 @@ namespace Yodii.Script
             {
                 _arguments = new ArgumentResolver( this, callFrame.Expr.Arguments );
                 _closures = closures;
-            }
-
-            protected override PExpr DoVisit()
-            {
-                PExpr args = _arguments.VisitArguments();
-                if( args.IsPendingOrSignal ) return args;
-
-                // Registering parameters.
-                int iParam = 0;
-                foreach( var parameter in Expr.Parameters )
-                {
-                    var r = _visitor.ScopeManager.Register( parameter );
-                    if( iParam < _arguments.ResolvedParameters.Count ) r.Value = _arguments.ResolvedParameters[iParam];
-                    ++iParam;
-                }
                 // Registering closed variables.
                 foreach( var c in _closures )
                 {
                     _visitor.ScopeManager.Register( c );
+                }
+            }
+
+            protected override PExpr DoVisit()
+            {
+                if( !_arguments.IsArgumentsResolved )
+                {
+                    PExpr args = _arguments.VisitArguments();
+                    if( args.IsPendingOrSignal ) return PendingOrSignal( args );
+
+                    // Registering parameters.
+                    Debug.Assert( _arguments.IsArgumentsResolved );
+                    int iParam = 0;
+                    foreach( var parameter in Expr.Parameters )
+                    {
+                        var r = _visitor.ScopeManager.Register( parameter );
+                        if( iParam < _arguments.ResolvedParameters.Count ) r.Value = _arguments.ResolvedParameters[iParam];
+                        ++iParam;
+                    }
                 }
 
                 if( IsPendingOrSignal( ref _body, Expr.Body ) )
@@ -79,15 +83,25 @@ namespace Yodii.Script
                 return SetResult( RuntimeObj.Undefined );
             }
 
+            public override PExpr SetResult( RuntimeObj result )
+            {
+                Debug.Assert( PrevFrame is IAccessorFrame );
+                PrevFrame.SetResult( result );
+                return base.SetResult( result );
+            }
+
             protected override void OnDispose()
             {
-                foreach( var local in Expr.Parameters )
-                {
-                    _visitor.ScopeManager.Unregister( local );
-                }
                 foreach( var c in _closures )
                 {
                     _visitor.ScopeManager.Unregister( c.Variable );
+                }
+                if( _arguments.IsArgumentsResolved )
+                {
+                    foreach( var local in Expr.Parameters )
+                    {
+                        _visitor.ScopeManager.Unregister( local );
+                    }
                 }
             }
         }

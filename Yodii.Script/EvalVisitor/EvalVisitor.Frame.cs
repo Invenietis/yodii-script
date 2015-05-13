@@ -70,7 +70,15 @@ namespace Yodii.Script
 
             public PExpr StepOver()
             {
-                return _result == null ? DoVisit() : new PExpr( _result );
+                while( _result == null )
+                {
+                    Debug.Assert( _visitor.Frames.Contains( this ) );
+                    PExpr r = _visitor._currentFrame.VisitAndClean();
+                    if( r.IsPending ) return r;
+                    // To Handle KeepStackOnError mode, we must break the loop.
+                    if( _visitor._keepStackOnError && r.IsErrorResult ) return r;
+                }
+                return new PExpr( _result );
             }
 
             public PExpr StepIn()
@@ -87,8 +95,13 @@ namespace Yodii.Script
                     _visitor.BreakOnNext = false;
                     return new PExpr( this );
                 }
+                return VisitAndClean();
+            }
+
+            PExpr VisitAndClean()
+            {
                 PExpr r = DoVisit();
-                Debug.Assert( r.Result == _result && (r.Deferred == null || r.Deferred == this ) );
+                Debug.Assert( r.Result == _result || (r.Result == null && r.Deferred != null) );
                 if( _result != null )
                 {
                     if( !(_result is RuntimeSignal) || OnSignal( ref _result ) )
@@ -107,7 +120,8 @@ namespace Yodii.Script
 
             public PExpr PendingOrSignal( PExpr sub )
             {
-                return sub.IsSignal ? SetResult( sub.Result ) : new PExpr( this );
+                Debug.Assert( sub.IsPendingOrSignal );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this );
             }
 
             public bool IsPendingOrSignal( ref PExpr current, Expr e )

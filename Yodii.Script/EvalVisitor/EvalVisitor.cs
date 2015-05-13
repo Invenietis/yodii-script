@@ -70,7 +70,7 @@ namespace Yodii.Script
         {
             get 
             { 
-                var f = _currentFrame; 
+                var f = _firstFrame; 
                 while( f != null )
                 {
                     yield return f;
