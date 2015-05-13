@@ -21,13 +21,14 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace Yodii.Script
 {
     /// <summary>
     /// Main object of the evaluation processus.
     /// </summary>
-    public partial class ScriptEngine : IVariablesList
+    public partial class ScriptEngine
     {
         readonly BreakpointManager _breakpoints;
         readonly EvalVisitor _evaluator;
@@ -146,19 +147,6 @@ namespace Yodii.Script
             Expr e = ExprAnalyser.AnalyseString( s );
             EvalVisitor v = new EvalVisitor( ctx ?? new GlobalContext() );
             return v.VisitExpr( e ).Result;
-        }
-
-        public IReadOnlyList<Variable> Vars
-        {
-            get
-            {
-                return _evaluator.Vars;
-            }
-        }
-
-        public Variable FindByName( string name )
-        {
-            return _evaluator.FindByName( name );
         }
     }
 }

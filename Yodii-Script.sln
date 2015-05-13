@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4BFD09
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Debugger", "Yodii.Script.Debugger\Yodii.Script.Debugger.csproj", "{576274A5-5FBF-4803-91DB-96EFFCF4159A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Debugger.Tests", "Yodii.Script.Debugger.Tests\Yodii.Script.Debugger.Tests.csproj", "{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yodii.Script.Debugger.Tests", "Tests\Yodii.Script.Debugger.Tests\Yodii.Script.Debugger.Tests.csproj", "{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
