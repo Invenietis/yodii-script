@@ -47,7 +47,7 @@ namespace Yodii.Script
                 if( Expr.ReturnedValue != null )
                 {
                     if( IsPendingOrSignal( ref _returns, Expr.ReturnedValue ) ) return PendingOrSignal( _returns );
-                    return SetResult( new RuntimeFlowBreaking( Expr, _returns.Result ) );
+                    return SetResult( new RuntimeFlowBreaking( Expr, _returns.Result.ToValue() ) );
                 }
                 return SetResult( new RuntimeFlowBreaking( Expr ) );
             }

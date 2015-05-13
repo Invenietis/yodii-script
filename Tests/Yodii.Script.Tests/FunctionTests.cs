@@ -179,5 +179,56 @@ namespace Yodii.Script.Tests
             } );
         }
 
+        [Test]
+        public void returning_a_closed_variable_does_not_return_the_reference()
+        {
+            string s = @"   function f()
+                            {
+                                let max = 0;
+                                function f(n)
+                                {
+                                    if( n/2 > max ) max = n/2;
+                                    while( n > 0 )
+                                    {
+                                        if( n <= max ) return max;
+                                        --n;
+                                    }
+                                }
+                                return f;
+                            }
+                            let m = f();
+                            m(5) + m(10) + m(20);";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 17.5 ) );
+            } );
+        }
+
+        [Test]
+        public void checking_complex_closure_and_evaluations()
+        {
+            // Code has been tested on Chrome & Firefox (with firebug).
+            string s = @"   function f()
+                            {
+                               let x = 0;
+                               function fSetX(f,n)
+                               {
+                                 return x = f(n);
+                               }
+                               return function(n)
+                               {
+                                 return fSetX( function(n) { return x + n; }, x + n ) + x;
+                               };
+                            }
+                            let wtf = f();
+                            wtf(5)+','+wtf(6)+','+wtf(42)+','+wtf(3)+','+wtf(1)+','+wtf(0);";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "10,32,148,302,606,1212" ) );
+            } );
+        }
+
     }
 }

@@ -81,16 +81,6 @@ namespace Yodii.Script
                 }
                 return SetResult( RuntimeObj.Undefined );
             }
-
-            protected override bool OnSignal( ref RuntimeObj result )
-            {
-                RuntimeFlowBreaking b = result as RuntimeFlowBreaking;
-                if( b != null && b.Expr.Type == FlowBreakingExpr.BreakingType.Return )
-                {
-                    return true;
-                }
-                return base.OnSignal( ref result );
-            }
         }
 
         public PExpr Visit( WhileExpr e )
