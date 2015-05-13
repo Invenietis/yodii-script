@@ -47,7 +47,7 @@ namespace Yodii.Script
 
         public override string Type
         {
-            get { return RuntimeObj.TypeObject; }
+            get { return RuntimeObj.TypeFunction; }
         }
 
         public override bool ToBoolean()

@@ -32,7 +32,7 @@ namespace Yodii.Script
     {
         static public readonly JSEvalString EmptyString = new JSEvalString( String.Empty );
 
-        string _value;
+        readonly string _value;
 
         public JSEvalString( string value )
         {

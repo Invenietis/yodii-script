@@ -62,10 +62,10 @@ namespace Yodii.Script
             return JSSupport.ToString( _value );
         }
 
-        public override RuntimeObj ToPrimitive( GlobalContext c )
-        {
-            return c.CreateString( JSSupport.ToString( _value ) );
-        }
+        //public override RuntimeObj ToPrimitive( GlobalContext c )
+        //{
+        //    return c.CreateString( JSSupport.ToString( _value ) );
+        //}
 
         public override bool Equals( object obj )
         {

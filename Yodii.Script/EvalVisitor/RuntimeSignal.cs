@@ -52,11 +52,6 @@ namespace Yodii.Script
             return false;
         }
 
-        public override RuntimeObj ToPrimitive( GlobalContext c )
-        {
-            return RuntimeObj.Undefined;
-        }
-
         public override PExpr Visit( IAccessorFrame frame )
         {
             return frame.SetError();

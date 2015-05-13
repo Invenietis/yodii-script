@@ -34,6 +34,7 @@ namespace Yodii.Script
         public readonly static string TypeBoolean = "boolean";
         public readonly static string TypeNumber = "number";
         public readonly static string TypeObject = "object";
+        public readonly static string TypeFunction = "function";
         public readonly static string TypeString = "string";
         public readonly static string TypeUndefined = "undefined";
 
@@ -89,7 +90,7 @@ namespace Yodii.Script
 
             public override bool Equals( object obj )
             {
-                return obj == null || obj == DBNull.Value || obj is JSNull;
+                return obj == null || obj == Null || obj == DBNull.Value;
             }
         }
 
@@ -108,11 +109,6 @@ namespace Yodii.Script
         /// </summary>
         /// <returns>This object or the referenced object if this is a reference.</returns>
         public virtual RuntimeObj ToValue()
-        {
-            return this;
-        }
-
-        public virtual RuntimeObj ToPrimitive( GlobalContext c )
         {
             return this;
         }
