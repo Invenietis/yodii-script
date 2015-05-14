@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         /// <summary>
         /// This is a basic frame object that captures an evaluation step. 
@@ -65,40 +65,20 @@ namespace Yodii.Script
 
             public bool IsResolved
             {
-                get { return Result != null; }
+                get { return _result != null; }
             }
 
             public PExpr StepOver()
             {
-                while( _result == null )
-                {
-                    Debug.Assert( _visitor.Frames.Contains( this ) );
-                    PExpr r = _visitor._currentFrame.VisitAndClean();
-                    if( r.IsPending ) return r;
-                    // To Handle KeepStackOnError mode, we must break the loop.
-                    if( _visitor._keepStackOnError && r.IsErrorResult ) return r;
-                }
-                return new PExpr( _result );
+                return _visitor.StepOver( this, StepOverKind.ExternalStepOver );
             }
 
             public PExpr StepIn()
             {
-                _visitor.BreakOnNext = true;
-                return StepOver();
+                return _visitor.StepOver( this, StepOverKind.ExternalStepIn );
             }
 
-            internal PExpr Visit()
-            {
-                Debug.Assert( _result == null );
-                if( Expr.IsBreakable && (_visitor.BreakOnNext || _visitor._breakpoints( Expr )) )
-                {
-                    _visitor.BreakOnNext = false;
-                    return new PExpr( this );
-                }
-                return VisitAndClean();
-            }
-
-            PExpr VisitAndClean()
+            internal PExpr VisitAndClean()
             {
                 PExpr r = DoVisit();
                 Debug.Assert( r.Result == _result || (r.Result == null && r.Deferred != null) );
@@ -121,14 +101,14 @@ namespace Yodii.Script
             public PExpr PendingOrSignal( PExpr sub )
             {
                 Debug.Assert( sub.IsPendingOrSignal );
-                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.DeferredStatus );
             }
 
             public bool IsPendingOrSignal( ref PExpr current, Expr e )
             {
                 if( current.IsResolved ) return false;
                 if( current.IsUnknown ) current = _visitor.VisitExpr( e );
-                else current = current.Deferred.StepOver();
+                else current = _visitor.StepOver( current.Frame, StepOverKind.InternalStepOver );
                 return current.IsPendingOrSignal;
             }
 
@@ -146,11 +126,6 @@ namespace Yodii.Script
             public Frame PrevFrame
             {
                 get { return _prev; }
-            }
-
-            public IEvalVisitor Visitor
-            {
-                get { return _visitor; }
             }
 
             public GlobalContext Global

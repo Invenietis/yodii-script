@@ -148,9 +148,8 @@ namespace Yodii.Script.Tests
             }, ctx );
         }
 
-
         [TestCase( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
-        [TestCase( "typeof Ghost.M( Ghost.M[5+8], Date(2015, 4, 23) ) == 'number'" )]
+        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], Date(2015, 4, 23) ) == 'number'" )]
         public void access_to_a_ghost_object_step_by_step( string s )
         {
             var ctx = new Context();

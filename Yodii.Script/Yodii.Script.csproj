@@ -114,7 +114,6 @@
     <Compile Include="EvalVisitor\GlobalContext.cs" />
     <Compile Include="EvalVisitor\IAccessorFrame.cs" />
     <Compile Include="EvalVisitor\IAccessorVisitor.cs" />
-    <Compile Include="EvalVisitor\IEvalVisitor.cs" />
     <Compile Include="EvalVisitor\JSEvalBoolean.cs" />
     <Compile Include="EvalVisitor\JSEvalDate.cs" />
     <Compile Include="EvalVisitor\JSEvalNumber.cs" />

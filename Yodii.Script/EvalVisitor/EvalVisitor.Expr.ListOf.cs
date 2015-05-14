@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class ListOfExprFrame : Frame<ListOfExpr>
         {
@@ -57,7 +57,7 @@ namespace Yodii.Script
 
         public PExpr Visit( ListOfExpr e )
         {
-            return new ListOfExprFrame( this, e ).Visit();
+            return Run( new ListOfExprFrame( this, e ) );
         }
 
     }

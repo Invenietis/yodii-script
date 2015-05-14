@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class FlowBreakingExprFrame : Frame<FlowBreakingExpr>
         {
@@ -55,7 +55,7 @@ namespace Yodii.Script
 
         public PExpr Visit( FlowBreakingExpr e )
         {
-            return new FlowBreakingExprFrame( this, e ).Visit();
+            return Run( new FlowBreakingExprFrame( this, e ) );
         }
 
     }

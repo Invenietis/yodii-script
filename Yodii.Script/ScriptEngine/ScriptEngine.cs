@@ -103,14 +103,6 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Gets the inner <see cref="EvalVisitor"/> object.
-        /// </summary>
-        protected EvalVisitor EvalVisitor
-        {
-            get { return _visitor; }
-        }
-
-        /// <summary>
         /// Starts a new execution: this creates a <see cref="Result"/> object (or a specialization of it) that will
         /// enable interactions during execution.
         /// </summary>

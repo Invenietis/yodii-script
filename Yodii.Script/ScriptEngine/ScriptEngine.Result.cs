@@ -52,15 +52,6 @@ namespace Yodii.Script
             }
 
             /// <summary>
-            /// Gets the <see cref="EvalVisitor"/> of the engine.
-            /// Null whenever this result has been <see cref="Dispose"/>d.
-            /// </summary>
-            protected EvalVisitor EvalVisitor
-            {
-                get { return _visitor; }
-            }
-
-            /// <summary>
             /// Gets the result of the execution. When an execution is pending, this is the 
             /// result of the top frame that has just been resolved.
             /// </summary>
@@ -86,13 +77,14 @@ namespace Yodii.Script
             }
 
             /// <summary>
-            /// Continue the execution of the script. Must be called only when <see cref="Status"/> is <see cref="ScriptEngineStatus.IsPending"/> otherwise
-            /// an exception is thrown.
+            /// Continue the execution of the script. 
+            /// Must be called only when <see cref="Status"/> is <see cref="ScriptEngineStatus.Breakpoint"/> or <see cref="ScriptEngineStatus.Timeout"/> 
+            /// otherwise an exception is thrown.
             /// </summary>
             public void Continue()
             {
                 if( _engine == null ) throw new ObjectDisposedException( "EvaluationResult" );
-                if( _status != ScriptEngineStatus.IsPending ) throw new InvalidOperationException();
+                if( _status != ScriptEngineStatus.Breakpoint || _status != ScriptEngineStatus.Timeout ) throw new InvalidOperationException();
                 if( _visitor.FirstFrame != null )
                 {
                     UpdateStatus( _visitor.FirstFrame.StepOver() );
@@ -108,7 +100,17 @@ namespace Yodii.Script
                 _error = (_result = r.Result) as RuntimeError;
                 _status = ScriptEngineStatus.None;
                 if( r.IsErrorResult ) _status |= ScriptEngineStatus.IsError;
-                if( r.IsPending ) _status |= ScriptEngineStatus.IsPending;
+                if( r.IsPending )
+                {
+                    Debug.Assert( r.DeferredStatus != PExpr.DeferredKind.None );
+                    switch( r.DeferredStatus )
+                    {
+                        case PExpr.DeferredKind.Timeout: _status |= ScriptEngineStatus.Timeout; break;
+                        case PExpr.DeferredKind.Breakpoint: _status |= ScriptEngineStatus.Breakpoint; break;
+                        case PExpr.DeferredKind.AsyncCall: _status |= ScriptEngineStatus.AsyncCall; break;
+                        default: Debug.Fail( "UpdateStatus" ); break;
+                    }
+                }
                 else _status |= ScriptEngineStatus.IsFinished;
             }
 

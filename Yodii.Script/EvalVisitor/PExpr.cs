@@ -34,23 +34,59 @@ namespace Yodii.Script
     /// </summary>
     public struct PExpr
     {
-        public readonly IDeferredExpr Deferred;
+        internal readonly EvalVisitor.Frame Frame;
         public readonly RuntimeObj Result;
+        public readonly DeferredKind DeferredStatus;
 
-        public PExpr( IDeferredExpr pending )
-            : this( pending, null )
+        /// <summary>
+        /// Describes the pending reason.
+        /// </summary>
+        public enum DeferredKind
+        {
+            /// <summary>
+            /// Not pending.
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// A breakpoint has been reached.
+            /// </summary>
+            Breakpoint = 1,
+
+            /// <summary>
+            /// An asynchronous call is being processed.
+            /// </summary>
+            AsyncCall = 2,
+
+            /// <summary>
+            /// A timeout occurred.
+            /// </summary>
+            Timeout = 3
+        }
+
+        internal PExpr( EvalVisitor.Frame pending, DeferredKind status )
+            : this( pending, null, status )
         {
         }
 
         public PExpr( RuntimeObj resultOrSignal )
-            : this( null, resultOrSignal )
+            : this( null, resultOrSignal, DeferredKind.None )
         {
         }
 
-        PExpr( IDeferredExpr pending, RuntimeObj resultOrSignal )
+        PExpr( EvalVisitor.Frame pending, RuntimeObj resultOrSignal, DeferredKind status )
         {
-            Deferred = pending;
+            Frame = pending;
             Result = resultOrSignal;
+            DeferredStatus = status;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDeferredExpr"/> if <see cref="Result"/> is null.
+        /// </summary>
+        public IDeferredExpr Deferred
+        {
+            get { return Frame; }
         }
 
         /// <summary>

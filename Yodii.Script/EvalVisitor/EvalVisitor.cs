@@ -30,12 +30,17 @@ using System.Diagnostics;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor : IExprVisitor<PExpr>, IEvalVisitor
+    internal partial class EvalVisitor : IExprVisitor<PExpr>
     {
+        internal readonly DynamicScope ScopeManager;
         readonly GlobalContext _global;
         readonly Func<Expr,bool> _breakpoints;
         Frame _firstFrame;
         Frame _currentFrame;
+        bool _breakOnNext;
+        bool _hasTimeout;
+        DateTime _timeLimit;
+        TimeSpan _timeout;
         bool _keepStackOnError;
 
         public EvalVisitor( GlobalContext context, bool keepStackOnError = false, Func<Expr, bool> breakpoints = null, DynamicScope scopeManager = null )
@@ -47,13 +52,15 @@ namespace Yodii.Script
             ScopeManager = scopeManager ?? new DynamicScope();
         }
 
-        internal readonly DynamicScope ScopeManager;
-        internal bool BreakOnNext;
-
-
+        [DebuggerStepThrough]
         public PExpr VisitExpr( Expr e )
         {
             return e.Accept( this );
+        }
+
+        public GlobalContext Global 
+        {
+            get { return _global; }
         }
 
         public IDeferredExpr CurrentFrame
@@ -79,14 +86,68 @@ namespace Yodii.Script
             }
         }
 
-        public void ResetCurrentEvaluation()
+        /// <summary>
+        /// Gets or sets the timeout limit: <see cref="TimeSpan.Zero"/> and 
+        /// </summary>
+        public TimeSpan Timeout
         {
-            _currentFrame = null;
+            get { return _timeout; }
+            set 
+            { 
+                if( _timeout != value )
+                {
+                    _timeout = value;
+                    _hasTimeout = _timeout != TimeSpan.Zero && _timeout != TimeSpan.MaxValue;
+                }
+            }
         }
 
-        public GlobalContext Global 
+        public void ResetCurrentEvaluation()
         {
-            get { return _global; }
+            _firstFrame = _currentFrame = null;
+        }
+
+        internal enum StepOverKind
+        {
+            InternalStepOver = 0,
+            ExternalStepOver = -1,
+            ExternalStepIn = 1
+        }
+
+        internal PExpr StepOver( Frame f, StepOverKind k )
+        {
+            if( k != StepOverKind.InternalStepOver )
+            {
+                _breakOnNext = k == StepOverKind.ExternalStepIn;
+                if( _hasTimeout ) _timeLimit = DateTime.UtcNow + _timeout;
+            }
+            while( !f.IsResolved )
+            {
+                Debug.Assert( Frames.Contains( f ) );
+                PExpr r = _currentFrame.VisitAndClean();
+                if( r.IsPending ) return r;
+                // To Handle KeepStackOnError mode, we must break the loop.
+                if( _keepStackOnError && r.IsErrorResult ) return r;
+            }
+            return new PExpr( f.Result );
+        }
+
+        internal PExpr Run( Frame f )
+        {
+            Debug.Assert( !f.IsResolved );
+            if( f.Expr.IsBreakable )
+            {
+                if( _breakOnNext || _breakpoints( f.Expr ) )
+                {
+                    _breakOnNext = false;
+                    return new PExpr( f, PExpr.DeferredKind.Breakpoint );
+                }
+                if( _hasTimeout && _timeLimit <= DateTime.UtcNow )
+                {
+                    return new PExpr( f, PExpr.DeferredKind.Timeout );
+                }
+            }
+            return f.VisitAndClean();
         }
 
     }

@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class PrePostIncDecExprFrame : Frame<PrePostIncDecExpr>
         {
@@ -58,7 +58,7 @@ namespace Yodii.Script
 
         public PExpr Visit( PrePostIncDecExpr e )
         {
-            return new PrePostIncDecExprFrame( this, e ).Visit();
+            return Run( new PrePostIncDecExprFrame( this, e ) );
         }
 
     }

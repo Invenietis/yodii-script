@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class WhileExprFrame : Frame<WhileExpr>
         {
@@ -85,7 +85,7 @@ namespace Yodii.Script
 
         public PExpr Visit( WhileExpr e )
         {
-            return new WhileExprFrame( this, e ).Visit();
+            return Run( new WhileExprFrame( this, e ) );
         }
 
     }

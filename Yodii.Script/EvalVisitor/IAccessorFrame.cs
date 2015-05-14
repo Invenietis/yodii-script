@@ -45,7 +45,7 @@ namespace Yodii.Script
         GlobalContext Global { get; }
 
         /// <summary>
-        /// Initialize an accessor state based on a configuration. ReturnedValue null if no matching configuration have been found.
+        /// Initializes an accessor state based on a configuration. Returns null if no matching configuration have been found.
         /// </summary>
         /// <param name="configuration">Configuration of resolution handlers.</param>
         /// <returns>Null if no matching configuration have been found.</returns>

@@ -30,7 +30,7 @@ using System.Collections.ObjectModel;
 
 namespace Yodii.Script
 {
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         internal class FunctionExprFrame : Frame<FunctionExpr>
         {

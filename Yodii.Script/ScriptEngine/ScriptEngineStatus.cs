@@ -28,12 +28,45 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Describes engine status.
+    /// </summary>
     public enum ScriptEngineStatus
     {
+        /// <summary>
+        /// No current status.
+        /// </summary>
         None = 0,
-        IsFinished = 1,
-        IsPending = 2,
-        IsError = 4
+
+        /// <summary>
+        /// An error has been encountered.
+        /// </summary>
+        IsError = 1,
+
+        /// <summary>
+        /// Execution is over.
+        /// </summary>
+        IsFinished = 2,
+        
+        /// <summary>
+        /// Common bit of <see cref="Breakpoint"/>, <see cref="AsyncCall"/>, <see cref="Timeout"/>.
+        /// </summary>
+        IsPending = 4,
+        
+        /// <summary>
+        /// A breakpoint has been reached.
+        /// </summary>
+        Breakpoint = IsPending | 8,
+
+        /// <summary>
+        /// An asynchronous call is being processed.
+        /// </summary>
+        AsyncCall = IsPending | 16,
+
+        /// <summary>
+        /// A timeout occurred.
+        /// </summary>
+        Timeout = IsPending | 32
     }
 
 }
