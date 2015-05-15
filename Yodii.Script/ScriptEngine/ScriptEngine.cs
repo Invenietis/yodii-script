@@ -44,7 +44,7 @@ namespace Yodii.Script
         {
             _breakpoints = breakPointManager ?? new BreakpointManager();
             _globalContext = ctx ?? new GlobalContext();
-            _visitor = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak, scopeManager );
+            _visitor = new EvalVisitor( _globalContext, _breakpoints.MustBreak, scopeManager );
         }
 
         /// <summary>

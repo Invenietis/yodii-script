@@ -54,19 +54,29 @@ namespace Yodii.Script
         IsPending = 4,
         
         /// <summary>
+        /// Common bit of <see cref="Breakpoint"/>, <see cref="AsyncCall"/>, <see cref="Timeout"/>.
+        /// </summary>
+        CanContinue = 8,
+        
+        /// <summary>
         /// A breakpoint has been reached.
         /// </summary>
-        Breakpoint = IsPending | 8,
+        Breakpoint = IsPending | CanContinue | 16,
 
         /// <summary>
         /// An asynchronous call is being processed.
         /// </summary>
-        AsyncCall = IsPending | 16,
+        AsyncCall = IsPending | 32,
 
         /// <summary>
         /// A timeout occurred.
         /// </summary>
-        Timeout = IsPending | 32
+        Timeout = IsPending | CanContinue | 64,
+        
+        /// <summary>
+        /// An error occurred. Execution is stopped at the point of the error.
+        /// </summary>
+        FirstChanceError = IsPending | IsError | CanContinue | 128
     }
 
 }

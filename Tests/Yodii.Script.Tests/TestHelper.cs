@@ -18,7 +18,7 @@ namespace Yodii.Script.Tests
             using( ScriptEngine.Result rAsync = engine.Execute( script ) )
             {
                 int nbStep = 0;
-                while( rAsync.Status == ScriptEngineStatus.IsPending )
+                while( rAsync.CanContinue )
                 {
                     ++nbStep;
                     rAsync.Continue();

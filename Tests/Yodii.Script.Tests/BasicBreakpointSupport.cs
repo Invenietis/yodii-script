@@ -51,7 +51,7 @@ namespace Yodii.Script.Tests
             using( var r2 = engine.Execute( e ) )
             {
                 int nbStep = 0;
-                while( r2.Status == ScriptEngineStatus.IsPending )
+                while( r2.CanContinue )
                 {
                     ++nbStep;
                     r2.Continue();

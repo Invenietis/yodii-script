@@ -61,7 +61,13 @@ namespace Yodii.Script
             /// <summary>
             /// A timeout occurred.
             /// </summary>
-            Timeout = 3
+            Timeout = 3,
+
+            /// <summary>
+            /// An error occured.
+            /// </summary>
+            FirstChanceError = 4
+
         }
 
         internal PExpr( EvalVisitor.Frame pending, DeferredKind status )
@@ -121,7 +127,7 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            string sP = Deferred != null ? String.Format( "({0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr ) : null;
+            string sP = Deferred != null ? String.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, DeferredStatus ) : null;
             string sR = Result != null ? String.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
             return sP ?? sR ?? "(Unknown)";
         }

@@ -77,14 +77,21 @@ namespace Yodii.Script
             }
 
             /// <summary>
+            /// Gets whether <see cref="Continue"/> can be called (<see cref="Status"/> has <see cref="ScriptEngineStatus.CanContinue"/> bit set).
+            /// </summary>
+            public bool CanContinue
+            {
+                get { return (_status & ScriptEngineStatus.CanContinue) != 0; }
+            }
+
+            /// <summary>
             /// Continue the execution of the script. 
-            /// Must be called only when <see cref="Status"/> is <see cref="ScriptEngineStatus.Breakpoint"/> or <see cref="ScriptEngineStatus.Timeout"/> 
-            /// otherwise an exception is thrown.
+            /// Must be called only when <see cref="CanContinue"/> is true otherwise an exception is thrown.
             /// </summary>
             public void Continue()
             {
                 if( _engine == null ) throw new ObjectDisposedException( "EvaluationResult" );
-                if( _status != ScriptEngineStatus.Breakpoint || _status != ScriptEngineStatus.Timeout ) throw new InvalidOperationException();
+                if( (_status & ScriptEngineStatus.CanContinue) == 0 ) throw new InvalidOperationException();
                 if( _visitor.FirstFrame != null )
                 {
                     UpdateStatus( _visitor.FirstFrame.StepOver() );
@@ -108,6 +115,7 @@ namespace Yodii.Script
                         case PExpr.DeferredKind.Timeout: _status |= ScriptEngineStatus.Timeout; break;
                         case PExpr.DeferredKind.Breakpoint: _status |= ScriptEngineStatus.Breakpoint; break;
                         case PExpr.DeferredKind.AsyncCall: _status |= ScriptEngineStatus.AsyncCall; break;
+                        case PExpr.DeferredKind.FirstChanceError: _status |= ScriptEngineStatus.FirstChanceError; break;
                         default: Debug.Fail( "UpdateStatus" ); break;
                     }
                 }
