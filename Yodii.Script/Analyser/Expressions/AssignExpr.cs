@@ -34,7 +34,7 @@ namespace Yodii.Script
     public class AssignExpr : Expr
     {
         public AssignExpr( SourceLocation location, AccessorExpr left, Expr right )
-            : base( location, true )
+            : base( location, right.IsStatement, true )
         {
             if( left == null ) throw new ArgumentNullException( "left" );
             if( right == null ) throw new ArgumentNullException( "right" );

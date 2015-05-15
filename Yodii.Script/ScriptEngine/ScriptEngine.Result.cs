@@ -106,7 +106,7 @@ namespace Yodii.Script
             {
                 _error = (_result = r.Result) as RuntimeError;
                 _status = ScriptEngineStatus.None;
-                if( r.IsErrorResult ) _status |= ScriptEngineStatus.IsError;
+                if( r.AsErrorResult != null ) _status |= ScriptEngineStatus.IsError;
                 if( r.IsPending )
                 {
                     Debug.Assert( r.DeferredStatus != PExpr.DeferredKind.None );

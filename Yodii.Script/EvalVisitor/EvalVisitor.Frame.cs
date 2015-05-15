@@ -85,12 +85,17 @@ namespace Yodii.Script
                 if( _result != null )
                 {
                     r = new PExpr( _result );
-                    OnDispose();
-                    _visitor._currentFrame = _prev;
-                    if( _prev != null ) _prev._next = null;
-                    else _visitor._firstFrame = null;
+                    DoDispose();
                 }
                 return r;
+            }
+
+            internal void DoDispose()
+            {
+                OnDispose();
+                _visitor._currentFrame = _prev;
+                if( _prev != null ) _prev._next = null;
+                else _visitor._firstFrame = null;
             }
 
             protected abstract PExpr DoVisit();

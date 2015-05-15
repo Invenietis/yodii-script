@@ -45,7 +45,7 @@ namespace Yodii.Script
 
         public PExpr Visit( SyntaxErrorExpr e )
         {
-            return new PExpr( _global.CreateRuntimeError( e, e.ErrorMessage ) );
+            return new PExpr( _global.CreateSyntaxError( e, e.ErrorMessage ) );
         }
 
         public PExpr Visit( NopExpr e )

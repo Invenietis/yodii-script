@@ -33,10 +33,11 @@ namespace Yodii.Script
 
     public class NopExpr : Expr
     {
-        public static readonly NopExpr Default = new NopExpr();
+        public static readonly NopExpr Expression = new NopExpr( false );
+        public static readonly NopExpr Statement = new NopExpr( true );
 
-        NopExpr()
-            : base( SourceLocation.Empty, false )
+        NopExpr( bool isStatement )
+            : base( SourceLocation.Empty, isStatement, false )
         {
         }
 

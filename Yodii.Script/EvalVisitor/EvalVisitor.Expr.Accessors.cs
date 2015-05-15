@@ -232,8 +232,8 @@ namespace Yodii.Script
 
             public PExpr SetError( string message = null )
             {
-                if( message != null ) return SetResult( _visitor._global.CreateRuntimeError( Expr, message ) );
-                return SetResult( _visitor._global.CreateAccessorError( Expr ) );
+                if( message != null ) return SetResult( _visitor._global.CreateSyntaxError( Expr, message ) );
+                return SetResult( _visitor._global.CreateAccessorSyntaxError( Expr ) );
             }
 
             AccessorExpr IAccessorFrame.Expr 

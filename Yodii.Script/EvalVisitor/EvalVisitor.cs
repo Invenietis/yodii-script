@@ -111,6 +111,7 @@ namespace Yodii.Script
         public void ResetCurrentEvaluation()
         {
             _firstFrame = _currentFrame = null;
+            _firstChanceError = null;
         }
 
         public RuntimeError FirstChanceError
@@ -118,8 +119,8 @@ namespace Yodii.Script
             get { return _firstChanceError; }
             internal set
             {
-                Debug.Assert( _enableFirstChanceError );
-                Debug.Assert( _firstChanceError == null );
+                Debug.Assert( value == null || _enableFirstChanceError );
+                Debug.Assert( value == null || _firstChanceError == null );
                 _firstChanceError = value;
             }
         }
@@ -135,16 +136,27 @@ namespace Yodii.Script
         {
             if( !f.IsResolved )
             {
+                RuntimeError fError = null;
                 if( kind != StepOverKind.InternalStepOver )
                 {
+                    fError = _firstChanceError;
                     _breakOnNext = kind == StepOverKind.ExternalStepIn;
                     if( _hasTimeout ) _timeLimit = DateTime.UtcNow + _timeout;
                 }
                 do
                 {
                     Debug.Assert( Frames.Contains( f ) );
-                    PExpr r = _currentFrame.VisitAndClean();
-                    if( r.IsPending ) return r;
+                    if( fError != null )
+                    {
+                        PExpr r = _currentFrame.SetResult( fError );
+                        _currentFrame.DoDispose();
+                        fError = null;
+                    }
+                    else
+                    {
+                        PExpr r = _currentFrame.VisitAndClean();
+                        if( r.IsPending ) return r;
+                    }
                 }
                 while( !f.IsResolved );
             }

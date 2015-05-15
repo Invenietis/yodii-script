@@ -193,7 +193,8 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Declares an expression in the current scope.
+        /// Declares an expression in the current scope. Returns either the given <see cref="AccessorLetExpr"/>
+        /// or a <see cref="SyntaxErrorExpr"/>.
         /// </summary>
         /// <param name="name">Name of the expression.</param>
         /// <param name="e">The expression to register.</param>
@@ -222,12 +223,12 @@ namespace Yodii.Script
                         }
                         else
                         {
-                            return new SyntaxErrorExpr( e.Location, "Declaration conflicts with declaration at {0}.", first.E.Location );
+                            return new SyntaxErrorExpr( e.Location, "Declaration of '{1}' conflicts with declaration at {0}.", first.E.Location, e.Name );
                         }
                     }
                     else
                     {
-                        return new SyntaxErrorExpr( e.Location, "Masking is not allowed: declaration conflicts with declaration at {0}.", first.E.Location );
+                        return new SyntaxErrorExpr( e.Location, "Masking is not allowed: declaration of '{1}' conflicts with declaration at {0}.", first.E.Location, e.Name );
                     }
                 }
             }
@@ -272,7 +273,7 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Closes the current scope and returns all the declared variables in the order of their declarations, optionnaly skipping the first ones.
+        /// Closes the current scope (be it strong or not) and returns all the declared variables in the order of their declarations, optionnaly skipping the first ones.
         /// </summary>
         /// <returns>The declared expressions (an empty list if nothing has been declared or skipCount is too big).</returns>
         public IReadOnlyList<AccessorLetExpr> CloseScope( int skipCount = 0 )

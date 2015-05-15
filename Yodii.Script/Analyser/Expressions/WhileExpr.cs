@@ -39,7 +39,7 @@ namespace Yodii.Script
         }
 
         public WhileExpr( SourceLocation location, bool doWhile, Expr condition, Expr code )
-            : base( location, false )
+            : base( location, true, false )
         {
             Condition = condition;
             Code = code;

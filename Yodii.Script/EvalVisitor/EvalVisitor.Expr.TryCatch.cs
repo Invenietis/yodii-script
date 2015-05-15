@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.FlowBreaking.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.If.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -33,34 +33,52 @@ namespace Yodii.Script
 
     internal partial class EvalVisitor
     {
-        class FlowBreakingExprFrame : Frame<FlowBreakingExpr>
+        class TryCatchExprFrame : Frame<TryCatchExpr>
         {
-            PExpr _returns;
+            PExpr _try;
+            PExpr _catch;
+            bool _catching;
 
-            public FlowBreakingExprFrame( EvalVisitor evaluator, FlowBreakingExpr e )
+            public TryCatchExprFrame( EvalVisitor evaluator, TryCatchExpr e )
                 : base( evaluator, e )
             {
             }
 
             protected override PExpr DoVisit()
             {
-                if( Expr.ReturnedValue != null )
+                if( IsPendingOrSignal( ref _try, Expr.TryExpr ) )
                 {
-                    if( IsPendingOrSignal( ref _returns, Expr.ReturnedValue ) ) return PendingOrSignal( _returns );
-                    if( Expr.Type == FlowBreakingExpr.BreakingType.Throw )
+                    RuntimeError e = _try.AsErrorResult;
+                    if( e == null || !e.IsCatchable )
                     {
-                        return SetResult( new RuntimeError( Expr, _returns.Result.ToValue() ) );
+                        return PendingOrSignal( _try );
                     }
-                    return SetResult( new RuntimeFlowBreaking( Expr, _returns.Result.ToValue() ) );
+                    if( !_catching )
+                    {
+                        if( Expr.ExceptionParameter != null )
+                        {
+                            _visitor.ScopeManager.Register( Expr.ExceptionParameter ).Value = e.ThrownValue;
+                        }
+                        _visitor.FirstChanceError = null;
+                        _catching = true;
+                    }
+                    if( IsPendingOrSignal( ref _catch, Expr.CatchExpr ) ) return PendingOrSignal( _catch );
                 }
-                return SetResult( new RuntimeFlowBreaking( Expr ) );
+                return SetResult( RuntimeObj.Undefined );
+            }
+
+            protected override void OnDispose()
+            {
+                if( _catching && Expr.ExceptionParameter != null )
+                {
+                    _visitor.ScopeManager.Unregister( Expr.ExceptionParameter );
+                }
             }
         }
 
-        public PExpr Visit( FlowBreakingExpr e )
+        public PExpr Visit( TryCatchExpr e )
         {
-            return Run( new FlowBreakingExprFrame( this, e ) );
+            return Run( new TryCatchExprFrame( this, e ) );
         }
-
     }
 }

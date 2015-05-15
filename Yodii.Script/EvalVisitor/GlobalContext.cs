@@ -93,21 +93,21 @@ namespace Yodii.Script
             return new JSEvalDate( value );
         }
 
-        public RuntimeError CreateRuntimeError( Expr e, string message, RuntimeError previous = null )
+        public RuntimeError CreateSyntaxError( Expr e, string message )
         {
-            return new RuntimeError( e, message, previous );
+            return new RuntimeError( e, message );
         }
 
-        public RuntimeError CreateAccessorError( AccessorExpr e, RuntimeError previous = null )
+        public RuntimeError CreateAccessorSyntaxError( AccessorExpr e )
         {
             AccessorMemberExpr m = e as AccessorMemberExpr;
             if( m != null )
             {
-                if( m.IsUnbound ) return CreateRuntimeError( e, "Undefined in scope: " + m.Name );
-                return CreateRuntimeError( e, "Unknown property: " + m.Name, previous );
+                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name );
+                return CreateSyntaxError( e, "Unknown property: " + m.Name );
             }
-            if( e is AccessorIndexerExpr ) return CreateRuntimeError( e, "Indexer is not supported.", previous );
-            return CreateRuntimeError( e, "Not a function.", previous );
+            if( e is AccessorIndexerExpr ) return CreateSyntaxError( e, "Indexer is not supported." );
+            return CreateSyntaxError( e, "Not a function." );
         }
 
         /// <summary>

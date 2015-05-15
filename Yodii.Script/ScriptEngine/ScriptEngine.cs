@@ -72,6 +72,15 @@ namespace Yodii.Script
         }
 
         /// <summary>
+        /// Gets or sets whether the engine should break whenever a runtime error occurred.
+        /// </summary>
+        public virtual bool EnableFirstChanceError
+        {
+            get { return _visitor.EnableFirstChanceError; }
+            set { _visitor.EnableFirstChanceError = value; }
+        }
+
+        /// <summary>
         /// Gets whether this engine is currently executing a script.
         /// </summary>
         public bool IsExecuting
@@ -135,7 +144,17 @@ namespace Yodii.Script
         /// <returns>The result of the evaluation.</returns>
         public static RuntimeObj Evaluate( string s, GlobalContext ctx = null )
         {
-            Expr e = ExprAnalyser.AnalyseString( s );
+            return Evaluate( ExprAnalyser.AnalyseString( s ) );
+        }
+
+        /// <summary>
+        /// Simple static helper to evaluate an expression (typically a pure expression without side effects).
+        /// </summary>
+        /// <param name="e">The expression to evaluate.</param>
+        /// <param name="ctx">The <see cref="GlobalContext"/>. When null, a new default GlobalContext is used.</param>
+        /// <returns>The result of the evaluation.</returns>
+        public static RuntimeObj Evaluate( Expr e, GlobalContext ctx = null )
+        {
             EvalVisitor v = new EvalVisitor( ctx ?? new GlobalContext() );
             return v.VisitExpr( e ).Result;
         }

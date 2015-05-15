@@ -34,7 +34,7 @@ namespace Yodii.Script
     public class FunctionExpr : Expr
     {
         public FunctionExpr( SourceLocation location, IReadOnlyList<AccessorLetExpr> parameters, Expr body, IReadOnlyList<AccessorLetExpr> closures, AccessorLetExpr name = null )
-            : base( location, false )
+            : base( location, name != null, false )
         {
             if( parameters == null ) throw new ArgumentNullException();
             if( body == null ) throw new ArgumentNullException();

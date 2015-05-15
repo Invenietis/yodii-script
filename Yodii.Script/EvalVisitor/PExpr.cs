@@ -106,9 +106,10 @@ namespace Yodii.Script
         public bool IsSignal { get { return Result is RuntimeSignal; } }
 
         /// <summary>
-        /// Gets whether the resolved <see cref="Result"/> is a <see cref="RuntimeError"/> (a RuntimeError is a <see cref="RuntimeSignal"/>).
+        /// Gets the resolved <see cref="Result"/> as a <see cref="RuntimeError"/> if it is an error. 
+        /// (A RuntimeError is a <see cref="RuntimeSignal"/>.)
         /// </summary>
-        public bool IsErrorResult { get { return Result is RuntimeError; } }
+        public RuntimeError AsErrorResult { get { return Result as RuntimeError; } }
 
         /// <summary>
         /// Gets whether the <see cref="Deferred"/> is not null (and the <see cref="Result"/> is null).

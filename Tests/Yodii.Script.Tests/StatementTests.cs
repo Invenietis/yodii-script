@@ -32,23 +32,15 @@ namespace Yodii.Script.Tests
     [TestFixture]
     public class StatementTests
     {
-        [Test]
-        public void evaluating_basic_numbers_expressions()
+        [TestCase( "6;7+3", 10.0 )]
+        [TestCase( "1+2*(3+1);", 9.0 )]
+        [TestCase( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", 2173.0 )]
+        public void evaluating_basic_numbers_expressions( string expr, double result )
         {
-            TestHelper.RunNormalAndStepByStep( "6;7+3", o =>
+            TestHelper.RunNormalAndStepByStep( expr, o =>
             {
                 Assert.IsInstanceOf<JSEvalNumber>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
-            } );
-            TestHelper.RunNormalAndStepByStep( "1+2*(3+1)", o =>
-            {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 9 ) );
-            } );
-            TestHelper.RunNormalAndStepByStep( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", o =>
-            {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 2173 ) );
+                Assert.That( o.ToDouble(), Is.EqualTo( result ) );
             } );
         }
 
@@ -356,6 +348,21 @@ namespace Yodii.Script.Tests
             {
                 Assert.IsInstanceOf<JSEvalString>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+            } );
+        }
+
+        [TestCase( "a+++b", "r=0, a=1, b=0" )]
+        [TestCase( "a+++b+++a++", "r=1, a=2, b=1" )]
+        [TestCase( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
+        public void ambiguous_postfix_increment_and_addition_works_like_in_javascript( string add, string result )
+        {
+            string s = String.Format( @"let a = 0, b = 0, r = {0};
+                                        'r='+r+', a='+a+', b='+b
+                                        ", add );
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( result ) );
             } );
         }
 

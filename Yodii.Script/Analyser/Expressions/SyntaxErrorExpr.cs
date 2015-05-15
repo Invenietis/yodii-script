@@ -31,20 +31,13 @@ namespace Yodii.Script
 {
     public class SyntaxErrorExpr : Expr
     {
-        public static readonly SyntaxErrorExpr ReservedErrorExpr = new SyntaxErrorExpr( SourceLocation.Empty, "Reserved." );
-
         public SyntaxErrorExpr( SourceLocation location, string errorMessageFormat, params object[] messageParameters )
-            : base( location )
+            : base( location, true, false )
         {
             ErrorMessage = String.Format( errorMessageFormat, messageParameters );
         }
 
         public string ErrorMessage { get; private set; }
-
-        public bool IsReserved
-        {
-            get { return this == ReservedErrorExpr; }
-        }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.

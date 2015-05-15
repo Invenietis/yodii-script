@@ -38,9 +38,9 @@ namespace Yodii.Script
         /// Creates a new <see cref="AccessorCallExpr"/>: 0 or n arguments can be provided.
         /// </summary>
         /// <param name="left">Left scope. Must not be null.</param>
-        /// <param name="arguments">When null, it is normalized to an empty list.</param>
-        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments = null )
-            : base( location, left, true )
+        /// <param name="arguments">When null, it is normalized to <see cref="Expr.EmptyArray"/>.</param>
+        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, bool isStatement )
+            : base( location, left, isStatement, true )
         {
             _args = arguments ?? Expr.EmptyArray;
         }

@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\ConstantExpr.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\Analyser\Expressions\IfExpr.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,24 +22,41 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
+
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public class ConstantExpr : Expr
-    {
-        public static readonly ConstantExpr UndefinedExpr = new ConstantExpr( SourceLocation.Empty, JSSupport.Undefined, false );
 
-        public ConstantExpr( SourceLocation location, object value, bool isStatement )
-            : base( location, isStatement, false )
+    public class TryCatchExpr : Expr
+    {
+        public TryCatchExpr( SourceLocation location, Expr tryExpr, AccessorLetExpr exceptionParameter, Expr catchExpr )
+            : base( location, true, true )
         {
-            Value = value;
+            if( tryExpr == null ) throw new ArgumentException( "tryExpr" );
+            if( catchExpr == null ) throw new ArgumentNullException( "catchExpr" );
+            TryExpr = tryExpr;
+            ExceptionParameter = exceptionParameter;
+            CatchExpr = catchExpr;
         }
 
-        public object Value { get; private set; }
+        /// <summary>
+        /// Gets the try expression.
+        /// </summary>
+        public Expr TryExpr { get; private set; }
+
+        /// <summary>
+        /// Gets the exception parameter. Can be null.
+        /// </summary>
+        public AccessorLetExpr ExceptionParameter { get; private set; }
+
+        /// <summary>
+        /// Gets the catch expression.
+        /// </summary>
+        public Expr CatchExpr { get; private set; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -53,9 +70,16 @@ namespace Yodii.Script
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
-            return Value != null ? Value.ToString() : "(null)";
+            string s = "[try " + TryExpr.ToString() + " catch " + CatchExpr.ToString() + "]";
+            return s;
         }
     }
+
+
 }

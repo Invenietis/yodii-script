@@ -32,34 +32,40 @@ namespace Yodii.Script.Tests
     [TestFixture]
     public class EvalTests
     {
-        [Test]
-        public void evaluating_basic_numbers_expressions()
+        [TestCase( "6", 6 )]
+        [TestCase( "(6+6)*3/4*2", (6.0 + 6.0) * 3.0 / 4.0 * 2.0 )]
+        [TestCase( "8*5/4+1-(100/5/4)", 8.0 * 5.0 / 4.0 + 1.0 - (100.0 / 5.0 / 4.0) )]
+        [TestCase( "8*5/4+1-(100/5/4) > 1 ? 14+56/7/2-4 : (14+13+12)/2*47/3", 14.0 + 56.0 / 7.0 / 2.0 - 4.0 )]
+        public void evaluating_basic_numbers_expressions( string expr, double result )
         {
-            RuntimeObj o;
+            TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                o = ScriptEngine.Evaluate( "6" );
                 Assert.That( o is JSEvalNumber );
-                Assert.That( o.ToDouble(), Is.EqualTo( 6 ) );
-            }
+                Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+            } );
+        }
+
+        [TestCase( "+2", 2.0 )]
+        [TestCase( "-2", -2.0 )]
+        [TestCase( "+'8'", 8.0 )]
+        [TestCase( "+'8' ? -'2' : -'3'", -2.0 )]
+        [TestCase( "+'8'+'7'", "87" )]
+        [TestCase( "+'8'+ +'7'", 15.0 )]
+        public void operator_plus_or_minus_convert_to_number_just_like_in_javascript( string expr, object result )
+        {
+            TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                o = ScriptEngine.Evaluate( "6+++8" );
-                Assert.That( o is RuntimeError );
-            }
-            {
-                o = ScriptEngine.Evaluate( "(6+6)*3/4*2" );
-                Assert.That( o is JSEvalNumber );
-                Assert.That( o.ToDouble(), Is.EqualTo( (6.0 + 6.0) * 3.0 / 4.0 * 2.0 ) );
-            }
-            {
-                o = ScriptEngine.Evaluate( "8*5/4+1-(100/5/4)" );
-                Assert.That( o is JSEvalNumber );
-                Assert.That( o.ToDouble(), Is.EqualTo( 8.0 * 5.0 / 4.0 + 1.0 - (100.0 / 5.0 / 4.0) ) );
-            }
-            {
-                o = ScriptEngine.Evaluate( "8*5/4+1-(100/5/4) > 1 ? 14+56/7/2-4 : (14+13+12)/2*47/3" );
-                Assert.That( o is JSEvalNumber );
-                Assert.That( o.ToDouble(), Is.EqualTo( 14.0 + 56.0 / 7.0 / 2.0 - 4.0 ) );
-            }
+                if( result is Double )
+                {
+                    Assert.That( o is JSEvalNumber );
+                    Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+                }
+                else
+                {
+                    Assert.That( o is JSEvalString );
+                    Assert.That( o.ToString(), Is.EqualTo( result ) );
+                }
+            } );
         }
 
         [Test]
@@ -73,35 +79,18 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
-        public void comparing_strings_and_numbers()
+        [TestCase( "'45' + 4 == '454'", true )]
+        [TestCase( "'45' <= '454'", true )]
+        [TestCase( "45 <= '454'", true )]
+        [TestCase( "'45' > 454", false )]
+        [TestCase( "'olivier' < 'spi'", true )]
+        public void comparing_strings_and_numbers( string expr, bool result )
         {
-            RuntimeObj o;
+            TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                o = ScriptEngine.Evaluate( "'45' + 4 == '454'" );
                 Assert.That( o is JSEvalBoolean );
-                Assert.That( o.ToBoolean(), Is.True );
-            }
-            {
-                o = ScriptEngine.Evaluate( "'45' <= '454'" );
-                Assert.That( o is JSEvalBoolean );
-                Assert.That( o.ToBoolean(), Is.True );
-            }
-            {
-                o = ScriptEngine.Evaluate( "45 <= '454'" );
-                Assert.That( o is JSEvalBoolean );
-                Assert.That( o.ToBoolean(), Is.True );
-            }
-            {
-                o = ScriptEngine.Evaluate( "'45' > 454" );
-                Assert.That( o is JSEvalBoolean );
-                Assert.That( o.ToBoolean(), Is.False );
-            }
-            {
-                o = ScriptEngine.Evaluate( "'olivier' < 'spi'" );
-                Assert.That( o is JSEvalBoolean );
-                Assert.That( o.ToBoolean(), Is.True );
-            }
+                Assert.That( o.ToBoolean(), Is.EqualTo( result ) );
+            } );
         }
 
         [Test]
