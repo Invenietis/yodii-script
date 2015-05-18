@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script.Debugger
 {
-    class Variable
+    public class Variable
     {
         string _name;
         RefRuntimeObj _obj;

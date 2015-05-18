@@ -8,7 +8,7 @@ namespace Yodii.Script.Debugger
 {
     interface IVariableList
     {
-        IReadOnlyList<Variable> Vars { get; }
+        List<Variable> Vars { get; }
         Variable FindByName( string name );
     }
 }
