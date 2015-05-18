@@ -59,12 +59,14 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BasicBreakpointSupport.cs" />
+    <Compile Include="TryCatchTests.cs" />
     <Compile Include="FunctionTests.cs" />
     <Compile Include="StatementTests.cs" />
     <Compile Include="EvalTests.cs" />
     <Compile Include="JSAnalyserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticScopeTests.cs" />
+    <Compile Include="TestHelper.cs" />
     <Compile Include="WithGlobalContext.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -40,7 +40,7 @@ namespace Yodii.Script
         public class Result : IDisposable
         {
             readonly ScriptEngine _engine;
-            EvalVisitor _ev;
+            EvalVisitor _visitor;
             RuntimeObj _result;
             RuntimeError _error;
             ScriptEngineStatus _status;
@@ -48,16 +48,7 @@ namespace Yodii.Script
             internal Result( ScriptEngine e )
             {
                 _engine = e;
-                _ev = e._evaluator;
-            }
-
-            /// <summary>
-            /// Gets the <see cref="EvalVisitor"/> of the engine.
-            /// Null whenever this result has been <see cref="Dispose"/>d.
-            /// </summary>
-            protected EvalVisitor EvalVisitor
-            {
-                get { return _ev; }
+                _visitor = e._visitor;
             }
 
             /// <summary>
@@ -86,16 +77,24 @@ namespace Yodii.Script
             }
 
             /// <summary>
-            /// Continue the execution of the script. Must be called only when <see cref="Status"/> is <see cref="ScriptEngineStatus.IsPending"/> otherwise
-            /// an exception is thrown.
+            /// Gets whether <see cref="Continue"/> can be called (<see cref="Status"/> has <see cref="ScriptEngineStatus.CanContinue"/> bit set).
+            /// </summary>
+            public bool CanContinue
+            {
+                get { return (_status & ScriptEngineStatus.CanContinue) != 0; }
+            }
+
+            /// <summary>
+            /// Continue the execution of the script. 
+            /// Must be called only when <see cref="CanContinue"/> is true otherwise an exception is thrown.
             /// </summary>
             public void Continue()
             {
                 if( _engine == null ) throw new ObjectDisposedException( "EvaluationResult" );
-                if( _status != ScriptEngineStatus.IsPending ) throw new InvalidOperationException();
-                if( _ev.FirstFrame != null )
+                if( (_status & ScriptEngineStatus.CanContinue) == 0 ) throw new InvalidOperationException();
+                if( _visitor.FirstFrame != null )
                 {
-                    UpdateStatus( _ev.FirstFrame.StepOver() );
+                    UpdateStatus( _visitor.FirstFrame.StepOver() );
                 }
             }
 
@@ -107,8 +106,19 @@ namespace Yodii.Script
             {
                 _error = (_result = r.Result) as RuntimeError;
                 _status = ScriptEngineStatus.None;
-                if( r.IsErrorResult ) _status |= ScriptEngineStatus.IsError;
-                if( r.IsPending ) _status |= ScriptEngineStatus.IsPending;
+                if( r.AsErrorResult != null ) _status |= ScriptEngineStatus.IsError;
+                if( r.IsPending )
+                {
+                    Debug.Assert( r.DeferredStatus != PExpr.DeferredKind.None );
+                    switch( r.DeferredStatus )
+                    {
+                        case PExpr.DeferredKind.Timeout: _status |= ScriptEngineStatus.Timeout; break;
+                        case PExpr.DeferredKind.Breakpoint: _status |= ScriptEngineStatus.Breakpoint; break;
+                        case PExpr.DeferredKind.AsyncCall: _status |= ScriptEngineStatus.AsyncCall; break;
+                        case PExpr.DeferredKind.FirstChanceError: _status |= ScriptEngineStatus.FirstChanceError; break;
+                        default: Debug.Fail( "UpdateStatus" ); break;
+                    }
+                }
                 else _status |= ScriptEngineStatus.IsFinished;
             }
 
@@ -117,13 +127,13 @@ namespace Yodii.Script
             /// </summary>
             public void Dispose()
             {
-                if( _ev != null )
+                if( _visitor != null )
                 {
                     _engine.StopExecution();
                     _error = null;
                     _result = null;
                     _status = ScriptEngineStatus.None;
-                    _ev = null;
+                    _visitor = null;
                 }
             }
         }

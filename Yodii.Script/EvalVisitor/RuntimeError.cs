@@ -29,34 +29,59 @@ namespace Yodii.Script
 {
     public class RuntimeError : RuntimeSignal
     {
-        RuntimeError _next;
-        RuntimeError _prev;
-
-        public RuntimeError( Expr culprit, string message, RuntimeError previous = null )
+        /// <summary>
+        /// Initializes a new syntax error.
+        /// </summary>
+        /// <param name="culprit">The expression. Can not be null.</param>
+        /// <param name="syntaxErrorMessage">A message describing the syntax error. Can not be null.</param>
+        public RuntimeError( Expr culprit, string syntaxErrorMessage )
             : base( culprit )
         {
-            Message = message;
-            if( previous != null )
-            {
-                if( previous._next != null ) throw new InvalidOperationException( "Previous error is already linked to a next error." );
-                previous._next = this;
-                _prev = previous;
-            }
+            if( syntaxErrorMessage == null ) throw new ArgumentNullException();
+            Message = syntaxErrorMessage;
         }
 
+        /// <summary>
+        /// Initializes a new runtime error.
+        /// </summary>
+        /// <param name="culprit">The expression. Can not be null.</param>
+        /// <param name="thrownValue">The error value. Can not be null.</param>
+        public RuntimeError( Expr culprit, RuntimeObj thrownValue )
+            : base( culprit )
+        {
+            if( thrownValue == null ) throw new ArgumentNullException();
+            if( thrownValue is RefRuntimeObj ) throw new ArgumentException();
+            Message = "Runtime error.";
+            ThrownValue = thrownValue;
+        }
+
+        /// <summary>
+        /// Gets whether this is a syntax error.
+        /// Syntax errors are not recoverables (they are not <see cref="IsCatchable"/>).
+        /// </summary>
+        public bool IsSyntaxError
+        {
+            get { return ThrownValue == null; }
+        }
+
+        /// <summary>
+        /// Gets whether this error can be caught.
+        /// </summary>
+        public bool IsCatchable
+        {
+            get { return ThrownValue != null; }
+        }
+
+        /// <summary>
+        /// Gets the message for syntax error. 
+        /// This is "Runtime Error" when <see cref="ThrownValue"/> is not null.
+        /// </summary>
         public string Message { get; private set; }
 
-        public RuntimeError Previous { get { return _prev; } }
-
-        public RuntimeError Origin
-        {
-            get
-            {
-                RuntimeError e = this;
-                while( e._prev != null ) e = e._prev;
-                return e;
-            }
-        }
+        /// <summary>
+        /// Gets the thrown value. Null when <see cref="IsSyntaxError"/> is true.
+        /// </summary>
+        public RuntimeObj ThrownValue { get; private set; }
 
         public override PExpr Visit( IAccessorFrame frame )
         {
@@ -66,7 +91,9 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return String.Format( "Error: {0} at {1}.", Message, Expr.Location.ToString() );
+            return IsSyntaxError 
+                    ? String.Format( "Syntax Error: {0} at {1}.", Message, Expr.Location.ToString() )
+                    : String.Format( "Runtime Error at {0}. Error: {1}", Expr.Location.ToString(), ThrownValue.ToString() );
         }
     }
 

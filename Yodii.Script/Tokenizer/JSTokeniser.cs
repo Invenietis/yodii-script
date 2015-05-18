@@ -256,10 +256,14 @@ namespace Yodii.Script
             get { return (_token & (int)JSTokenizerToken.IsUnaryOperator) != 0; }
         }
         
-        public bool IsUnaryOperatorExtended
+        /// <summary>
+        /// Gets whether the current token is one of the <see cref="IsUnaryOperator"/> or <see cref="JSTokenizerToken.Plus"/> or <see cref="JSTokenizerToken.Minus"/>.
+        /// </summary>
+        public bool IsUnaryOperatorOrPlusOrMinus
         {
-            get { return (_token & (int)JSTokenizerToken.OpLevelMask) == (int)JSTokenizerToken.OpLevel14; }
+            get { return IsUnaryOperator || _token == (int)JSTokenizerToken.Plus || _token == (int)JSTokenizerToken.Minus; }
         }
+        
         #endregion
 
         /// <summary>

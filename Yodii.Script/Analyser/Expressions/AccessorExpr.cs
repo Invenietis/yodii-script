@@ -43,9 +43,10 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="location">Location of this expression.</param>
         /// <param name="left">Left access.</param>
-        /// <param name="isbreakable">True to allow breaking on this type of expession.</param>
-        protected AccessorExpr( SourceLocation location, Expr left, bool isBreakable )
-            : base( location, isBreakable )
+        /// <param name="isStatement">True if this expression is a statement.</param>
+        /// <param name="isBreakable">True to allow breaking on this type of expession.</param>
+        protected AccessorExpr( SourceLocation location, Expr left, bool isStatement, bool isBreakable )
+            : base( location, isStatement, isBreakable )
         {
             Left = left;
         }

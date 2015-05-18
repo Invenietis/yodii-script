@@ -37,8 +37,8 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="left">Left scope. Can be null for unbound reference.</param>
         /// <param name="fieldOrVariableName">Field, variable or function name.</param>
-        public AccessorMemberExpr( SourceLocation location, Expr left, string fieldOrVariableName )
-            : base( location, left, false )
+        public AccessorMemberExpr( SourceLocation location, Expr left, string fieldOrVariableName, bool isStatement )
+            : base( location, left, isStatement, false )
         {
             Name = fieldOrVariableName;
         }

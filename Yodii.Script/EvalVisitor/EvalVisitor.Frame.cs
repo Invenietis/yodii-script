@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         /// <summary>
         /// This is a basic frame object that captures an evaluation step. 
@@ -65,62 +65,64 @@ namespace Yodii.Script
 
             public bool IsResolved
             {
-                get { return Result != null; }
+                get { return _result != null; }
             }
 
             public PExpr StepOver()
             {
-                return _result == null ? DoVisit() : new PExpr( _result );
+                return _visitor.StepOver( this, StepOverKind.ExternalStepOver );
             }
 
             public PExpr StepIn()
             {
-                _visitor.BreakOnNext = true;
-                return StepOver();
+                return _visitor.StepOver( this, StepOverKind.ExternalStepIn );
             }
 
-            internal PExpr Visit()
+            internal PExpr VisitAndClean()
             {
-                Debug.Assert( _result == null );
-                if( Expr.IsBreakable && (_visitor.BreakOnNext || _visitor._breakpoints( Expr )) )
-                {
-                    _visitor.BreakOnNext = false;
-                    return new PExpr( this );
-                }
                 PExpr r = DoVisit();
-                Debug.Assert( r.Result == _result && (r.Deferred == null || r.Deferred == this ) );
+                Debug.Assert( r.Result == _result || (r.Result == null && r.Deferred != null) );
                 if( _result != null )
                 {
-                    if( !(_result is RuntimeSignal) || OnSignal( ref _result ) )
-                    {
-                        r = new PExpr( _result );
-                        OnDispose();
-                        _visitor._currentFrame = _prev;
-                        if( _prev != null ) _prev._next = null;
-                        else _visitor._firstFrame = null;
-                    }
+                    r = new PExpr( _result );
+                    DoDispose();
                 }
                 return r;
+            }
+
+            internal void DoDispose()
+            {
+                OnDispose();
+                _visitor._currentFrame = _prev;
+                if( _prev != null ) _prev._next = null;
+                else _visitor._firstFrame = null;
             }
 
             protected abstract PExpr DoVisit();
 
             public PExpr PendingOrSignal( PExpr sub )
             {
-                return sub.IsSignal ? SetResult( sub.Result ) : new PExpr( this );
+                Debug.Assert( sub.IsPendingOrSignal );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.DeferredStatus );
             }
 
             public bool IsPendingOrSignal( ref PExpr current, Expr e )
             {
                 if( current.IsResolved ) return false;
                 if( current.IsUnknown ) current = _visitor.VisitExpr( e );
-                else current = current.Deferred.StepOver();
+                else current = _visitor.StepOver( current.Frame, StepOverKind.InternalStepOver );
                 return current.IsPendingOrSignal;
             }
 
             public virtual PExpr SetResult( RuntimeObj result )
             {
                 Debug.Assert( _result == null );
+                RuntimeError e = result as RuntimeError;
+                if( e != null && !(e.Expr is SyntaxErrorExpr) && _visitor.EnableFirstChanceError )
+                {
+                    _visitor.FirstChanceError = e;
+                    return new PExpr( this, PExpr.DeferredKind.FirstChanceError );
+                }
                 return new PExpr( (_result = result) );
             }
 
@@ -134,25 +136,9 @@ namespace Yodii.Script
                 get { return _prev; }
             }
 
-            public IEvalVisitor Visitor
-            {
-                get { return _visitor; }
-            }
-
             public GlobalContext Global
             {
                 get { return _visitor.Global; }
-            }
-
-            /// <summary>
-            /// Must return true to dispose the frame, false to keep the frame alive.
-            /// By default, when result is a <see cref="RuntimeError"/>, the frame is disposed (unless KeepStackOnError is true).
-            /// </summary>
-            /// <param name="result">The result of the frame (initially a <see cref="RuntimeSignal"/>) that can be updated.</param>
-            /// <returns>True to dispose the frame. False to keep it alive.</returns>
-            protected virtual bool OnSignal( ref RuntimeObj result )
-            {
-                return !(_visitor._keepStackOnError && _result is RuntimeError);
             }
             
             protected virtual void OnDispose()

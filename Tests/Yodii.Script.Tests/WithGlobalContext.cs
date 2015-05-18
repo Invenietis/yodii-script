@@ -75,8 +75,11 @@ namespace Yodii.Script.Tests
         [Test]
         public void access_to_a_non_exisitng_object_on_the_Context_is_a_runtime_error()
         {
-            RuntimeObj o = ScriptEngine.Evaluate( "AnIntrinsicArray[0]" );
-            Assert.That( o is RuntimeError );
+            string s = "AnIntrinsicArray[0]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is RuntimeError );
+            } );
         }
 
 
@@ -84,60 +87,77 @@ namespace Yodii.Script.Tests
         public void access_to_members_via_On_does_not_fallback()
         {
             var ctx = new Context();
-            RuntimeObj o = ScriptEngine.Evaluate( "An.array.with.one.cell[6]", ctx );
-            Assert.That( o is JSEvalString && o.ToString() == "An.array.with.one.cell[] => 6" );
+            string s = "An.array.with.one.cell[6]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is JSEvalString && o.ToString() == "An.array.with.one.cell[] => 6" );
+            }, ctx );
 
-            o = ScriptEngine.Evaluate( "array", ctx );
-            Assert.That( o is RuntimeError );
-            
-            o = ScriptEngine.Evaluate( "XX.array", ctx );
-            Assert.That( o is RuntimeError );
+            s = "array";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is RuntimeError );
+            }, ctx );
+
+            s = "XX.array";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is RuntimeError );
+            }, ctx );
         }
 
         [Test]
         public void access_to_AnIntrinsicArray_exposed_by_the_Context()
         {
-            RuntimeObj o;
+            string s;
             var ctx = new Context();
-            o = ScriptEngine.Evaluate( "AnIntrinsicArray[0]", ctx );
-            Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+            s = "AnIntrinsicArray[0]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+            }, ctx );
+
             ctx.AnIntrinsicArray = new[] { 1.2 };
-            o = ScriptEngine.Evaluate( "AnIntrinsicArray[-1]", ctx );
-            Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
-            o = ScriptEngine.Evaluate( "AnIntrinsicArray[2]", ctx );
-            Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
-            o = ScriptEngine.Evaluate( "AnIntrinsicArray[0]", ctx );
-            Assert.That( o is JSEvalNumber );
-            Assert.That( o.ToDouble(), Is.EqualTo( 1.2 ) );
+            
+            s = "AnIntrinsicArray[-1]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+            }, ctx );            
+            
+            s = "AnIntrinsicArray[2]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+            }, ctx );
+            
+            s = "AnIntrinsicArray[0]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is JSEvalNumber );
+                Assert.That( o.ToDouble(), Is.EqualTo( 1.2 ) );
+            }, ctx );
+            
             ctx.AnIntrinsicArray = new[] { 3.4, 5.6 };
-            o = ScriptEngine.Evaluate( "AnIntrinsicArray[0+0] + AnIntrinsicArray[1+0] ", ctx );
-            Assert.That( o is JSEvalNumber );
-            Assert.That( o.ToDouble(), Is.EqualTo( 3.4 + 5.6 ) );
+
+            s = "AnIntrinsicArray[0+(7-7)] + AnIntrinsicArray[1+0]";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.That( o is JSEvalNumber );
+                Assert.That( o.ToDouble(), Is.EqualTo( 3.4 + 5.6 ) );
+            }, ctx );
         }
 
-
         [TestCase( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
-        [TestCase( "typeof Ghost.M( Ghost.M[5+8], Date(2015, 4, 23) ) == 'number'" )]
+        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], Date(2015, 4, 23) ) == 'number'" )]
         public void access_to_a_ghost_object_step_by_step( string s )
         {
             var ctx = new Context();
-            RuntimeObj syncResult = ScriptEngine.Evaluate( s, ctx );
-            Assert.That( syncResult is JSEvalBoolean && syncResult.ToBoolean() );
-
-            ScriptEngine engine = new ScriptEngine( ctx );
-            engine.Breakpoints.BreakAlways = true;
-            using( ScriptEngine.Result rAsync = engine.Execute( s ) )
+            TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                int nbStep = 0;
-                while( rAsync.Status == ScriptEngineStatus.IsPending )
-                {
-                    ++nbStep;
-                    rAsync.Continue();
-                }
-                Assert.That( rAsync.Status, Is.EqualTo( ScriptEngineStatus.IsFinished ) );
-                Assert.That( new RuntimeObjComparer( rAsync.CurrentResult, syncResult ).AreEqualStrict( engine.Context ) );
-                Console.WriteLine( "String '{0}' = {1} evaluated in {2} steps.", s, syncResult.ToString(), nbStep );
-            }
+                Assert.That( o is JSEvalBoolean );
+                Assert.That( o.ToBoolean() );
+            }, ctx );
         }
     }
 }

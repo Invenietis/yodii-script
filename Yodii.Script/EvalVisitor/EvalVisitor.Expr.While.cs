@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class WhileExprFrame : Frame<WhileExpr>
         {
@@ -57,10 +57,17 @@ namespace Yodii.Script
                         if( _code.IsSignal )
                         {
                             RuntimeFlowBreaking b = _code.Result as RuntimeFlowBreaking;
-                            if( b != null && b.Expr.Type == FlowBreakingExpr.BreakingType.Continue )
+                            if( b != null )
                             {
-                                _condition = _code = new PExpr();
-                                continue;
+                                if( b.Expr.Type == FlowBreakingExpr.BreakingType.Continue )
+                                {
+                                    _condition = _code = new PExpr();
+                                    continue;
+                                }
+                                if( b.Expr.Type == FlowBreakingExpr.BreakingType.Break )
+                                {
+                                    return SetResult( RuntimeObj.Undefined );
+                                }
                             }
                         }
                         return PendingOrSignal( _code );
@@ -74,29 +81,11 @@ namespace Yodii.Script
                 }
                 return SetResult( RuntimeObj.Undefined );
             }
-
-            protected override bool OnSignal( ref RuntimeObj result )
-            {
-                RuntimeFlowBreaking b = result as RuntimeFlowBreaking;
-                if( b != null )
-                {
-                    if( b.Expr.Type ==  FlowBreakingExpr.BreakingType.Break )
-                    {
-                        result = RuntimeObj.Undefined;
-                        return true;
-                    }
-                    if( b.Expr.Type == FlowBreakingExpr.BreakingType.Return )
-                    {
-                        return true;
-                    }
-                }
-                return base.OnSignal( ref result );
-            }
         }
 
         public PExpr Visit( WhileExpr e )
         {
-            return new WhileExprFrame( this, e ).Visit();
+            return Run( new WhileExprFrame( this, e ) );
         }
 
     }

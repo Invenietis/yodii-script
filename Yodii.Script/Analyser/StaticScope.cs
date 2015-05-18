@@ -68,10 +68,10 @@ namespace Yodii.Script
             {
                 if( skipCount < 0 ) throw new ArgumentException( "skipCount" );
                 int i = _count - skipCount;
-                if( i <= 0 ) return AccessorLetExpr.EmptyArray;
-                var all = new AccessorLetExpr[i];
+                if( i <= 0 && !close ) return AccessorLetExpr.EmptyArray;
+                var all = i > 0 ? new AccessorLetExpr[i] : AccessorLetExpr.EmptyArray;
                 NameEntry first = _firstNamed;
-                do
+                while( first != null )
                 {
                     NameEntry e = first.Next ?? first;
                     Debug.Assert( e.E != null );
@@ -79,7 +79,6 @@ namespace Yodii.Script
                     if( close ) container.Unregister( first );
                     first = e.NextInScope;
                 }
-                while( first != null );
                 return all;
             }
 
@@ -194,7 +193,8 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Declares an expression in the current scope.
+        /// Declares an expression in the current scope. Returns either the given <see cref="AccessorLetExpr"/>
+        /// or a <see cref="SyntaxErrorExpr"/>.
         /// </summary>
         /// <param name="name">Name of the expression.</param>
         /// <param name="e">The expression to register.</param>
@@ -223,12 +223,12 @@ namespace Yodii.Script
                         }
                         else
                         {
-                            return new SyntaxErrorExpr( e.Location, "Declaration conflicts with declaration at {0}.", first.E.Location );
+                            return new SyntaxErrorExpr( e.Location, "Declaration of '{1}' conflicts with declaration at {0}.", first.E.Location, e.Name );
                         }
                     }
                     else
                     {
-                        return new SyntaxErrorExpr( e.Location, "Masking is not allowed: declaration conflicts with declaration at {0}.", first.E.Location );
+                        return new SyntaxErrorExpr( e.Location, "Masking is not allowed: declaration of '{1}' conflicts with declaration at {0}.", first.E.Location, e.Name );
                     }
                 }
             }
@@ -273,7 +273,7 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Closes the current scope and returns all the declared variables in the order of their declarations, optionnaly skipping the first ones.
+        /// Closes the current scope (be it strong or not) and returns all the declared variables in the order of their declarations, optionnaly skipping the first ones.
         /// </summary>
         /// <returns>The declared expressions (an empty list if nothing has been declared or skipCount is too big).</returns>
         public IReadOnlyList<AccessorLetExpr> CloseScope( int skipCount = 0 )

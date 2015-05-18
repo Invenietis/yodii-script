@@ -33,8 +33,8 @@ namespace Yodii.Script
 
     public class PrePostIncDecExpr : Expr
     {
-        public PrePostIncDecExpr( SourceLocation location, AccessorExpr operand, bool plus, bool prefix )
-            : base( location, true )
+        public PrePostIncDecExpr( SourceLocation location, AccessorExpr operand, bool plus, bool prefix, bool isStatement )
+            : base( location, isStatement, true )
         {
             if( operand == null ) throw new ArgumentNullException( "left" );
             Operand = operand;

@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class ArgumentResolver : IReadOnlyList<RuntimeObj>
         {
@@ -45,6 +45,11 @@ namespace Yodii.Script
                 Frame = frame;
                 _arguments = arguments;
                 _args = new PExpr[_arguments.Count];
+            }
+
+            public bool IsArgumentsResolved
+            {
+                get { return _rpCount == _args.Length; }
             }
 
             public PExpr VisitArguments()
@@ -227,8 +232,8 @@ namespace Yodii.Script
 
             public PExpr SetError( string message = null )
             {
-                if( message != null ) return SetResult( _visitor._global.CreateRuntimeError( Expr, message ) );
-                return SetResult( _visitor._global.CreateAccessorError( Expr ) );
+                if( message != null ) return SetResult( _visitor._global.CreateSyntaxError( Expr, message ) );
+                return SetResult( _visitor._global.CreateAccessorSyntaxError( Expr ) );
             }
 
             AccessorExpr IAccessorFrame.Expr 
@@ -242,9 +247,9 @@ namespace Yodii.Script
                 if( Result != null )
                 {
                     Debug.Assert( Result == sub.Result );
-                    return new PExpr( Result );
+                    return sub;
                 }
-                return sub.IsErrorResult ? SetResult( sub.Result ) : new PExpr( this );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.DeferredStatus );
             }
 
             protected PExpr ReentrantSetResult( RuntimeObj result )
@@ -297,17 +302,17 @@ namespace Yodii.Script
 
         public PExpr Visit( AccessorMemberExpr e )
         {
-            return new AccessorMemberFrame( this, e ).Visit();
+            return Run( new AccessorMemberFrame( this, e ) );
         }
 
         public PExpr Visit( AccessorIndexerExpr e )
         {
-            return new AccessorFrame( this, e ).Visit();
+            return Run( new AccessorFrame( this, e ) );
         }
 
         public PExpr Visit( AccessorCallExpr e )
         {
-            return new AccessorFrame( this, e ).Visit();
+            return Run( new AccessorFrame( this, e ) );
         }
 
         public PExpr Visit( AccessorLetExpr e )

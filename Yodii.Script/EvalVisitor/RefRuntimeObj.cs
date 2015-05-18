@@ -76,12 +76,6 @@ namespace Yodii.Script
             return _value;
         }
 
-
-        public override RuntimeObj ToPrimitive( GlobalContext c )
-        {
-            return _value.ToPrimitive( c );
-        }
-
         public override PExpr Visit( IAccessorFrame frame )
         {
             return _value.Visit( frame );

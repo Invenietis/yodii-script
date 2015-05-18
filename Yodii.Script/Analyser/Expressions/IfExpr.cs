@@ -34,7 +34,7 @@ namespace Yodii.Script
     public class IfExpr : Expr
     {
         public IfExpr( SourceLocation location, bool isTernary, Expr condition, Expr whenTrue, Expr whenFalse )
-            : base( location, true )
+            : base( location, !isTernary || whenFalse.IsStatement, true )
         {
             IsTernaryOperator = isTernary;
             Condition = condition;

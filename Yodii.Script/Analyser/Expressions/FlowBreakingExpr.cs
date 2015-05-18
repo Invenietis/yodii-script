@@ -38,28 +38,40 @@ namespace Yodii.Script
             None,
             Break,
             Continue,
+            Throw,
             Return
         }
 
+        /// <summary>
+        /// Initializes a new <see cref="BreakingType.Break"/> or <see cref="BreakingType.Continue"/>.
+        /// </summary>
+        /// <param name="location">Source location.</param>
+        /// <param name="isContinue">True for Continue, false for Break.</param>
         public FlowBreakingExpr( SourceLocation location, bool isContinue )
-            : base( location, true )
+            : base( location, true, true )
         {
             Type = isContinue ? BreakingType.Continue : BreakingType.Break;
         }
 
-        public FlowBreakingExpr( SourceLocation location, Expr returnValue )
-            : base( location, true )
+        /// <summary>
+        /// Initializes a new <see cref="BreakingType.Return"/> or <see cref="BreakingType.Throw"/>.
+        /// </summary>
+        /// <param name="location">Source location.</param>
+        /// <param name="returnValue">Returned or thrown value. Must not be null (<see cref="NopExpr"/> must be used for return without value).</param>
+        /// <param name="isThrow">True for Throw, false for Return.</param>
+        public FlowBreakingExpr( SourceLocation location, Expr returnValue, bool isThrow )
+            : base( location, true, true )
         {
             if( returnValue == null ) throw new ArgumentNullException( "returnValue" );
-            Type = BreakingType.Return;
+            Type = isThrow ? BreakingType.Throw : BreakingType.Return;
             ReturnedValue = returnValue;
         }
 
         public FlowBreakingExpr( SourceLocation location, BreakingType type, Expr returnValue )
-            : base( location, true )
+            : base( location, true, true )
         {
             if( type == BreakingType.None ) throw new ArgumentNullException( "type" );
-            if( type == BreakingType.Return && returnValue == null ) throw new ArgumentNullException( "returnValue" );
+            if( (type == BreakingType.Return || type == BreakingType.Throw) && returnValue == null ) throw new ArgumentNullException( "returnValue" );
             Type = type;
             ReturnedValue = returnValue;
         }
@@ -70,7 +82,7 @@ namespace Yodii.Script
         public BreakingType Type { get; private set; }
 
         /// <summary>
-        /// Gets the parameter exprssion. Currently makes senses only for <see cref="BreakingType.Return"/>.
+        /// Gets the parameter expression. Applies to <see cref="BreakingType.Return"/> and <see cref="BreakingType.Throw"/>.
         /// </summary>
         public Expr ReturnedValue { get; private set; }
 
@@ -93,6 +105,7 @@ namespace Yodii.Script
             {
                 case BreakingType.Break: p = "break"; break;
                 case BreakingType.Continue: p = "continue"; break;
+                case BreakingType.Throw: p = "throw"; break;
                 default: p = "return"; break;
             }
             if( ReturnedValue != null ) p += ' ' + ReturnedValue.ToString();

@@ -31,7 +31,7 @@ namespace Yodii.Script
     public partial class ScriptEngine
     {
         readonly BreakpointManager _breakpoints;
-        readonly EvalVisitor _evaluator;
+        readonly EvalVisitor _visitor;
         readonly GlobalContext _globalContext;
         Result _currentResult;
 
@@ -45,7 +45,7 @@ namespace Yodii.Script
         {
             _breakpoints = breakPointManager ?? new BreakpointManager();
             _globalContext = ctx ?? new GlobalContext();
-            _evaluator = new EvalVisitor( _globalContext, true, _breakpoints.MustBreak, scopeManager );
+            _visitor = new EvalVisitor( _globalContext, _breakpoints.MustBreak, scopeManager );
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Yodii.Script
         /// </summary>
         protected DynamicScope ScopeManager
         {
-            get { return _evaluator.ScopeManager; }
+            get { return _visitor.ScopeManager; }
         }
 
         /// <summary>
@@ -70,6 +70,15 @@ namespace Yodii.Script
         public GlobalContext Context
         {
             get { return _globalContext; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the engine should break whenever a runtime error occurred.
+        /// </summary>
+        public virtual bool EnableFirstChanceError
+        {
+            get { return _visitor.EnableFirstChanceError; }
+            set { _visitor.EnableFirstChanceError = value; }
         }
 
         /// <summary>
@@ -99,16 +108,8 @@ namespace Yodii.Script
         {
             if( _currentResult != null ) throw new InvalidOperationException();
             _currentResult = StartExecution();
-            _currentResult.UpdateStatus( _evaluator.VisitExpr( e ) );
+            _currentResult.UpdateStatus( _visitor.VisitExpr( e ) );
             return _currentResult;
-        }
-
-        /// <summary>
-        /// Gets the inner <see cref="EvalVisitor"/> object.
-        /// </summary>
-        protected EvalVisitor EvalVisitor
-        {
-            get { return _evaluator; }
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Yodii.Script
         {
             OnStopExecution();
             if( _currentResult == null ) throw new InvalidOperationException();
-            _evaluator.ResetCurrentEvaluation();
+            _visitor.ResetCurrentEvaluation();
             _currentResult = null;
         }
 
@@ -144,7 +145,17 @@ namespace Yodii.Script
         /// <returns>The result of the evaluation.</returns>
         public static RuntimeObj Evaluate( string s, GlobalContext ctx = null )
         {
-            Expr e = ExprAnalyser.AnalyseString( s );
+            return Evaluate( ExprAnalyser.AnalyseString( s ) );
+        }
+
+        /// <summary>
+        /// Simple static helper to evaluate an expression (typically a pure expression without side effects).
+        /// </summary>
+        /// <param name="e">The expression to evaluate.</param>
+        /// <param name="ctx">The <see cref="GlobalContext"/>. When null, a new default GlobalContext is used.</param>
+        /// <returns>The result of the evaluation.</returns>
+        public static RuntimeObj Evaluate( Expr e, GlobalContext ctx = null )
+        {
             EvalVisitor v = new EvalVisitor( ctx ?? new GlobalContext() );
             return v.VisitExpr( e ).Result;
         }

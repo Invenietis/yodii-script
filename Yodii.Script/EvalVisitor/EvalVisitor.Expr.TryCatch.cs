@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.Block.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\EvalVisitor.Expr.If.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -33,30 +33,52 @@ namespace Yodii.Script
 
     internal partial class EvalVisitor
     {
-        class BlockExprFrame : ListOfExprFrame
+        class TryCatchExprFrame : Frame<TryCatchExpr>
         {
-            public BlockExprFrame( EvalVisitor evaluator, BlockExpr e )
+            PExpr _try;
+            PExpr _catch;
+            bool _catching;
+
+            public TryCatchExprFrame( EvalVisitor evaluator, TryCatchExpr e )
                 : base( evaluator, e )
             {
-                foreach( var local in ((BlockExpr)Expr).Locals )
+            }
+
+            protected override PExpr DoVisit()
+            {
+                if( IsPendingOrSignal( ref _try, Expr.TryExpr ) )
                 {
-                    _visitor.ScopeManager.Register( local );
+                    RuntimeError e = _try.AsErrorResult;
+                    if( e == null || !e.IsCatchable )
+                    {
+                        return PendingOrSignal( _try );
+                    }
+                    if( !_catching )
+                    {
+                        if( Expr.ExceptionParameter != null )
+                        {
+                            _visitor.ScopeManager.Register( Expr.ExceptionParameter ).Value = e.ThrownValue;
+                        }
+                        _visitor.FirstChanceError = null;
+                        _catching = true;
+                    }
+                    if( IsPendingOrSignal( ref _catch, Expr.CatchExpr ) ) return PendingOrSignal( _catch );
                 }
+                return SetResult( RuntimeObj.Undefined );
             }
 
             protected override void OnDispose()
             {
-                foreach( var local in ((BlockExpr)Expr).Locals )
+                if( _catching && Expr.ExceptionParameter != null )
                 {
-                    _visitor.ScopeManager.Unregister( local );
+                    _visitor.ScopeManager.Unregister( Expr.ExceptionParameter );
                 }
             }
         }
 
-        public PExpr Visit( BlockExpr e )
+        public PExpr Visit( TryCatchExpr e )
         {
-            return Run( new BlockExprFrame( this, e ) );
+            return Run( new TryCatchExprFrame( this, e ) );
         }
-
     }
 }

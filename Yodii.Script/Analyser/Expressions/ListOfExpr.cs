@@ -33,7 +33,7 @@ namespace Yodii.Script
     public class ListOfExpr : Expr
     {
         public ListOfExpr( IReadOnlyList<Expr> multi )
-            : base( SourceLocation.Empty, false )
+            : base( SourceLocation.Empty, true, false )
         {
             if( multi == null ) throw new ArgumentNullException( "multi" );
             List = multi;

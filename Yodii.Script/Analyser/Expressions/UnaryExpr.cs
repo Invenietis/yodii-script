@@ -32,7 +32,7 @@ namespace Yodii.Script
     public class UnaryExpr : Expr
     {
         public UnaryExpr( SourceLocation location, JSTokenizerToken type, Expr e )
-            : base( location )
+            : base( location, e.IsStatement, false )
         {
             TokenType = type;
             Expression = e;

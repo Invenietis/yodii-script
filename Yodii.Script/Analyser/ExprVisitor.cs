@@ -38,22 +38,22 @@ namespace Yodii.Script
 
         public virtual Expr Visit( AccessorMemberExpr e )
         {
-            Expr lV = VisitExpr( e.Left );
-            return lV == e.Left ? e : new AccessorMemberExpr( e.Location, lV, e.Name );
+            Expr lV = e.Left != null ? VisitExpr( e.Left ) : null;
+            return lV == e.Left ? e : new AccessorMemberExpr( e.Location, lV, e.Name, e.IsStatement );
         }
 
         public virtual Expr Visit( AccessorIndexerExpr e )
         {
             Expr lV = VisitExpr( e.Left );
             Expr iV = VisitExpr( e.Index );
-            return lV == e.Left && iV == e.Index ? e : new AccessorIndexerExpr( e.Location, lV, iV );
+            return lV == e.Left && iV == e.Index ? e : new AccessorIndexerExpr( e.Location, lV, iV, e.IsStatement );
         }
 
         public virtual Expr Visit( AccessorCallExpr e )
         {
             var lV = VisitExpr( e.Left );
             var aV = Visit( e.Arguments );
-            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV );
+            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV, e.IsStatement );
         }
 
         public IReadOnlyList<Expr> Visit( IReadOnlyList<Expr> multi )
@@ -140,7 +140,7 @@ namespace Yodii.Script
         public virtual Expr Visit( PrePostIncDecExpr e )
         {
             var oV = VisitExpr( e.Operand );
-            return oV == e.Operand ? e : new PrePostIncDecExpr( e.Location, (AccessorExpr)oV, e.Plus, e.Prefix );
+            return oV == e.Operand ? e : new PrePostIncDecExpr( e.Location, (AccessorExpr)oV, e.Plus, e.Prefix, e.IsStatement );
         }
 
         public virtual Expr Visit( WhileExpr e )
@@ -163,6 +163,14 @@ namespace Yodii.Script
             var bV = VisitExpr( e.Body );
             var cV = (IReadOnlyList<AccessorLetExpr>)Visit( e.Closures );
             return nV == e.Name && pV == e.Parameters && bV == e.Body && cV == e.Closures ? e : new FunctionExpr( e.Location, pV, bV, cV, nV );
+        }
+
+        public virtual Expr Visit( TryCatchExpr e )
+        {
+            var tV = VisitExpr( e.TryExpr );
+            var pV = (AccessorLetExpr)Visit( e.ExceptionParameter );
+            var cV = VisitExpr( e.CatchExpr );
+            return tV == e.TryExpr && pV == e.ExceptionParameter && cV == e.CatchExpr ? e : new TryCatchExpr( e.Location, tV, pV, cV );
         }
 
     }

@@ -42,10 +42,12 @@ namespace Yodii.Script
         /// Initializes a new <see cref="Expr"/>.
         /// </summary>
         /// <param name="location">Location of this expression.</param>
+        /// <param name="isStatement">True if this expression is a statement.</param>
         /// <param name="isbreakable">True to allow breaking on this type of expession.</param>
-        protected Expr( SourceLocation location, bool isbreakable = false )
+        protected Expr( SourceLocation location, bool isStatement, bool isbreakable )
         {
             Location = location;
+            IsStatement = isStatement;
             IsBreakable = isbreakable;
         }
 
@@ -53,6 +55,20 @@ namespace Yodii.Script
         /// Gets whether this expression is breakable.
         /// </summary>
         public readonly bool IsBreakable;
+
+        /// <summary>
+        /// Gets whether this expression is a statement: either because it is syntaxically a statement 
+        /// or because a ; closes it.
+        /// </summary>
+        public readonly bool IsStatement;
+
+        /// <summary>
+        /// Gets whether this Expr is either <see cref="NopExpr.Expression"/> or <see cref="NopExpr.Statement"/>.
+        /// </summary>
+        public bool IsNop
+        {
+            get { return this == NopExpr.Expression || this == NopExpr.Statement; }
+        }
 
         /// <summary>
         /// Gets the location of this expression.

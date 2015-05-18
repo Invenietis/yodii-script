@@ -51,14 +51,15 @@ namespace Yodii.Script
         {
             if( o == null ) return JSEvalBoolean.False;
             if( o is JSEvalBoolean ) return o;
-            o = o.ToPrimitive( this );
-            if( o is JSEvalBoolean ) return o;
             return CreateBoolean( o.ToBoolean() );
         }
 
         public RuntimeObj CreateNumber( double value )
         {
             if( value == 0 ) return JSEvalNumber.Zero;
+            if( value == -1 ) return JSEvalNumber.MinusOne;
+            if( value == 1 ) return JSEvalNumber.One;
+            if( value == 2 ) return JSEvalNumber.Two;
             if( Double.IsNaN( value ) ) return JSEvalNumber.NaN;
             if( Double.IsPositiveInfinity( value ) ) return JSEvalNumber.Infinity;
             if( Double.IsNegativeInfinity( value ) ) return JSEvalNumber.NegativeInfinity;
@@ -68,8 +69,6 @@ namespace Yodii.Script
         public RuntimeObj CreateNumber( RuntimeObj o )
         {
             if( o == null ) return JSEvalNumber.Zero;
-            if( o is JSEvalNumber ) return o;
-            o = o.ToPrimitive( this );
             if( o is JSEvalNumber ) return o;
             return CreateNumber( o.ToDouble() );
         }
@@ -85,8 +84,6 @@ namespace Yodii.Script
         {
             if( o == null ) return RuntimeObj.Null;
             if( o is JSEvalString ) return o;
-            o = o.ToPrimitive( this );
-            if( o is JSEvalString ) return o;
             return CreateString( o.ToString() );
         }
 
@@ -96,21 +93,21 @@ namespace Yodii.Script
             return new JSEvalDate( value );
         }
 
-        public RuntimeError CreateRuntimeError( Expr e, string message, RuntimeError previous = null )
+        public RuntimeError CreateSyntaxError( Expr e, string message )
         {
-            return new RuntimeError( e, message, previous );
+            return new RuntimeError( e, message );
         }
 
-        public RuntimeError CreateAccessorError( AccessorExpr e, RuntimeError previous = null )
+        public RuntimeError CreateAccessorSyntaxError( AccessorExpr e )
         {
             AccessorMemberExpr m = e as AccessorMemberExpr;
             if( m != null )
             {
-                if( m.IsUnbound ) return CreateRuntimeError( e, "Undefined in scope: " + m.Name );
-                return CreateRuntimeError( e, "Unknown property: " + m.Name, previous );
+                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name );
+                return CreateSyntaxError( e, "Unknown property: " + m.Name );
             }
-            if( e is AccessorIndexerExpr ) return CreateRuntimeError( e, "Indexer is not supported.", previous );
-            return CreateRuntimeError( e, "Not a function.", previous );
+            if( e is AccessorIndexerExpr ) return CreateSyntaxError( e, "Indexer is not supported." );
+            return CreateSyntaxError( e, "Not a function." );
         }
 
         /// <summary>

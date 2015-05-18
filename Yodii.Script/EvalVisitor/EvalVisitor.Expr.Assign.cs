@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class AssignExprFrame : Frame<AssignExpr>
         {
@@ -45,18 +45,18 @@ namespace Yodii.Script
 
             protected override PExpr DoVisit()
             {
-                if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
                 if( IsPendingOrSignal( ref _right, Expr.Right ) ) return PendingOrSignal( _right );
+                if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
                 RefRuntimeObj r = _left.Result as RefRuntimeObj;
-                if( r == null ) return SetResult( Global.CreateRuntimeError( Expr.Left, "Invalid assignment left-hand side." ) );
+                if( r == null ) return SetResult( Global.CreateSyntaxError( Expr.Left, "Invalid assignment left-hand side." ) );
                 r.Value = _right.Result;
-                return SetResult( _right.Result );
+                return SetResult( r.Value );
             }
         }
 
         public PExpr Visit( AssignExpr e )
         {
-            return new AssignExprFrame( this, e ).Visit();
+            return Run( new AssignExprFrame( this, e ) );
         }
 
     }

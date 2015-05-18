@@ -40,18 +40,15 @@ namespace Yodii.Script
             else x = x.ToValue();
             if( y == RuntimeObj.Null ) y = RuntimeObj.Undefined;
             else y = y.ToValue();
-
-            if( String.CompareOrdinal( x.Type, y.Type ) > 0 )
+            if( (Swapped = String.CompareOrdinal( x.Type, y.Type ) > 0) )
             {
                 X = y;
                 Y = x;
-                Swapped = true;
             }
             else
             {
                 X = x;
                 Y = y;
-                Swapped = false;
             }
         }
 
@@ -95,14 +92,6 @@ namespace Yodii.Script
             if( ReferenceEquals( X.Type, RuntimeObj.TypeBoolean ) || ReferenceEquals( Y.Type, RuntimeObj.TypeBoolean ) )
             {
                 return X.ToBoolean() == Y.ToBoolean();
-            }
-            if( ReferenceEquals( Y.Type, RuntimeObj.TypeObject ) && X != RuntimeObj.Undefined )
-            {
-                return new RuntimeObjComparer( X, Y.ToPrimitive( c ) ).AreEqual( c );
-            }
-            if( ReferenceEquals( X.Type, RuntimeObj.TypeObject ) && Y != RuntimeObj.Undefined )
-            {
-                return new RuntimeObjComparer( X.ToPrimitive( c ), Y ).AreEqual( c );
             }
             return false;
         }

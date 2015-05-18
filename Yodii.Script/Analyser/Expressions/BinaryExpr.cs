@@ -32,7 +32,7 @@ namespace Yodii.Script
     public class BinaryExpr : Expr
     {
         public BinaryExpr( SourceLocation location, Expr left, JSTokenizerToken binaryOperatorToken, Expr right )
-            : base( location, true )
+            : base( location, right.IsStatement, true )
         {
             Left = left;
             BinaryOperatorToken = binaryOperatorToken;

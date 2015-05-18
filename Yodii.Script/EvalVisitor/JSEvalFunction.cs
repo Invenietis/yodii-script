@@ -47,7 +47,7 @@ namespace Yodii.Script
 
         public override string Type
         {
-            get { return RuntimeObj.TypeObject; }
+            get { return RuntimeObj.TypeFunction; }
         }
 
         public override bool ToBoolean()
@@ -69,9 +69,10 @@ namespace Yodii.Script
         {
             if( frame.Expr is AccessorCallExpr )
             {
-                return new EvalVisitor.FunctionExprFrame( (EvalVisitor.AccessorFrame)frame, _expr, _closures ).Visit();
+                EvalVisitor.AccessorFrame f = (EvalVisitor.AccessorFrame)frame;
+                return f._visitor.Run( new EvalVisitor.FunctionExprFrame( f, _expr, _closures ) );
             }
-            return base.Visit( frame );
+            return frame.SetError();
         }
     }
 }

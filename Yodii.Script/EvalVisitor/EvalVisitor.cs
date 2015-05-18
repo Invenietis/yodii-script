@@ -30,30 +30,37 @@ using System.Diagnostics;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor : IExprVisitor<PExpr>, IEvalVisitor
+    internal partial class EvalVisitor : IExprVisitor<PExpr>
     {
+        internal readonly DynamicScope ScopeManager;
         readonly GlobalContext _global;
         readonly Func<Expr,bool> _breakpoints;
         Frame _firstFrame;
         Frame _currentFrame;
-        bool _keepStackOnError;
+        bool _breakOnNext;
+        bool _hasTimeout;
+        DateTime _timeLimit;
+        TimeSpan _timeout;
+        RuntimeError _firstChanceError;
+        bool _enableFirstChanceError;
 
-        public EvalVisitor( GlobalContext context, bool keepStackOnError = false, Func<Expr, bool> breakpoints = null, DynamicScope scopeManager = null )
+        public EvalVisitor( GlobalContext context, Func<Expr, bool> breakpoints = null, DynamicScope scopeManager = null )
         {
             if( context == null ) throw new ArgumentNullException( "context" );
             _global = context;
-            _keepStackOnError = keepStackOnError;
             _breakpoints = breakpoints ?? (e => false);
             ScopeManager = scopeManager ?? new DynamicScope();
         }
 
-        internal readonly DynamicScope ScopeManager;
-        internal bool BreakOnNext;
-
-
+        [DebuggerStepThrough]
         public PExpr VisitExpr( Expr e )
         {
             return e.Accept( this );
+        }
+
+        public GlobalContext Global 
+        {
+            get { return _global; }
         }
 
         public IDeferredExpr CurrentFrame
@@ -70,7 +77,7 @@ namespace Yodii.Script
         {
             get 
             { 
-                var f = _currentFrame; 
+                var f = _firstFrame; 
                 while( f != null )
                 {
                     yield return f;
@@ -79,14 +86,99 @@ namespace Yodii.Script
             }
         }
 
-        public void ResetCurrentEvaluation()
+        public bool EnableFirstChanceError
         {
-            _currentFrame = null;
+            get { return _enableFirstChanceError && _firstChanceError == null; }
+            set { _enableFirstChanceError = value; }
         }
 
-        public GlobalContext Global 
+        /// <summary>
+        /// Gets or sets the timeout limit: <see cref="TimeSpan.Zero"/> and 
+        /// </summary>
+        public TimeSpan Timeout
         {
-            get { return _global; }
+            get { return _timeout; }
+            set 
+            { 
+                if( _timeout != value )
+                {
+                    _timeout = value;
+                    _hasTimeout = _timeout != TimeSpan.Zero && _timeout != TimeSpan.MaxValue;
+                }
+            }
+        }
+
+        public void ResetCurrentEvaluation()
+        {
+            _firstFrame = _currentFrame = null;
+            _firstChanceError = null;
+        }
+
+        public RuntimeError FirstChanceError
+        {
+            get { return _firstChanceError; }
+            internal set
+            {
+                Debug.Assert( value == null || _enableFirstChanceError );
+                Debug.Assert( value == null || _firstChanceError == null );
+                _firstChanceError = value;
+            }
+        }
+
+        internal enum StepOverKind
+        {
+            InternalStepOver = 0,
+            ExternalStepOver = -1,
+            ExternalStepIn = 1
+        }
+
+        internal PExpr StepOver( Frame f, StepOverKind kind )
+        {
+            if( !f.IsResolved )
+            {
+                RuntimeError fError = null;
+                if( kind != StepOverKind.InternalStepOver )
+                {
+                    fError = _firstChanceError;
+                    _breakOnNext = kind == StepOverKind.ExternalStepIn;
+                    if( _hasTimeout ) _timeLimit = DateTime.UtcNow + _timeout;
+                }
+                do
+                {
+                    Debug.Assert( Frames.Contains( f ) );
+                    if( fError != null )
+                    {
+                        PExpr r = _currentFrame.SetResult( fError );
+                        _currentFrame.DoDispose();
+                        fError = null;
+                    }
+                    else
+                    {
+                        PExpr r = _currentFrame.VisitAndClean();
+                        if( r.IsPending ) return r;
+                    }
+                }
+                while( !f.IsResolved );
+            }
+            return new PExpr( f.Result );
+        }
+
+        internal PExpr Run( Frame f )
+        {
+            Debug.Assert( !f.IsResolved );
+            if( f.Expr.IsBreakable )
+            {
+                if( _breakOnNext || _breakpoints( f.Expr ) )
+                {
+                    _breakOnNext = false;
+                    return new PExpr( f, PExpr.DeferredKind.Breakpoint );
+                }
+                if( _hasTimeout && _timeLimit <= DateTime.UtcNow )
+                {
+                    return new PExpr( f, PExpr.DeferredKind.Timeout );
+                }
+            }
+            return f.VisitAndClean();
         }
     }
 }

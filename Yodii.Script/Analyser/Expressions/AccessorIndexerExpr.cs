@@ -44,8 +44,8 @@ namespace Yodii.Script
         /// <param name="location">Location of this expression.</param>
         /// <param name="left">Left scope. Must not be null.</param>
         /// <param name="index">Index for the indexer.</param>
-        public AccessorIndexerExpr( SourceLocation location, Expr left, Expr index )
-            : base( location, left, true )
+        public AccessorIndexerExpr( SourceLocation location, Expr left, Expr index, bool isStatement )
+            : base( location, left, isStatement, true )
         {
             _args = new Expr[]{ index };
         }

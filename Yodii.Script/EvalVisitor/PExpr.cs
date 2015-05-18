@@ -34,46 +34,103 @@ namespace Yodii.Script
     /// </summary>
     public struct PExpr
     {
-        public readonly IDeferredExpr Deferred;
+        internal readonly EvalVisitor.Frame Frame;
         public readonly RuntimeObj Result;
+        public readonly DeferredKind DeferredStatus;
 
-        public PExpr( IDeferredExpr pending )
-            : this( pending, null )
+        /// <summary>
+        /// Describes the pending reason.
+        /// </summary>
+        public enum DeferredKind
+        {
+            /// <summary>
+            /// Not pending.
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// A breakpoint has been reached.
+            /// </summary>
+            Breakpoint = 1,
+
+            /// <summary>
+            /// An asynchronous call is being processed.
+            /// </summary>
+            AsyncCall = 2,
+
+            /// <summary>
+            /// A timeout occurred.
+            /// </summary>
+            Timeout = 3,
+
+            /// <summary>
+            /// An error occured.
+            /// </summary>
+            FirstChanceError = 4
+
+        }
+
+        internal PExpr( EvalVisitor.Frame pending, DeferredKind status )
+            : this( pending, null, status )
         {
         }
 
         public PExpr( RuntimeObj resultOrSignal )
-            : this( null, resultOrSignal )
+            : this( null, resultOrSignal, DeferredKind.None )
         {
         }
 
-        PExpr( IDeferredExpr pending, RuntimeObj resultOrSignal )
+        PExpr( EvalVisitor.Frame pending, RuntimeObj resultOrSignal, DeferredKind status )
         {
-            Deferred = pending;
+            Frame = pending;
             Result = resultOrSignal;
+            DeferredStatus = status;
         }
 
+        /// <summary>
+        /// Gets the <see cref="IDeferredExpr"/> if <see cref="Result"/> is null.
+        /// </summary>
+        public IDeferredExpr Deferred
+        {
+            get { return Frame; }
+        }
+
+        /// <summary>
+        /// Gets whether this is an unitialized PExpr: its <see cref="Result"/> and <see cref="Deferred"/> are both null.
+        /// </summary>
         public bool IsUnknown { get { return Result == null && Deferred == null; } }
 
+        /// <summary>
+        /// Gets whether this PExpr is resolved and <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
+        /// </summary>
         public bool IsSignal { get { return Result is RuntimeSignal; } }
 
-        public bool IsErrorResult { get { return Result is RuntimeError; } }
+        /// <summary>
+        /// Gets the resolved <see cref="Result"/> as a <see cref="RuntimeError"/> if it is an error. 
+        /// (A RuntimeError is a <see cref="RuntimeSignal"/>.)
+        /// </summary>
+        public RuntimeError AsErrorResult { get { return Result as RuntimeError; } }
 
+        /// <summary>
+        /// Gets whether the <see cref="Deferred"/> is not null (and the <see cref="Result"/> is null).
+        /// </summary>
         public bool IsPending { get { return Deferred != null; } }
         
+        /// <summary>
+        /// Gets whether a <see cref="Result"/> exists (it can be a <see cref="RuntimeSignal"/>).
+        /// </summary>
         public bool IsResolved { get { return Result != null; } }
 
+        /// <summary>
+        /// Gets whether this PExpr is pending (<see cref="Deferred"/> is not null) or <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
+        /// </summary>
         public bool IsPendingOrSignal { get { return Deferred != null || IsSignal; } }
-
-        public bool IsValidResult { get { return Result != null && !IsSignal; } }
 
         public override string ToString()
         {
-            string sP = Deferred != null ? String.Format( "Deferred = {0}", Deferred.Expr ) : null;
-            string sR = Result != null ? String.Format( "Result = {0}", Result ) : null;
-            if( sP == null ) return sR != null ? sR : "(Unknown)";
-            if( sR == null ) return sP;
-            return sP + ", " + sR;
+            string sP = Deferred != null ? String.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, DeferredStatus ) : null;
+            string sR = Result != null ? String.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
+            return sP ?? sR ?? "(Unknown)";
         }
     }
 

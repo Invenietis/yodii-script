@@ -39,7 +39,7 @@ namespace Yodii.Script
         public new static readonly AccessorLetExpr[] EmptyArray = new AccessorLetExpr[0];
 
         public AccessorLetExpr( SourceLocation location, string name )
-            : base( location, null, false )
+            : base( location, null, false, false )
         {
             if( name == null ) throw new ArgumentNullException();
             Name = name;

@@ -31,11 +31,14 @@ namespace Yodii.Script
     public class JSEvalNumber : RuntimeObj
     {
         static public readonly JSEvalNumber NaN = new JSEvalNumber( Double.NaN );
-        static public readonly JSEvalNumber Zero = new JSEvalNumber( 0 );
+        static public readonly JSEvalNumber Zero = new JSEvalNumber( 0.0 );
+        static public readonly JSEvalNumber MinusOne = new JSEvalNumber( -1.0 );
+        static public readonly JSEvalNumber One = new JSEvalNumber( 1.0 );
+        static public readonly JSEvalNumber Two = new JSEvalNumber( 2.0 );
         static public readonly JSEvalNumber Infinity = new JSEvalNumber( Double.PositiveInfinity );
         static public readonly JSEvalNumber NegativeInfinity = new JSEvalNumber( Double.NegativeInfinity );
 
-        double _value;
+        readonly double _value;
 
         public JSEvalNumber( double value )
         {

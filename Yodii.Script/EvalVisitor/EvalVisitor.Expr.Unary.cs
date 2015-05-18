@@ -30,7 +30,7 @@ using System.Collections.ObjectModel;
 
 namespace Yodii.Script
 {
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class UnaryExprFrame : Frame<UnaryExpr>
         {
@@ -99,7 +99,7 @@ namespace Yodii.Script
 
         public PExpr Visit( UnaryExpr e )
         {
-            return new UnaryExprFrame( this, e ).Visit();
+            return Run( new UnaryExprFrame( this, e ) );
         }
     }
 }

@@ -31,11 +31,12 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         public PExpr Visit( ConstantExpr e )
         {
-            if( e.Value == null || e.Value is string ) return new PExpr( _global.CreateString( (string)e.Value ) );
+            if( e.Value == null ) return new PExpr( RuntimeObj.Null );
+            if( e.Value is string ) return new PExpr( _global.CreateString( (string)e.Value ) );
             if( e == ConstantExpr.UndefinedExpr ) return new PExpr( RuntimeObj.Undefined );
             if( e.Value is Double ) return new PExpr( _global.CreateNumber( (Double)e.Value ) );
             if( e.Value is Boolean ) return new PExpr( _global.CreateBoolean( (Boolean)e.Value ) );
@@ -44,7 +45,7 @@ namespace Yodii.Script
 
         public PExpr Visit( SyntaxErrorExpr e )
         {
-            return new PExpr( _global.CreateRuntimeError( e, e.ErrorMessage ) );
+            return new PExpr( _global.CreateSyntaxError( e, e.ErrorMessage ) );
         }
 
         public PExpr Visit( NopExpr e )

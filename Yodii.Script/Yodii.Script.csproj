@@ -59,6 +59,7 @@
     <Compile Include="Analyser\Expressions\AccessorMemberExpr.cs" />
     <Compile Include="Analyser\Expressions\FlowBreakingExpr.cs" />
     <Compile Include="Analyser\Expressions\FunctionExpr.cs" />
+    <Compile Include="Analyser\Expressions\TryCatchExpr.cs" />
     <Compile Include="Analyser\Expressions\ListOfExpr.cs" />
     <Compile Include="Analyser\Expressions\WhileExpr.cs" />
     <Compile Include="Analyser\Expressions\PrePostIncDecExpr.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Accessors.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Function.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.FlowBreaking.cs" />
+    <Compile Include="EvalVisitor\EvalVisitor.Expr.TryCatch.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.ListOf.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Block.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Assign.cs" />
@@ -109,12 +111,10 @@
     <Compile Include="Tokenizer\JSTokeniserError.cs" />
     <Compile Include="Tokenizer\JSTokeniserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EvalVisitor\CallFunctionDescriptor.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.cs" />
     <Compile Include="EvalVisitor\GlobalContext.cs" />
     <Compile Include="EvalVisitor\IAccessorFrame.cs" />
     <Compile Include="EvalVisitor\IAccessorVisitor.cs" />
-    <Compile Include="EvalVisitor\IEvalVisitor.cs" />
     <Compile Include="EvalVisitor\JSEvalBoolean.cs" />
     <Compile Include="EvalVisitor\JSEvalDate.cs" />
     <Compile Include="EvalVisitor\JSEvalNumber.cs" />
@@ -124,7 +124,6 @@
     <Compile Include="EvalVisitor\RuntimeObjComparer.cs" />
     <Compile Include="Tokenizer\SourceLocation.cs" />
     <Compile Include="Analyser\SyntaxErrorCollector.cs" />
-    <Compile Include="ToStringVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EvalVisitor\RuntimeObj.cd" />

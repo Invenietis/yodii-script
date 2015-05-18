@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class PrePostIncDecExprFrame : Frame<PrePostIncDecExpr>
         {
@@ -46,7 +46,7 @@ namespace Yodii.Script
             {
                 if( IsPendingOrSignal( ref _operand, Expr.Operand ) ) return PendingOrSignal( _operand );
                 RefRuntimeObj r = _operand.Result as RefRuntimeObj;
-                if( r == null ) return SetResult( Global.CreateRuntimeError( Expr.Operand, "Invalid increment or decrement operand." ) );
+                if( r == null ) return SetResult( Global.CreateSyntaxError( Expr.Operand, "Invalid increment or decrement operand." ) );
                 
                 var newValue = Global.CreateNumber( _operand.Result.ToDouble() + (Expr.Plus ? 1.0 : -1.0) );
                 if( Expr.Prefix ) return SetResult( (r.Value = newValue) );
@@ -58,7 +58,7 @@ namespace Yodii.Script
 
         public PExpr Visit( PrePostIncDecExpr e )
         {
-            return new PrePostIncDecExprFrame( this, e ).Visit();
+            return Run( new PrePostIncDecExprFrame( this, e ) );
         }
 
     }

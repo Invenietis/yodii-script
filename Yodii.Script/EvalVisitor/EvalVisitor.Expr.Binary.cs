@@ -31,7 +31,7 @@ using System.Collections.ObjectModel;
 namespace Yodii.Script
 {
 
-    public partial class EvalVisitor
+    internal partial class EvalVisitor
     {
         class BinaryExprFrame : Frame<BinaryExpr>
         {
@@ -121,16 +121,13 @@ namespace Yodii.Script
                         {
                             case (int)JSTokenizerToken.Plus & 15:
                                 {
-                                    RuntimeObj l = left.ToPrimitive( Global );
-                                    RuntimeObj rO = right.ToPrimitive( Global );
-
-                                    if( ReferenceEquals( l.Type, RuntimeObj.TypeString ) || ReferenceEquals( rO.Type, RuntimeObj.TypeString ) )
+                                    if( ReferenceEquals( left.Type, RuntimeObj.TypeNumber ) && ReferenceEquals( right.Type, RuntimeObj.TypeNumber ) )
                                     {
-                                        result = Global.CreateString( String.Concat( l.ToString(), rO.ToString() ) );
+                                        result = Global.CreateNumber( left.ToDouble() + right.ToDouble() );
                                     }
                                     else
                                     {
-                                        result = Global.CreateNumber( l.ToDouble() + rO.ToDouble() );
+                                        result = Global.CreateString( String.Concat( left.ToString(), right.ToString() ) );
                                     }
                                     break;
                                 }
@@ -210,10 +207,10 @@ namespace Yodii.Script
                 return SetResult( result );
             }
 
-            NotSupportedException UnsupportedOperatorException()
+            NotImplementedException UnsupportedOperatorException()
             {
                 string msg = String.Format( "Unsupported binary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
-                return new NotSupportedException( msg );
+                return new NotImplementedException( msg );
             }
 
             RuntimeObj BitwiseShift( RuntimeObj val, RuntimeObj shift, bool right )
@@ -246,7 +243,7 @@ namespace Yodii.Script
 
         public PExpr Visit( BinaryExpr e )
         {
-            return new BinaryExprFrame( this, e ).Visit();
+            return Run( new BinaryExprFrame( this, e ) );
         }
 
     }
