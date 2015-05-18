@@ -180,6 +180,5 @@ namespace Yodii.Script
             }
             return f.VisitAndClean();
         }
-
     }
 }

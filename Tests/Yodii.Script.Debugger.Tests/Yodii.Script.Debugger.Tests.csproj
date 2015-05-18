@@ -1,23 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{270354A6-A0EE-4C0F-BF23-D5CAC4121DEC}</ProjectGuid>
+    <ProjectGuid>{04FE4BA4-34A8-4987-A3B5-E14B963F6BE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Yodii.Script.Tests</RootNamespace>
-    <AssemblyName>Yodii.Script.Tests</AssemblyName>
+    <RootNamespace>Yodii.Script.Debugger.Tests</RootNamespace>
+    <AssemblyName>Yodii.Script.Debugger.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <StartAction>Program</StartAction>
-    <StartProgram>$(SolutionDir)packages\NUnit.Runners.2.6.4\tools\nunit.exe</StartProgram>
-    <StartArguments>Yodii.Script.Tests.dll</StartArguments>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,50 +30,35 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CK.Core, Version=4.1.0.0, Culture=neutral, PublicKeyToken=edfa2f62fc978217, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\CK.Core.4.1.0\lib\net45\CK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="BasicBreakpointSupport.cs" />
-    <Compile Include="TryCatchTests.cs" />
-    <Compile Include="FunctionTests.cs" />
-    <Compile Include="StatementTests.cs" />
-    <Compile Include="EvalTests.cs" />
-    <Compile Include="JSAnalyserTests.cs" />
+    <Compile Include="BasicDebuggerSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StaticScopeTests.cs" />
-    <Compile Include="TestHelper.cs" />
-    <Compile Include="WithGlobalContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\Yodii.Script.Debugger\Yodii.Script.Debugger.csproj">
+      <Project>{576274a5-5fbf-4803-91db-96effcf4159a}</Project>
+      <Name>Yodii.Script.Debugger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Yodii.Script\Yodii.Script.csproj">
       <Project>{388870e4-cf4e-45b5-bbec-ec6fad2e7490}</Project>
-      <Name>CK.Javascript</Name>
+      <Name>Yodii.Script</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
