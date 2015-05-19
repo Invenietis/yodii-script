@@ -21,8 +21,7 @@ namespace Yodii.Script.Debugger
 
         public void ShowDebug()
         {
-            throw new NotImplementedException();
-            //ScopeManager.FindByName( "hh" );
+            throw new NotImplementedException();           
         }
     }
 }

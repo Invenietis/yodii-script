@@ -32,7 +32,6 @@ namespace Yodii.Script.Debugger
             _variables.Remove( _variables.FindLast( v => v.Name == decl.Name ) );
             base.Unregister( decl );
         }
-
         #region IVariableList Members
 
         public List<Variable> Vars

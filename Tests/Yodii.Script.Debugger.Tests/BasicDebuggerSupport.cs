@@ -69,8 +69,14 @@ namespace Yodii.Script.Debugger.Tests
             BreakableVisitor bkv = new BreakableVisitor();
             bkv.VisitExpr( exp );
             Assert.That( bkv.BreakableExprs.Count, Is.EqualTo( 4 ) );
-            engine.Execute( exp );
-            Assert.That( engine.ScopeManager.Vars.Count, Is.EqualTo( 3 ) );
+            engine.Breakpoints.AddBreakpoint( bkv.BreakableExprs[3] );
+
+            using( var r2 = engine.Execute( exp ) )
+            {
+                Assert.That( engine.ScopeManager.Vars.Count, Is.EqualTo( 3 ) );
+
+                r2.Continue();
+            }
         }
         [Test]
         public void show_vars_from_closure()
