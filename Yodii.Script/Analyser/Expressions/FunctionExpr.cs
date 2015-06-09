@@ -47,6 +47,9 @@ namespace Yodii.Script
 
         public Expr Body { get; private set; }
 
+        /// <summary>
+        /// Gets the name of the function. Null for anonymous function.
+        /// </summary>
         public AccessorLetExpr Name { get; private set; }
 
         public IReadOnlyList<AccessorLetExpr> Parameters { get; private set; }

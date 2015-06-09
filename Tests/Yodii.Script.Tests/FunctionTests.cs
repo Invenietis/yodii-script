@@ -72,7 +72,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void functions_are_first_class_objects()
         {
-            string s = @"
+            string s = @" 
                             function gen() 
                             { 
                               return function(a,b) { return a+b; };
@@ -227,6 +227,28 @@ namespace Yodii.Script.Tests
             {
                 Assert.IsInstanceOf<JSEvalString>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "10,32,148,302,606,1212" ) );
+            } );
+        }
+
+        [Test]
+        public void named_functions_defined_in_parameters()
+        {
+            string s = @"   let x = 0;
+                            function fX( f1, f2, c )
+                            {
+                                f1(c);
+                                f2(c);
+                            }
+                            fX( function f1( c ) { x += c; return c; },
+                                function f2( c ) { x *= f1(c); },
+                                3
+                              );
+                            typeof f1 == 'function' || typeof f2 == 'function' ? 'functions defined in parameters must be scoped.' : x;
+                            ";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<RuntimeObj>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "18" ) );
             } );
         }
 

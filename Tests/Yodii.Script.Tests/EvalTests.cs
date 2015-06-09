@@ -79,10 +79,11 @@ namespace Yodii.Script.Tests
             }
         }
 
+        [TestCase( "'45' > 454", false )]
+        [TestCase( "'45' >= 45", true )]
         [TestCase( "'45' + 4 == '454'", true )]
         [TestCase( "'45' <= '454'", true )]
         [TestCase( "45 <= '454'", true )]
-        [TestCase( "'45' > 454", false )]
         [TestCase( "'olivier' < 'spi'", true )]
         public void comparing_strings_and_numbers( string expr, bool result )
         {

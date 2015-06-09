@@ -383,7 +383,6 @@ namespace Yodii.Script
                     Debug.Assert( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) == 2 );
                     Expr e = Expression( 2 );
                     if( e is SyntaxErrorExpr ) return e;
-
                     if( parameters == null ) parameters = new List<Expr>();
                     parameters.Add( e );
 
