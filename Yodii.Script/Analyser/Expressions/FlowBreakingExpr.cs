@@ -31,8 +31,14 @@ using System.Diagnostics;
 namespace Yodii.Script
 {
 
+    /// <summary>
+    /// Expression that captures break, continue, throw and return.
+    /// </summary>
     public class FlowBreakingExpr : Expr
     {
+        /// <summary>
+        /// Type of the <see cref="FlowBreakingExpr"/>.
+        /// </summary>
         public enum BreakingType
         {
             None,
@@ -82,7 +88,8 @@ namespace Yodii.Script
         public BreakingType Type { get; private set; }
 
         /// <summary>
-        /// Gets the parameter expression. Applies to <see cref="BreakingType.Return"/> and <see cref="BreakingType.Throw"/>.
+        /// Gets the parameter expression. 
+        /// Applies to <see cref="BreakingType.Return"/> and <see cref="BreakingType.Throw"/>.
         /// </summary>
         public Expr ReturnedValue { get; private set; }
 
