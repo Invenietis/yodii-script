@@ -32,20 +32,28 @@ namespace Yodii.Script
 {
     public class AccessorCallExpr : AccessorExpr
     {
-        IReadOnlyList<Expr> _args;
+        readonly IReadOnlyList<Expr> _args;
+        readonly IReadOnlyList<AccessorLetExpr> _declaredFunctions;
 
         /// <summary>
         /// Creates a new <see cref="AccessorCallExpr"/>: 0 or n arguments can be provided.
         /// </summary>
         /// <param name="left">Left scope. Must not be null.</param>
         /// <param name="arguments">When null, it is normalized to <see cref="Expr.EmptyArray"/>.</param>
-        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, bool isStatement )
+        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, IReadOnlyList<AccessorLetExpr> declaredFunctions, bool isStatement )
             : base( location, left, isStatement, true )
         {
             _args = arguments ?? Expr.EmptyArray;
+            _declaredFunctions = declaredFunctions;
+
         }
 
-        public override IReadOnlyList<Expr> Arguments { get { return _args; } }
+        public override IReadOnlyList<Expr> Arguments => _args;
+
+        /// <summary>
+        /// Gets the declared functions. Can be null.
+        /// </summary>
+        public IReadOnlyList<AccessorLetExpr> DeclaredFunctions => _declaredFunctions;
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -54,10 +62,7 @@ namespace Yodii.Script
         /// <param name="visitor">visitor.</param>
         /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
-        internal protected override T Accept<T>( IExprVisitor<T> visitor )
-        {
-            return visitor.Visit( this );
-        }
+        internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
         /// <summary>
         /// This is just to ease debugging.

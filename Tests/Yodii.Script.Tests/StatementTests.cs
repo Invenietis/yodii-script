@@ -171,6 +171,17 @@ namespace Yodii.Script.Tests
         }
 
         [Test]
+        public void typeof_reference_error_is_undefined()
+        {
+            string s = @"typeof unexisting";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.That( o.ToString(), Is.EqualTo( "undefined" ) );
+            } );
+        }
+
+        [Test]
         public void post_incrementation_works()
         {
             string s = @"let i = 0;

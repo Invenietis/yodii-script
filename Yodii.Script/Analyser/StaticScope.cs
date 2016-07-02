@@ -112,7 +112,7 @@ namespace Yodii.Script
             public AccessorLetExpr E;
 
             /// <summary>
-            /// This is unfortunately required to support AllowLocalRedefinition = false in O(1).
+            /// This is required to support AllowLocalRedefinition = false in O(1).
             /// </summary>
             public Scope Scope;
 

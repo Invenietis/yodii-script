@@ -43,8 +43,17 @@ namespace Yodii.Script
 
             protected override PExpr DoVisit()
             {
-                if( IsPendingOrSignal( ref _expression, Expr.Expression ) ) return PendingOrSignal( _expression );
-
+                if( IsPendingOrSignal( ref _expression, Expr.Expression ) )
+                {
+                    RuntimeError e = _expression.AsErrorResult;
+                    if( e != null 
+                        && e.IsReferenceError 
+                        && ((int)Expr.TokenType & 15) == ((int)JSTokenizerToken.TypeOf & 15) )
+                    {
+                        return SetResult( Global.CreateString( RuntimeObj.TypeUndefined ) );
+                    }
+                    return PendingOrSignal( _expression );
+                }
                 RuntimeObj result = _expression.Result;
                 // Minus and Plus are classified as a binary operator.
                 // Handle those special cases here.

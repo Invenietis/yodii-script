@@ -239,11 +239,12 @@ namespace Yodii.Script.Tests
                                 f1(c);
                                 f2(c);
                             }
+                            // Here, f2 can call f2 since f1 is declared before f1.
                             fX( function f1( c ) { x += c; return c; },
                                 function f2( c ) { x *= f1(c); },
                                 3
                               );
-                            typeof f1 == 'function' || typeof f2 == 'function' ? 'functions defined in parameters must be scoped.' : x;
+                            x;
                             ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {

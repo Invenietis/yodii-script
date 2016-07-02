@@ -34,11 +34,13 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="culprit">The expression. Can not be null.</param>
         /// <param name="syntaxErrorMessage">A message describing the syntax error. Can not be null.</param>
-        public RuntimeError( Expr culprit, string syntaxErrorMessage )
+        /// <param name="referenceError">True for reference error.</param>    
+        public RuntimeError( Expr culprit, string syntaxErrorMessage, bool referenceError )
             : base( culprit )
         {
             if( syntaxErrorMessage == null ) throw new ArgumentNullException();
             Message = syntaxErrorMessage;
+            IsReferenceError = referenceError;
         }
 
         /// <summary>
@@ -59,29 +61,28 @@ namespace Yodii.Script
         /// Gets whether this is a syntax error.
         /// Syntax errors are not recoverables (they are not <see cref="IsCatchable"/>).
         /// </summary>
-        public bool IsSyntaxError
-        {
-            get { return ThrownValue == null; }
-        }
+        public bool IsSyntaxError => ThrownValue == null;
 
         /// <summary>
         /// Gets whether this error can be caught.
         /// </summary>
-        public bool IsCatchable
-        {
-            get { return ThrownValue != null; }
-        }
+        public bool IsCatchable => ThrownValue != null;
+
+        /// <summary>
+        /// Gets whether this is a reference error (unbound variable not resolved or missing property).
+        /// </summary>
+        public bool IsReferenceError { get; }
 
         /// <summary>
         /// Gets the message for syntax error. 
         /// This is "Runtime Error" when <see cref="ThrownValue"/> is not null.
         /// </summary>
-        public string Message { get; private set; }
+        public string Message { get; }
 
         /// <summary>
         /// Gets the thrown value. Null when <see cref="IsSyntaxError"/> is true.
         /// </summary>
-        public RuntimeObj ThrownValue { get; private set; }
+        public RuntimeObj ThrownValue { get; }
 
         public override PExpr Visit( IAccessorFrame frame )
         {

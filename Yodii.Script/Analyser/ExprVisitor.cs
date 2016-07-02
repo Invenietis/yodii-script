@@ -53,7 +53,7 @@ namespace Yodii.Script
         {
             var lV = VisitExpr( e.Left );
             var aV = Visit( e.Arguments );
-            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV, e.IsStatement );
+            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV, e.DeclaredFunctions, e.IsStatement );
         }
 
         public IReadOnlyList<Expr> Visit( IReadOnlyList<Expr> multi )

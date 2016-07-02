@@ -300,6 +300,34 @@ namespace Yodii.Script
 
         }
 
+        class AccessorCallFrame : AccessorFrame
+        {
+            internal protected AccessorCallFrame( EvalVisitor visitor, AccessorCallExpr e )
+                : base( visitor, e )
+            {
+                var declaredFunc = ((AccessorCallExpr)Expr).DeclaredFunctions;
+                if( declaredFunc != null )
+                {
+                    foreach( var df in declaredFunc )
+                    {
+                        _visitor.ScopeManager.Register( df );
+                    }
+                }
+            }
+
+            protected override void OnDispose()
+            {
+                var declaredFunc = ((AccessorCallExpr)Expr).DeclaredFunctions;
+                if( declaredFunc != null )
+                {
+                    foreach( var df in declaredFunc )
+                    {
+                        _visitor.ScopeManager.Unregister( df );
+                    }
+                }
+            }
+        }
+
         public PExpr Visit( AccessorMemberExpr e )
         {
             return Run( new AccessorMemberFrame( this, e ) );
@@ -312,7 +340,7 @@ namespace Yodii.Script
 
         public PExpr Visit( AccessorCallExpr e )
         {
-            return Run( new AccessorFrame( this, e ) );
+            return Run( new AccessorCallFrame( this, e ) );
         }
 
         public PExpr Visit( AccessorLetExpr e )

@@ -376,9 +376,11 @@ namespace Yodii.Script
         {
             SourceLocation loc = _parser.PrevNonCommentLocation;
             IList<Expr> parameters = null;
+            IReadOnlyList<AccessorLetExpr> declaredFunctions = null;
             if( !_parser.Match( JSTokenizerToken.ClosePar ) )
             {
-                for( ; ; )
+                _scope.OpenScope();
+                for( ;;)
                 {
                     Debug.Assert( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) == 2 );
                     Expr e = Expression( 2 );
@@ -392,9 +394,10 @@ namespace Yodii.Script
                         return new SyntaxErrorExpr( _parser.Location, "Expected ) opened at {0}.", loc );
                     }
                 }
+                declaredFunctions = _scope.CloseScope();
             }
             var arguments = parameters != null ? parameters.ToArray() : Expr.EmptyArray;
-            return new AccessorCallExpr( loc, left, arguments, _parser.Match( JSTokenizerToken.SemiColon ) );
+            return new AccessorCallExpr( loc, left, arguments, declaredFunctions, _parser.Match( JSTokenizerToken.SemiColon ) );
         }
 
         Expr HandleIdentifier()

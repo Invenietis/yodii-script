@@ -93,9 +93,9 @@ namespace Yodii.Script
             return new JSEvalDate( value );
         }
 
-        public RuntimeError CreateSyntaxError( Expr e, string message )
+        public RuntimeError CreateSyntaxError( Expr e, string message, bool referenceError = false )
         {
-            return new RuntimeError( e, message );
+            return new RuntimeError( e, message, referenceError );
         }
 
         public RuntimeError CreateAccessorSyntaxError( AccessorExpr e )
@@ -103,8 +103,8 @@ namespace Yodii.Script
             AccessorMemberExpr m = e as AccessorMemberExpr;
             if( m != null )
             {
-                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name );
-                return CreateSyntaxError( e, "Unknown property: " + m.Name );
+                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name, referenceError: true );
+                return CreateSyntaxError( e, "Unknown property: " + m.Name, referenceError: true );
             }
             if( e is AccessorIndexerExpr ) return CreateSyntaxError( e, "Indexer is not supported." );
             return CreateSyntaxError( e, "Not a function." );

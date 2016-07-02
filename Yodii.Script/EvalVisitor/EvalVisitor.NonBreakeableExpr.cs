@@ -40,7 +40,7 @@ namespace Yodii.Script
             if( e == ConstantExpr.UndefinedExpr ) return new PExpr( RuntimeObj.Undefined );
             if( e.Value is Double ) return new PExpr( _global.CreateNumber( (Double)e.Value ) );
             if( e.Value is Boolean ) return new PExpr( _global.CreateBoolean( (Boolean)e.Value ) );
-            return new PExpr( new RuntimeError( e, "Unsupported JS type: " + e.Value.GetType().Name ) );
+            return new PExpr( new RuntimeError( e, "Unsupported JS type: " + e.Value.GetType().Name, false ) );
         }
 
         public PExpr Visit( SyntaxErrorExpr e )

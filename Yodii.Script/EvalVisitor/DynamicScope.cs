@@ -112,7 +112,7 @@ namespace Yodii.Script
                     return;
                 }
             }
-            throw new InvalidOperationException( String.Format( "Unregistering non registered '{0}'.", decl.Name ) );
+            throw new InvalidOperationException( $"Unregistering non registered '{decl.Name}'." );
         }
         
         /// <summary>
@@ -124,7 +124,7 @@ namespace Yodii.Script
         {
             Entry e;
             if( _vars.TryGetValue( r, out e ) ) return (e.Next ?? e).O;
-            throw new ArgumentException( String.Format( "Unregistered variable '{0}'.", r.Name ) );
+            throw new ArgumentException( $"Unregistered variable '{r.Name}'." );
         }
     }
 }
