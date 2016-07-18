@@ -49,8 +49,7 @@ namespace Yodii.Script
                 if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
                 RefRuntimeObj r = _left.Result as RefRuntimeObj;
                 if( r == null ) return SetResult( Global.CreateSyntaxError( Expr.Left, "Invalid assignment left-hand side." ) );
-                r.Value = _right.Result;
-                return SetResult( r.Value );
+                return SetResult( r.SetValue( Expr, _right.Result ) );
             }
         }
 

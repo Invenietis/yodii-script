@@ -38,53 +38,43 @@ namespace Yodii.Script
             _value = Undefined;
         }
 
-        public RuntimeObj Value
+        public RuntimeObj Value => _value;
+
+        /// <summary>
+        /// Sets the referenced value.
+        /// </summary>
+        /// <param name="e">The expression that sets the value.</param>
+        /// <param name="value">New value to set.</param>
+        /// <returns>The value or an error.</returns>
+        public virtual RuntimeObj SetValue( Expr e, RuntimeObj value )
         {
-            get { return _value; }
-            set 
+            if( value == null ) _value = RuntimeObj.Null;
+            else 
             {
-                if( value == null ) _value = RuntimeObj.Null;
-                else 
-                {
-                    var r = value as RefRuntimeObj;
-                    _value = r != null ? r.Value : value;
-                }
+                var r = value as RefRuntimeObj;
+                _value = r != null ? r.Value : value;
             }
+            return _value;
         }
 
-        public override string Type 
-        { 
-            get { return _value.Type; } 
-        }
+        public override string Type => _value.Type;
 
-        public override bool ToBoolean()
-        {
-            return _value.ToBoolean();
-        }
+        public override object ToNative( GlobalContext c ) => _value.ToNative( c );
 
-        public override double ToDouble()
-        {
-            return _value.ToDouble();
-        }
+        public override bool ToBoolean() => _value.ToBoolean();
+
+        public override double ToDouble() => _value.ToDouble();
 
         /// <summary>
         /// Overridden to return this <see cref="Value"/>.
         /// </summary>
         /// <returns>This Value.</returns>
-        public override RuntimeObj ToValue()
-        {
-            return _value;
-        }
+        public override RuntimeObj ToValue() => _value;
 
-        public override PExpr Visit( IAccessorFrame frame )
-        {
-            return _value.Visit( frame );
-        }
+        public override PExpr Visit( IAccessorFrame frame ) => _value.Visit( frame );
 
-        public override string ToString()
-        {
-            return _value.ToString();
-        } 
+        public override string ToString() => _value.ToString();
+
     }
 
 }

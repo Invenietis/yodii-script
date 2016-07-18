@@ -31,10 +31,12 @@ namespace Yodii.Script
     public class GlobalContext : IAccessorVisitor
     {
         JSEvalDate _epoch;
+        readonly Dictionary<Type, ExternalTypeHandler> _types;
 
         public GlobalContext()
         {
             _epoch = new JSEvalDate( JSSupport.JSEpoch );
+            _types = new Dictionary<Type, ExternalTypeHandler>();
         }
 
         public JSEvalDate Epoch
@@ -44,46 +46,39 @@ namespace Yodii.Script
 
         public RuntimeObj CreateBoolean( bool value )
         {
-            return value ? JSEvalBoolean.True : JSEvalBoolean.False;
+            return value ? BooleanObj.True : BooleanObj.False;
         }
 
         public RuntimeObj CreateBoolean( RuntimeObj o )
         {
-            if( o == null ) return JSEvalBoolean.False;
-            if( o is JSEvalBoolean ) return o;
+            if( o == null ) return BooleanObj.False;
+            if( o is BooleanObj ) return o;
             return CreateBoolean( o.ToBoolean() );
         }
 
         public RuntimeObj CreateNumber( double value )
         {
-            if( value == 0 ) return JSEvalNumber.Zero;
-            if( value == -1 ) return JSEvalNumber.MinusOne;
-            if( value == 1 ) return JSEvalNumber.One;
-            if( value == 2 ) return JSEvalNumber.Two;
-            if( Double.IsNaN( value ) ) return JSEvalNumber.NaN;
-            if( Double.IsPositiveInfinity( value ) ) return JSEvalNumber.Infinity;
-            if( Double.IsNegativeInfinity( value ) ) return JSEvalNumber.NegativeInfinity;
-            return new JSEvalNumber( value );
+            return DoubleObj.Create( value );
         }
 
         public RuntimeObj CreateNumber( RuntimeObj o )
         {
-            if( o == null ) return JSEvalNumber.Zero;
-            if( o is JSEvalNumber ) return o;
+            if( o == null ) return DoubleObj.Zero;
+            if( o is DoubleObj ) return o;
             return CreateNumber( o.ToDouble() );
         }
 
         public RuntimeObj CreateString( string value )
         {
             if( value == null ) return RuntimeObj.Null;
-            if( value.Length == 0 ) return JSEvalString.EmptyString;
-            return new JSEvalString( value );
+            if( value.Length == 0 ) return StringObj.EmptyString;
+            return new StringObj( value );
         }
 
         public RuntimeObj CreateString( RuntimeObj o )
         {
             if( o == null ) return RuntimeObj.Null;
-            if( o is JSEvalString ) return o;
+            if( o is StringObj ) return o;
             return CreateString( o.ToString() );
         }
 
@@ -110,6 +105,33 @@ namespace Yodii.Script
             return CreateSyntaxError( e, "Not a function." );
         }
 
+        public RuntimeObj Create( object o )
+        {
+            if( o == null ) return RuntimeObj.Null;
+            if( o is ValueType )
+            {
+                if( o is int ) return DoubleObj.Create( (int)o );
+                if( o is double ) return DoubleObj.Create( (double)o );
+                if( o is float ) return DoubleObj.Create( (float)o );
+                if( o is bool ) return (bool)o ? BooleanObj.True : BooleanObj.False;
+                if( o is DateTime ) return CreateDateTime( (DateTime)o );
+            }
+            string s = o as string;
+            if( s != null ) return CreateString( s );
+            return new ExternalObjectObj( this, o );
+        }
+
+        public ExternalTypeHandler FindType( Type type )
+        {
+            ExternalTypeHandler t;
+            if( !_types.TryGetValue( type, out t ) )
+            {
+                t = new ExternalTypeHandler( type );
+                _types.Add( type, t );
+            }
+            return t;
+        }
+
         /// <summary>
         /// Default implementation of <see cref="IAccessorVisitor.Visit"/> that supports evaluation of intrinsic 
         /// functions Number(), String(), Boolean() and Date().
@@ -119,23 +141,22 @@ namespace Yodii.Script
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
-            var s = frame.GetState( c =>
+            var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalNumber.Zero );
+                    if( args.Count == 0 ) return f.SetResult( DoubleObj.Zero );
                     return f.SetResult( CreateNumber( args[0] ) );
                 }
                 )
                 .On( "String" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalString.EmptyString );
+                    if( args.Count == 0 ) return f.SetResult( StringObj.EmptyString );
                     return f.SetResult( CreateString( args[0] ) );
 
                 } )
                 .On( "Boolean" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalBoolean.False );
-                    return f.SetResult( CreateBoolean( args[0] ) );
+                    return f.SetResult( args.Count == 1 && args[0].ToBoolean() ? BooleanObj.True : BooleanObj.False );
                 } )
                 .On( "Date" ).OnCall( ( f, args ) =>
                 {

@@ -92,11 +92,13 @@
     <Compile Include="EvalVisitor\IAccessorFrameInitializer.cs" />
     <Compile Include="EvalVisitor\IAccessorFrameState.cs" />
     <Compile Include="EvalVisitor\IDeferredExpr.cs" />
-    <Compile Include="EvalVisitor\JSEvalFunction.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\ExternalTypeHandler.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\ExternalObjectObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\FunctionObj.cs" />
     <Compile Include="EvalVisitor\PExpr.cs" />
-    <Compile Include="EvalVisitor\RefRuntimeObj.cs" />
-    <Compile Include="EvalVisitor\RuntimeFlowBreaking.cs" />
-    <Compile Include="EvalVisitor\RuntimeSignal.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeFlowBreaking.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeSignal.cs" />
     <Compile Include="ScriptEngine\BreakpointManager.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Frame.cs" />
     <Compile Include="Analyser\Expressions\IfExpr.cs" />
@@ -115,18 +117,18 @@
     <Compile Include="EvalVisitor\GlobalContext.cs" />
     <Compile Include="EvalVisitor\IAccessorFrame.cs" />
     <Compile Include="EvalVisitor\IAccessorVisitor.cs" />
-    <Compile Include="EvalVisitor\JSEvalBoolean.cs" />
-    <Compile Include="EvalVisitor\JSEvalDate.cs" />
-    <Compile Include="EvalVisitor\JSEvalNumber.cs" />
-    <Compile Include="EvalVisitor\JSEvalString.cs" />
-    <Compile Include="EvalVisitor\RuntimeError.cs" />
-    <Compile Include="EvalVisitor\RuntimeObj.cs" />
-    <Compile Include="EvalVisitor\RuntimeObjComparer.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\BooleanObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\JSEvalDate.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\DoubleObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\StringObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeError.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeObjComparer.cs" />
     <Compile Include="Tokenizer\SourceLocation.cs" />
     <Compile Include="Analyser\SyntaxErrorCollector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EvalVisitor\RuntimeObj.cd" />
+    <None Include="EvalVisitor\RuntimeObj\RuntimeObj.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

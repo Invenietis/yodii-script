@@ -49,9 +49,9 @@ namespace Yodii.Script
                 if( r == null ) return SetResult( Global.CreateSyntaxError( Expr.Operand, "Invalid increment or decrement operand." ) );
                 
                 var newValue = Global.CreateNumber( _operand.Result.ToDouble() + (Expr.Plus ? 1.0 : -1.0) );
-                if( Expr.Prefix ) return SetResult( (r.Value = newValue) );
+                if( Expr.Prefix ) return SetResult( r.SetValue( Expr, newValue ) );
                 var result = SetResult( r.Value );
-                r.Value = newValue;
+                r.SetValue( Expr, newValue );
                 return result;
             }
         }

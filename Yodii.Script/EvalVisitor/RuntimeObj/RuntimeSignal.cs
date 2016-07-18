@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\JSEvalBoolean.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\RuntimeSignal.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -25,40 +25,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace Yodii.Script
 {
-    public class JSEvalBoolean : RuntimeObj
+    public abstract class RuntimeSignal : RuntimeObj
     {
-        public static readonly JSEvalBoolean True = new JSEvalBoolean( true );
-        public static readonly JSEvalBoolean False = new JSEvalBoolean( false );
-
-        bool _value;
-
-        JSEvalBoolean( bool v )
+        public RuntimeSignal( Expr e )
         {
-            _value = v;
+            if( e == null ) throw new ArgumentNullException( nameof( e ) );
+            Expr = e;
         }
 
-        public override string Type
-        {
-            get { return RuntimeObj.TypeBoolean; }
-        }
+        public Expr Expr { get; private set; }
 
-        public override bool ToBoolean()
-        {
-            return _value;
-        }
+        public override string Type => RuntimeObj.TypeObject;
 
-        public override double ToDouble()
+        public override object ToNative( GlobalContext c ) => this;
+
+        public override double ToDouble() => double.NaN;
+
+        public override bool ToBoolean() => false;
+
+        public override PExpr Visit( IAccessorFrame frame )
         {
-            return _value ? 1.0 : 0.0;
+            return frame.SetError();
         }
 
         public override string ToString()
         {
-            return _value ? JSSupport.TrueString : JSSupport.FalseString;
+            return "Signal: " + Expr.ToString();
         }
-
     }
+
 }

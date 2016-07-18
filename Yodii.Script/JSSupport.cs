@@ -40,7 +40,7 @@ namespace Yodii.Script
 
         public static bool ToBoolean( double v )
         {
-            return v != 0 && !Double.IsNaN( v );
+            return v != 0 && !double.IsNaN( v );
         }
 
         public static bool ToBoolean( string s )
@@ -97,11 +97,11 @@ namespace Yodii.Script
         /// <param name="d">Double to convert.</param>
         /// <param name="toMinMax">True to map values exceeding [<see cref="Int32.MinValue"/>,<see cref="Int32.MaxValue"/>] to the closest min/max.</param>
         /// <returns>A signed integer.</returns>
-        public static Int32 ToInt32( Double d, bool toMinMax = false )
+        public static int ToInt32( double d, bool toMinMax = false )
         {
-            if( Double.IsNaN( d ) ) return 0;
-            if( d > Int64.MaxValue ) return toMinMax ? Int32.MaxValue : 0;
-            if( d < Int64.MinValue ) return toMinMax ? Int32.MinValue : 0;
+            if( double.IsNaN( d ) ) return 0;
+            if( d > int.MaxValue ) return toMinMax ? int.MaxValue : 0;
+            if( d < int.MinValue ) return toMinMax ? int.MinValue : 0;
             return Convert.ToInt32( d );
         }
 
@@ -112,11 +112,11 @@ namespace Yodii.Script
         /// <param name="d">Double to convert.</param>
         /// <param name="toMinMax">True to map values exceeding [<see cref="Int64.MinValue"/>,<see cref="Int64.MaxValue"/>] to the closest min/max.</param>
         /// <returns>A signed long.</returns>
-        public static Int64 ToInt64( Double d, bool toMinMax = false )
+        public static long ToInt64( Double d, bool toMinMax = false )
         {
-            if( Double.IsNaN( d ) ) return 0;
-            if( d > Int64.MaxValue ) return toMinMax ? Int64.MaxValue : 0;
-            if( d < Int64.MinValue ) return toMinMax ? Int64.MinValue : 0;
+            if( double.IsNaN( d ) ) return 0;
+            if( d > long.MaxValue ) return toMinMax ? long.MaxValue : 0;
+            if( d < long.MinValue ) return toMinMax ? long.MinValue : 0;
             return Convert.ToInt64( d );
         }
 
@@ -130,13 +130,13 @@ namespace Yodii.Script
         /// <returns>The double, following javascript conversion rules.</returns>
         public static double ToNumber( string s, double whenNullOrWhitespace = 0 )
         {
-            if( String.IsNullOrWhiteSpace( s ) ) return whenNullOrWhitespace;
+            if( string.IsNullOrWhiteSpace( s ) ) return whenNullOrWhitespace;
             double r;
-            if( Double.TryParse( s, NumberStyles.Float, CultureInfo.InvariantCulture, out r ) )
+            if( double.TryParse( s, NumberStyles.Float, CultureInfo.InvariantCulture, out r ) )
             {
                 return r;
             }
-            return Double.NaN;
+            return double.NaN;
         }
 
         /// <summary>

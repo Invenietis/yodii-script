@@ -41,7 +41,7 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 42 ) );
             } );
         }
@@ -59,7 +59,7 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( (42 * 100 - 7)*3 ) );
             } );
         }

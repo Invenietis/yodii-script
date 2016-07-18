@@ -40,7 +40,7 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.That( o is JSEvalNumber );
+                Assert.That( o is DoubleObj );
                 Assert.That( o.ToDouble(), Is.EqualTo( result ) );
             } );
         }
@@ -57,12 +57,12 @@ namespace Yodii.Script.Tests
             {
                 if( result is Double )
                 {
-                    Assert.That( o is JSEvalNumber );
+                    Assert.That( o is DoubleObj );
                     Assert.That( o.ToDouble(), Is.EqualTo( result ) );
                 }
                 else
                 {
-                    Assert.That( o is JSEvalString );
+                    Assert.That( o is StringObj );
                     Assert.That( o.ToString(), Is.EqualTo( result ) );
                 }
             } );
@@ -74,7 +74,7 @@ namespace Yodii.Script.Tests
             RuntimeObj o;
             {
                 o = ScriptEngine.Evaluate( "7 + '45' / 2 * '10' / '4'" );
-                Assert.That( o is JSEvalNumber );
+                Assert.That( o is DoubleObj );
                 Assert.That( o.ToDouble(), Is.EqualTo( 7.0 + 45.0 / 2.0 * 10.0 / 4.0 ) );
             }
         }
@@ -89,7 +89,7 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.That( o is JSEvalBoolean );
+                Assert.That( o is BooleanObj );
                 Assert.That( o.ToBoolean(), Is.EqualTo( result ) );
             } );
         }
@@ -356,7 +356,7 @@ namespace Yodii.Script.Tests
         static void IsBoolean( string s, bool v = true, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalBoolean>( o );
+            Assert.IsInstanceOf<BooleanObj>( o );
             Assert.That( o.ToBoolean(), Is.EqualTo( v ), msg ?? s );
         }
 
@@ -370,14 +370,14 @@ namespace Yodii.Script.Tests
         static void IsNumber( string s, double v, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalNumber>( o );
+            Assert.IsInstanceOf<DoubleObj>( o );
             Assert.That( o.ToDouble(), Is.EqualTo( v ), msg ?? s );
         }
 
         static void IsString( string s, string v, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalString>( o );
+            Assert.IsInstanceOf<StringObj>( o );
             Assert.That( o.ToString(), Is.EqualTo( v ), msg ?? s );
         }
 

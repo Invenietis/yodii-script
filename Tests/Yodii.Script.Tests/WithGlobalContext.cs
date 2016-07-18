@@ -39,7 +39,7 @@ namespace Yodii.Script.Tests
 
             public override PExpr Visit( IAccessorFrame frame )
             {
-                var s = frame.GetState( c => c
+                var s = frame.GetImplementationState( c => c
                     .On( "AnIntrinsicArray" ).OnIndex( ( f, idx ) =>
                     {
                         if( idx.Type != "number" ) return f.SetError( "Number expected." );
@@ -59,7 +59,7 @@ namespace Yodii.Script.Tests
                     {
                         Console.WriteLine( "Ghost.M() called with {0} arguments: {1} (=> returns {0}).", 
                                                 args.Count, 
-                                                String.Join( ", ", args.Select( a => a.ToString() )) );
+                                                string.Join( ", ", args.Select( a => a.ToString() )) );
                         return f.SetResult( f.Global.CreateNumber( args.Count ) );
                     } )
                     .On( "Ghost" ).On( "M" ).OnIndex( ( f, idx ) =>
@@ -73,7 +73,7 @@ namespace Yodii.Script.Tests
         }
 
         [Test]
-        public void access_to_a_non_exisitng_object_on_the_Context_is_a_runtime_error()
+        public void access_to_a_non_existing_object_on_the_Context_is_a_runtime_error()
         {
             string s = "AnIntrinsicArray[0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
@@ -90,7 +90,7 @@ namespace Yodii.Script.Tests
             string s = "An.array.with.one.cell[6]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is JSEvalString && o.ToString() == "An.array.with.one.cell[] => 6" );
+                Assert.That( o is StringObj && o.ToString() == "An.array.with.one.cell[] => 6" );
             }, ctx );
 
             s = "array";
@@ -134,7 +134,7 @@ namespace Yodii.Script.Tests
             s = "AnIntrinsicArray[0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is JSEvalNumber );
+                Assert.That( o is DoubleObj );
                 Assert.That( o.ToDouble(), Is.EqualTo( 1.2 ) );
             }, ctx );
             
@@ -143,7 +143,7 @@ namespace Yodii.Script.Tests
             s = "AnIntrinsicArray[0+(7-7)] + AnIntrinsicArray[1+0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is JSEvalNumber );
+                Assert.That( o is DoubleObj );
                 Assert.That( o.ToDouble(), Is.EqualTo( 3.4 + 5.6 ) );
             }, ctx );
         }
@@ -155,7 +155,7 @@ namespace Yodii.Script.Tests
             var ctx = new Context();
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is JSEvalBoolean );
+                Assert.That( o is BooleanObj );
                 Assert.That( o.ToBoolean() );
             }, ctx );
         }

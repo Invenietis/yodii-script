@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\JSEvalString.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\JSEvalDate.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -28,22 +28,26 @@ using System.Text;
 
 namespace Yodii.Script
 {
-    public class JSEvalString : RuntimeObj, IComparable
+    public class JSEvalDate : RuntimeObj, IComparable
     {
-        static public readonly JSEvalString EmptyString = new JSEvalString( String.Empty );
+        public static readonly string Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'zzz";
+        public static readonly string FormatTUTC = "ddd, dd MMM yyyy HH':'mm':'ss 'UTC'";
+        public static readonly string DateFormat = "ddd, dd MMM yyyy";
+        public static readonly string TimeFormat = "HH':'mm':'ss 'GMT'zzz";
+        
+        DateTime _value;
 
-        readonly string _value;
-
-        public JSEvalString( string value )
+        public JSEvalDate( DateTime value )
         {
-            if( value == null ) throw new ArgumentNullException( "value" );
             _value = value;
         }
 
         public override string Type
         {
-            get { return RuntimeObj.TypeString; }
+            get { return RuntimeObj.TypeObject; }
         }
+
+        public override object ToNative( GlobalContext c ) => _value;
 
         public override bool ToBoolean()
         {
@@ -57,14 +61,19 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return _value;
+            return JSSupport.ToString( _value );
         }
+
+        //public override RuntimeObj ToPrimitive( GlobalContext c )
+        //{
+        //    return c.CreateString( JSSupport.ToString( _value ) );
+        //}
 
         public override bool Equals( object obj )
         {
             if( obj == this ) return true;
-            JSEvalString s = obj as JSEvalString;
-            return s != null ? s._value == _value : false;
+            JSEvalDate d = obj as JSEvalDate;
+            return d != null ? d._value == _value : false;
         }
 
         public override int GetHashCode()
@@ -74,29 +83,25 @@ namespace Yodii.Script
 
         public int CompareTo( object obj )
         {
-            JSEvalString s = obj as JSEvalString;
-            if( s != null ) return String.Compare( _value, s._value, StringComparison.InvariantCulture );
-            if( obj is String ) return String.Compare( _value, (String)obj, StringComparison.InvariantCulture );
-            throw new ArgumentException( "Must be a string.", "obj" );
+            JSEvalDate d = obj as JSEvalDate;
+            if( d != null ) return _value.CompareTo( d._value );
+            if( obj is DateTime ) return _value.CompareTo( (DateTime)obj );
+            throw new ArgumentException( "Must be a Date.", "obj" );
         }
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            var s = frame.GetState( c =>
-                c.On( "charAt" ).OnCall( ( f, args ) =>
+            var s = frame.GetImplementationState( c =>
+                c.On( "toString" ).OnCall( ( f, args ) =>
                 {
-                    int idx = args.Count > 0 ? JSSupport.ToInt32( args[0].ToDouble() ) : 0;
-                    if( idx < 0 || idx >= _value.Length ) return f.SetResult( JSEvalString.EmptyString );
-                    return f.SetResult( f.Global.CreateString( new String( _value[idx], 1 ) ) );
-                } )
-                .On( "toString" ).OnCall( ( f, args ) =>
-                {
-                    return f.SetResult( this );
+                    return f.SetResult( f.Global.CreateString( JSSupport.ToString( _value ) ) );
                 }
                 ) );
             return s != null ? s.Visit() : frame.SetError();
         }
 
     }
+
+
 
 }

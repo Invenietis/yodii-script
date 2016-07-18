@@ -93,8 +93,8 @@ namespace Yodii.Script
         public override string ToString()
         {
             return IsSyntaxError 
-                    ? String.Format( "Syntax Error: {0} at {1}.", Message, Expr.Location.ToString() )
-                    : String.Format( "Runtime Error at {0}. Error: {1}", Expr.Location.ToString(), ThrownValue.ToString() );
+                    ? string.Format( "Syntax Error: {0} at {1}.", Message, Expr.Location.ToString() )
+                    : string.Format( "Runtime Error at {0}. Error: {1}", Expr.Location.ToString(), ThrownValue.ToString() );
         }
     }
 
