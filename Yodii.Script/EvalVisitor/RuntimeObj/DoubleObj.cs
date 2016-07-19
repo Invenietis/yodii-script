@@ -78,7 +78,7 @@ namespace Yodii.Script
         public override PExpr Visit( IAccessorFrame frame )
         {
             var s = frame.GetImplementationState( c => 
-                c.On("toString").OnCall( (f,args) => 
+                c.On("ToString").OnCall( (f,args) => 
                 {
                     int radix = 10;
                     if( args.Count == 1 ) radix = JSSupport.ToInt32( args[0].ToDouble() );

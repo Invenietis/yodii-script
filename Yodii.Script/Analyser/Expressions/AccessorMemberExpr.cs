@@ -43,14 +43,11 @@ namespace Yodii.Script
             Name = fieldOrVariableName;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public bool IsUnbound { get { return Left == null; } }
+        public bool IsUnbound => Left == null;
 
-        public override bool IsMember( string memberName )
-        {
-            return memberName == Name;
-        }
+        public override bool IsMember( string memberName ) => memberName == Name;
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -59,19 +56,13 @@ namespace Yodii.Script
         /// <param name="visitor">visitor.</param>
         /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
-        internal protected override T Accept<T>( IExprVisitor<T> visitor )
-        {
-            return visitor.Visit( this );
-        }
+        internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
         /// <summary>
         /// This is just to ease debugging.
         /// </summary>
         /// <returns>Readable expression.</returns>
-        public override string ToString()
-        {
-            return Left == null ? Name : Left.ToString() + '.' + Name;
-        }
+        public override string ToString() => Left == null ? Name : Left.ToString() + '.' + Name;
 
     }
 }

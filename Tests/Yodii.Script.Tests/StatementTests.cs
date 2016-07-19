@@ -129,7 +129,7 @@ namespace Yodii.Script.Tests
                             i /= 3.52;
                             if( i !== 8/3.52 ) bug = 'Bug in /';
                         
-                            bug.toString();
+                            bug.ToString();
 ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {

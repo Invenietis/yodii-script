@@ -31,9 +31,8 @@ using NUnit.Framework;
 namespace Yodii.Script.Tests
 {
     [TestFixture]
-    public class ExternalObjectAccess
+    public class ObjectSupportTests
     {
-
         class AnObject
         {
             public AnObject()
@@ -61,44 +60,21 @@ namespace Yodii.Script.Tests
             {
                 return ++TotalMethodCallCount;
             }
+            // This method is hidden by AMethod() without parameters.
+            public int AMethod( string willNeverBeCalled = null )
+            {
+                throw new Exception( "Never called!" );
+            }
             public int AMethod( int boost )
             {
                 return TotalMethodCallCount += boost;
             }
         }
 
-        class Context : GlobalContext
-        {
-            readonly Dictionary<string, RuntimeObj> _objects;
-
-            public Context()
-            {
-                _objects = new Dictionary<string, RuntimeObj>();
-            }
-
-            public void Register( string name, object o )
-            {
-                if( name == null ) throw new ArgumentNullException( nameof( name ) );
-                if( o == null ) throw new ArgumentNullException( nameof( o ) );
-                _objects.Add( name, Create( o ) );
-            }
-
-            public override PExpr Visit( IAccessorFrame frame )
-            {
-                AccessorMemberExpr mE = frame.Expr as AccessorMemberExpr;
-                if( mE != null )
-                {
-                    RuntimeObj obj;
-                    if( _objects.TryGetValue( mE.Name, out obj ) ) return frame.SetResult( obj );
-                }
-                return base.Visit( frame );
-            }
-        }
-
         [Test]
         public void accessing_property_and_field()
         {
-            var c = new Context();
+            var c = new GlobalContext();
             c.Register( "AnObject", new AnObject() );
             TestHelper.RunNormalAndStepByStep( "AnObject.Name + AnObject.NameAsField", o =>
             {
@@ -107,11 +83,10 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-
         [Test]
         public void setting_property_and_field()
         {
-            var c = new Context();
+            var c = new GlobalContext();
             c.Register( "AnObject", new AnObject() );
             TestHelper.RunNormalAndStepByStep( @"
                 AnObject.Name = ""X"";
@@ -126,7 +101,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void accessing_property_of_sub_property()
         {
-            var c = new Context();
+            var c = new GlobalContext();
             c.Register( "AnObject", new AnObject() );
             TestHelper.RunNormalAndStepByStep( @"AnObject.AnotherObject.OtherName", o =>
             {
@@ -138,7 +113,7 @@ namespace Yodii.Script.Tests
         [Test]
         public void postincrementing_integer_field()
         {
-            var c = new Context();
+            var c = new GlobalContext();
             var anObject = new AnObject();
             c.Register( "anObject", anObject );
             TestHelper.RunNormalAndStepByStep( @"
@@ -155,19 +130,20 @@ namespace Yodii.Script.Tests
         [Test]
         public void calling_methods()
         {
-            var c = new Context();
+            var c = new GlobalContext();
             var anObject = new AnObject();
             c.Register( "anObject", anObject );
             TestHelper.RunNormalAndStepByStep( @"
+                anObject.AnotherObject.TotalMethodCallCount = 0;
                 let r0 = anObject.AnotherObject.AMethod();
-                if( r0 != 1 || anObject.AnotherObject.TotalMethodCallCount != 1 ) throw ""BUg!"";
+                if( r0 != 1 || anObject.AnotherObject.TotalMethodCallCount != 1 ) throw ""BUG!"";
                 let r1 = anObject.AnotherObject.AMethod( 2 );
                 r1 * 1000 + anObject.AnotherObject.TotalMethodCallCount
                 ", o =>
             {
                 Assert.That( o is DoubleObj );
                 Assert.That( o.ToString(), Is.EqualTo( "3003" ) );
-                Assert.That( anObject.AnotherObject.IntegerField, Is.EqualTo( 3 ) );
+                Assert.That( anObject.AnotherObject.TotalMethodCallCount, Is.EqualTo( 3 ) );
             }, c );
         }
 

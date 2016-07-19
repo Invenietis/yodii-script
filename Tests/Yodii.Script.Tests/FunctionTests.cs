@@ -155,7 +155,7 @@ namespace Yodii.Script.Tests
                         (function() { 
                           i = j + i; 
                         })();
-                        i.toString();
+                        i.ToString();
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {

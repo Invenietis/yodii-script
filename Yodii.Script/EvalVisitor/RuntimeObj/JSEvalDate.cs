@@ -42,32 +42,15 @@ namespace Yodii.Script
             _value = value;
         }
 
-        public override string Type
-        {
-            get { return RuntimeObj.TypeObject; }
-        }
+        public override string Type => TypeObject; 
 
         public override object ToNative( GlobalContext c ) => _value;
 
-        public override bool ToBoolean()
-        {
-            return JSSupport.ToBoolean( _value );
-        }
+        public override bool ToBoolean() => JSSupport.ToBoolean( _value );
 
-        public override double ToDouble()
-        {
-            return JSSupport.ToNumber( _value );
-        }
+        public override double ToDouble() => JSSupport.ToNumber( _value );
 
-        public override string ToString()
-        {
-            return JSSupport.ToString( _value );
-        }
-
-        //public override RuntimeObj ToPrimitive( GlobalContext c )
-        //{
-        //    return c.CreateString( JSSupport.ToString( _value ) );
-        //}
+        public override string ToString() => JSSupport.ToString( _value );
 
         public override bool Equals( object obj )
         {
@@ -76,10 +59,7 @@ namespace Yodii.Script
             return d != null ? d._value == _value : false;
         }
 
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
+        public override int GetHashCode() => _value.GetHashCode();
 
         public int CompareTo( object obj )
         {
@@ -92,7 +72,7 @@ namespace Yodii.Script
         public override PExpr Visit( IAccessorFrame frame )
         {
             var s = frame.GetImplementationState( c =>
-                c.On( "toString" ).OnCall( ( f, args ) =>
+                c.On( "ToString" ).OnCall( ( f, args ) =>
                 {
                     return f.SetResult( f.Global.CreateString( JSSupport.ToString( _value ) ) );
                 }

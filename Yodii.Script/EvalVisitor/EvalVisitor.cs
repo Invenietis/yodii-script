@@ -53,25 +53,13 @@ namespace Yodii.Script
         }
 
         [DebuggerStepThrough]
-        public PExpr VisitExpr( Expr e )
-        {
-            return e.Accept( this );
-        }
+        public PExpr VisitExpr( Expr e ) => e.Accept( this );
 
-        public GlobalContext Global 
-        {
-            get { return _global; }
-        }
+        public GlobalContext Global  => _global; 
 
-        public IDeferredExpr CurrentFrame
-        {
-            get { return _currentFrame; }
-        }
+        public IDeferredExpr CurrentFrame => _currentFrame; 
 
-        public IDeferredExpr FirstFrame
-        {
-            get { return _firstFrame; }
-        }
+        public IDeferredExpr FirstFrame => _firstFrame; 
 
         public IEnumerable<IDeferredExpr> Frames
         {

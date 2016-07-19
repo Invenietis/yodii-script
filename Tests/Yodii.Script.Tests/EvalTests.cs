@@ -307,17 +307,17 @@ namespace Yodii.Script.Tests
             IsBoolean( "Infinity !== NaN", true );
         }
 
-        [TestCase( "(400+50+3).toString() === '453'", true )]
-        [TestCase( "(-98979).toString(2) === '-11000001010100011'", true )]
-        [TestCase( "(14714).toString(3) === '202011222'", true )]
-        [TestCase( "(-1.47e12).toString(9) === '-5175284306313'", true )]
-        [TestCase( "(1.4756896725e12).toString(30) === '27e7t31k0'", true )]
-        [TestCase( "(1.4756896725e12).toString(31) === '1mjn02pj9'", true )]
-        [TestCase( "(1.4756896725e12).toString(32) === '1auavarpk'", true )]
-        [TestCase( "(1.4756896725e12).toString(33) === '11kl9kf8l'", true )]
-        [TestCase( "(1.4756896725e12).toString(34) === 's38se3kg'", true )]
-        [TestCase( "(1.4756896725e12).toString(35) === 'mwqnd0lf'", true )]
-        [TestCase( "(1.4756896725e12).toString(36) === 'itx7j2no'", true )]
+        [TestCase( "(400+50+3).ToString() === '453'", true )]
+        [TestCase( "(-98979).ToString(2) === '-11000001010100011'", true )]
+        [TestCase( "(14714).ToString(3) === '202011222'", true )]
+        [TestCase( "(-1.47e12).ToString(9) === '-5175284306313'", true )]
+        [TestCase( "(1.4756896725e12).ToString(30) === '27e7t31k0'", true )]
+        [TestCase( "(1.4756896725e12).ToString(31) === '1mjn02pj9'", true )]
+        [TestCase( "(1.4756896725e12).ToString(32) === '1auavarpk'", true )]
+        [TestCase( "(1.4756896725e12).ToString(33) === '11kl9kf8l'", true )]
+        [TestCase( "(1.4756896725e12).ToString(34) === 's38se3kg'", true )]
+        [TestCase( "(1.4756896725e12).ToString(35) === 'mwqnd0lf'", true )]
+        [TestCase( "(1.4756896725e12).ToString(36) === 'itx7j2no'", true )]
         public void number_toString_method_supports_base_from_2_to_36( string s, bool v)
         {
             IsBoolean( s, v );
@@ -338,8 +338,8 @@ namespace Yodii.Script.Tests
         [TestCase( "Date(2012,4,3) != Date(2012,4,3,1)", true )]
         [TestCase( "Date(2012) > '2011'", false )]
         [TestCase( "Date(2012) < '2011'", false )]
-        [TestCase( "Date(2012,1,1) < Date(2014,1,1).toString()", false )]
-        [TestCase( "Date(2012,1,1) > Date(2014,1,1).toString()", false )]
+        [TestCase( "Date(2012,1,1) < Date(2014,1,1).ToString()", false )]
+        [TestCase( "Date(2012,1,1) > Date(2014,1,1).ToString()", false )]
         public void dates_comparison_uses_IComparable_interface( string s, bool result )
         {
             IsBoolean( s, result );

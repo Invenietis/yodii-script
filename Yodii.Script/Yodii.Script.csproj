@@ -62,6 +62,7 @@
     <Compile Include="Analyser\Expressions\FunctionExpr.cs" />
     <Compile Include="Analyser\Expressions\TryCatchExpr.cs" />
     <Compile Include="Analyser\Expressions\ListOfExpr.cs" />
+    <Compile Include="Analyser\Expressions\ForeachExpr.cs" />
     <Compile Include="Analyser\Expressions\WhileExpr.cs" />
     <Compile Include="Analyser\Expressions\PrePostIncDecExpr.cs" />
     <Compile Include="Analyser\Expressions\Expr.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="EvalVisitor\EvalVisitor.Expr.ListOf.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Block.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Assign.cs" />
+    <Compile Include="EvalVisitor\EvalVisitor.Expr.Foreach.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.While.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.PrePostIncDec.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Unary.cs" />

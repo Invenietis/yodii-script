@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\AccessorIndexerExpr.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\Analyser\Expressions\WhileExpr.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -22,38 +22,30 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
-    /// <summary>
-    /// Accessor that captures an indexed access.
-    /// </summary>
-    public class AccessorIndexerExpr : AccessorExpr
-    {
-        Expr[] _args;
 
-        /// <summary>
-        /// Creates a new <see cref="AccessorIndexerExpr"/>. 
-        /// One [Expr] index is enough.
-        /// </summary>
-        /// <param name="location">Location of this expression.</param>
-        /// <param name="left">Left scope. Must not be null.</param>
-        /// <param name="index">Index for the indexer.</param>
-        public AccessorIndexerExpr( SourceLocation location, Expr left, Expr index, bool isStatement )
-            : base( location, left, isStatement, true )
+    public class ForeachExpr : Expr
+    {
+        public ForeachExpr( SourceLocation location, AccessorLetExpr var, Expr generator, Expr code )
+            : base( location, true, false )
         {
-            _args = new Expr[]{ index };
+            Variable = var;
+            Generator = generator;
+            Code = code;
         }
 
-        /// <summary>
-        /// Gets the expression of the index.
-        /// </summary>
-        public Expr Index => _args[0];
+        public AccessorLetExpr Variable { get; }
+
+        public Expr Generator { get; }
+
+        public Expr Code { get; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -64,17 +56,9 @@ namespace Yodii.Script
         [DebuggerStepThrough]
         internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
-        /// <summary>
-        /// Gets a one-sized argument list that contains the <see cref="Index"/>.
-        /// </summary>
-        public override IReadOnlyList<Expr> Arguments =>  _args; 
-
-        /// <summary>
-        /// This is just to ease debugging.
-        /// </summary>
-        /// <returns>Readable expression.</returns>
-        public override string ToString() => Left.ToString() + '[' + Index.ToString() + ']';
+        public override string ToString() => $"foreach({Variable} in {Generator}) {{{Code}}}";
 
     }
+
 
 }

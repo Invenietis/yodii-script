@@ -46,6 +46,7 @@ namespace Yodii.Script
         T Visit( NopExpr e );
         T Visit( PrePostIncDecExpr e );
         T Visit( WhileExpr e );
+        T Visit( ForeachExpr e );
         T Visit( FlowBreakingExpr e );
         T Visit( FunctionExpr e );
         T Visit( TryCatchExpr e );

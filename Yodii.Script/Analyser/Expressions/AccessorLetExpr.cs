@@ -48,7 +48,7 @@ namespace Yodii.Script
         /// <summary>
         /// Gets the name of the declared variable.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -57,19 +57,13 @@ namespace Yodii.Script
         /// <param name="visitor">visitor.</param>
         /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
-        internal protected override T Accept<T>( IExprVisitor<T> visitor )
-        {
-            return visitor.Visit( this );
-        }
+        internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
         /// <summary>
         /// This is just to ease debugging.
         /// </summary>
         /// <returns>Readable expression.</returns>
-        public override string ToString()
-        {
-            return "let " + Name;
-        }
+        public override string ToString() => "let " + Name;
     }
 
 }

@@ -83,10 +83,7 @@ namespace Yodii.Script
             }
         }
 
-        public PExpr Visit( WhileExpr e )
-        {
-            return Run( new WhileExprFrame( this, e ) );
-        }
+        public PExpr Visit( WhileExpr e ) => Run( new WhileExprFrame( this, e ) );
 
     }
 }

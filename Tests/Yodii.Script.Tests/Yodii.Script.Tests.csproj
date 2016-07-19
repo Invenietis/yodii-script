@@ -60,15 +60,16 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BasicBreakpointSupport.cs" />
+    <Compile Include="ForeachTests.cs" />
     <Compile Include="TryCatchTests.cs" />
     <Compile Include="FunctionTests.cs" />
     <Compile Include="StatementTests.cs" />
     <Compile Include="EvalTests.cs" />
-    <Compile Include="JSAnalyserTests.cs" />
+    <Compile Include="AnalyserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticScopeTests.cs" />
     <Compile Include="TestHelper.cs" />
-    <Compile Include="ExternalObjectAccess.cs" />
+    <Compile Include="ObjectSupportTests.cs" />
     <Compile Include="WithGlobalContext.cs" />
   </ItemGroup>
   <ItemGroup>

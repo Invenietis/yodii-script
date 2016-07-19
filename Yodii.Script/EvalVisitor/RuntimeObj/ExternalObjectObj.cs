@@ -121,12 +121,14 @@ namespace Yodii.Script
 
             PExpr DoCall( IAccessorFrame frame, IReadOnlyList<RuntimeObj> parameters )
             {
-                MethodInfo m = _handler.FindMethod( parameters );
-                if( m == null ) return frame.SetError( $"Method {_handler.Name} can not be called with {parameters.Count} parameters." );
                 try
                 {
-                    var args = parameters.Select( p => p.ToNative( _eo._context ) ).ToArray();
-                    return frame.SetResult( _eo._context.Create( m.Invoke( _eo._o, args ) ) );
+                    var m = _handler.FindMethod( _eo._context, parameters );
+                    if( m.Method == null ) return frame.SetError( $"Method {_handler.Name} can not be called with {parameters.Count} parameters." );
+                    object result = m.Method.Invoke( _eo._o, m.Parameters );
+                    return m.Method.ReturnType == typeof(void) 
+                            ? frame.SetResult( RuntimeObj.Undefined )
+                            : frame.SetResult( _eo._context.Create( result ) );
                 }
                 catch( Exception ex )
                 {

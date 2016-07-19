@@ -43,6 +43,18 @@ namespace Yodii.Script
             _handlers = new List<IHandler>();
         }
 
+        public struct MethodCallInfo
+        {
+            public readonly MethodInfo Method;
+            public readonly object[] Parameters;
+
+            internal MethodCallInfo( MethodInfo m, object[] parameters )
+            {
+                Method = m;
+                Parameters = parameters;
+            }
+        }
+
         public interface IHandler
         {
             /// <summary>
@@ -73,9 +85,11 @@ namespace Yodii.Script
             /// <summary>
             /// Finds the best method based on the parameters.
             /// </summary>
+            /// <param name="ctx">Current global context.</param>
             /// <param name="parameters">Call parameters.</param>
-            /// <returns>Null or the most appropriate overload.</returns>
-            MethodInfo FindMethod( IReadOnlyList<RuntimeObj> parameters );
+            /// <param name="actualParameters">The actual parameters to use.</param>
+            /// <returns>The resulting most appropriate overload and its parameters.</returns>
+            MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters );
         }
 
         class PropertyHandler : IHandler
@@ -108,7 +122,7 @@ namespace Yodii.Script
             public Type PropertyOrFieldType { get; }
             public Func<object, object> PropertyGetter { get; }
             public Action<object, object> PropertySetter { get; }
-            public MethodInfo FindMethod( IReadOnlyList<RuntimeObj> parameters ) => null;
+            public MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters) => new MethodCallInfo();
             public override string ToString() => Holder._type.FullName + '.' + Name;
         }
 
@@ -122,17 +136,24 @@ namespace Yodii.Script
                 {
                     M = m;
                     Parameters = m.GetParameters();
+                    MinParameterCount = Parameters.Length - Parameters.Count( p => p.HasDefaultValue );
                 }
 
                 public readonly MethodInfo M;
                 public readonly ParameterInfo[] Parameters;
+                public readonly int MinParameterCount;
             }
 
             public MethodGroupHandler( ExternalTypeHandler h, string name, IEnumerable<MethodInfo> methods )
             {
                 Holder = h;
                 Name = name;
-                _methods = methods.Select( m => new Method( m ) ).ToArray();
+                _methods = methods
+                            .Select( m => new Method( m ) )
+                            .OrderBy( m => m.MinParameterCount ).ThenBy( m => m.Parameters.Length )
+                            .GroupBy( m => m.MinParameterCount )
+                            .Select( g => g.First() )
+                            .ToArray();
             }
 
             public ExternalTypeHandler Holder { get; }
@@ -140,9 +161,16 @@ namespace Yodii.Script
             public Type PropertyOrFieldType => null;
             Func<object, object> IHandler.PropertyGetter => null;
             Action<object, object> IHandler.PropertySetter => null;
-            public MethodInfo FindMethod( IReadOnlyList<RuntimeObj> parameters )
+            public MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters )
             {
-                return _methods.FirstOrDefault( m => m.Parameters.Length == parameters.Count ).M;
+                var m = _methods.FirstOrDefault( candidate => candidate.MinParameterCount == parameters.Count );
+                if( m.M == null ) return new MethodCallInfo();
+                var actualParameters = new object[parameters.Count];
+                for( int i = 0; i < actualParameters.Length; ++i )
+                {
+                    actualParameters[i] = Convert.ChangeType( parameters[i].ToNative( ctx ), m.Parameters[i].ParameterType );
+                }
+                return new MethodCallInfo( m.M, actualParameters );
             }
         }
 

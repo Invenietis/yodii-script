@@ -73,13 +73,13 @@ namespace Yodii.Script
         public override PExpr Visit( IAccessorFrame frame )
         {
             var s = frame.GetImplementationState( c =>
-                c.On( "charAt" ).OnCall( ( f, args ) =>
+                c.OnIndex( ( f, arg ) =>
                 {
-                    int idx = args.Count > 0 ? JSSupport.ToInt32( args[0].ToDouble() ) : 0;
+                    int idx = JSSupport.ToInt32( arg.ToDouble() );
                     if( idx < 0 || idx >= _value.Length ) return f.SetResult( StringObj.EmptyString );
                     return f.SetResult( f.Global.CreateString( new String( _value[idx], 1 ) ) );
                 } )
-                .On( "toString" ).OnCall( ( f, args ) =>
+                .On( "ToString" ).OnCall( ( f, args ) =>
                 {
                     return f.SetResult( this );
                 }

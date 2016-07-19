@@ -32,12 +32,22 @@ namespace Yodii.Script
     {
         JSEvalDate _epoch;
         readonly Dictionary<Type, ExternalTypeHandler> _types;
+        readonly Dictionary<string, RuntimeObj> _objects;
 
         public GlobalContext()
         {
             _epoch = new JSEvalDate( JSSupport.JSEpoch );
             _types = new Dictionary<Type, ExternalTypeHandler>();
+            _objects = new Dictionary<string, RuntimeObj>();
         }
+
+        public void Register( string name, object o )
+        {
+            if( name == null ) throw new ArgumentNullException( nameof( name ) );
+            if( o == null ) throw new ArgumentNullException( nameof( o ) );
+            _objects.Add( name, Create( o ) );
+        }
+
 
         public JSEvalDate Epoch
         {
@@ -141,6 +151,12 @@ namespace Yodii.Script
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
+            AccessorMemberExpr mE = frame.Expr as AccessorMemberExpr;
+            if( mE != null )
+            {
+                RuntimeObj obj;
+                if( _objects.TryGetValue( mE.Name, out obj ) ) return frame.SetResult( obj );
+            }
             var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {
