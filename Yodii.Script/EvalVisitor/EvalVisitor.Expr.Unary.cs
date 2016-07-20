@@ -86,6 +86,13 @@ namespace Yodii.Script
                                 else result = Global.CreateString( result.Type );
                                 break;
                             }
+                        case (int)JSTokenizerToken.IndexOf & 15:
+                            {
+                                RefRuntimeIndexedObj iO = result as RefRuntimeIndexedObj;
+                                if( iO == null ) result = Global.CreateSyntaxError( Expr, "No associated index. indexof must be used on a foreach variable." );
+                                else result = iO.Index;
+                                break;
+                            }
                         case (int)JSTokenizerToken.Void & 15:
                             {
                                 result = RuntimeObj.Undefined;

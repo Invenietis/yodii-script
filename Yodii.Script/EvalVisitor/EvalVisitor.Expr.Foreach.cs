@@ -40,6 +40,7 @@ namespace Yodii.Script
             PExpr _code;
             IEnumerator _nativeEnum;
             RefRuntimeObj _currentVariable;
+            int _index;
 
             public ForeachExprFrame( EvalVisitor evaluator, ForeachExpr e )
                 : base( evaluator, e )
@@ -76,7 +77,7 @@ namespace Yodii.Script
                             return new PExpr( Global.CreateSyntaxError( Expr.Generator, ex.Message ) );
                         }
                         if( !hasNext ) break;
-                        _currentVariable = _visitor.ScopeManager.Register( Expr.Variable );
+                        _currentVariable = _visitor.ScopeManager.Register( Expr.Variable, _index++ );
                         _currentVariable.SetValue( Expr.Variable, Global.Create( _nativeEnum.Current ) );
                     }
                     if( IsPendingOrSignal( ref _code, Expr.Code ) ) return PendingOrSignal( _code );

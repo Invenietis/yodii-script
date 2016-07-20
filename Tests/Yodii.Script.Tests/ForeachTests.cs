@@ -54,15 +54,14 @@ namespace Yodii.Script.Tests
             var c = new GlobalContext();
             c.Register( "L", new[] { "A", "B", "C" } );
             TestHelper.RunNormalAndStepByStep( @"
-                let s = """";
-                foreach( i in L ) { s += i.ToString(); };
+                let s = '';
+                foreach( i in L ) s += i;
                 s;", o =>
             {
                 Assert.That( o is RefRuntimeObj );
                 Assert.That( o.ToString(), Is.EqualTo( "ABC" ) );
             }, c );
         }
-
 
         [Test]
         public void nested_iterations()
@@ -79,10 +78,31 @@ namespace Yodii.Script.Tests
                         s2 += j;
                         s += '(' + i.ToString() + ',' + j + ')';
                     }
-                s1+""|""+s2+""|""+s;", o =>
+                s1+'|'+s2+'|'+s;", o =>
             {
                 Assert.That( o is StringObj );
                 Assert.That( o.ToString(), Is.EqualTo( "111222333|ABCABCABC|(1,A)(1,B)(1,C)(2,A)(2,B)(2,C)(3,A)(3,B)(3,C)" ) );
+            }, c );
+        }
+
+        [Test]
+        public void nested_iterations_with_indexof()
+        {
+            var c = new GlobalContext();
+            c.Register( "L1", new[] { 1, 2, 3 } );
+            c.Register( "L2", new[] { "A", "B", "C" } );
+            TestHelper.RunNormalAndStepByStep( @"
+                let s1 = '', s2 = '';
+                foreach( i in L1 ) 
+                    foreach( j in L2 ) 
+                    { 
+                        s1 += indexof i;
+                        s2 += indexof( j );
+                    }
+                s1+'|'+s2;", o =>
+            {
+                Assert.That( o is StringObj );
+                Assert.That( o.ToString(), Is.EqualTo( "000111222|012012012" ) );
             }, c );
         }
 
