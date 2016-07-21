@@ -64,7 +64,7 @@ namespace Yodii.Script
         Breakpoint = IsPending | CanContinue | 16,
 
         /// <summary>
-        /// An asynchronous call is being processed.
+        /// An asynchronous call is being processed (not implemented yet).
         /// </summary>
         AsyncCall = IsPending | 32,
 

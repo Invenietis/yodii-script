@@ -9,11 +9,13 @@
     <projectUrl>https://github.com/SampleInc/Project</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      Simple script and template engine.
+      Simple fully thread-safe script and template engine.
     </summary>
     <description>
       Yodii.Script is a purely interpreted script language loosely based on javascript that supports function
-      with closures. One of its major specificty is to be implemnted as a state machine.
+      with closures. One of its major specificty is to be implemnted as a state machine: it evaluates its
+      script in the calling thread, step-by-step or per time-slice without any cross threads concerns.
+      A very simple template engine (based on &lt;% ... %&gt; and &lt;%= ... %&gt; tags) is also available.
     </description>
     <language>en-US</language>
     <dependencies>

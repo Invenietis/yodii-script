@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{9BF04424-0B74-43A0-A324-9BB83E5197D6}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		README.md = README.md
 		RepositoryInfo.xml = RepositoryInfo.xml
 		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
