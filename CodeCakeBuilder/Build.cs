@@ -80,10 +80,10 @@ namespace CodeCake
                 .IsDependentOn( "Check-Repository" )
                 .Does( () =>
                 {
-                    //Cake.CleanDirectories( "**/bin/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
-                    //Cake.CleanDirectories( "**/obj/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
-                    //Cake.CleanDirectories( releasesDir );
-                    //Cake.DeleteFiles( "Tests/**/TestResult.xml" );
+                    Cake.CleanDirectories( "**/bin/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
+                    Cake.CleanDirectories( "**/obj/" + configuration, d => !d.Path.Segments.Contains( "CodeCakeBuilder" ) );
+                    Cake.CleanDirectories( releasesDir );
+                    Cake.DeleteFiles( "Tests/**/TestResult.xml" );
                 } );
 
             Task( "Build" )
@@ -92,22 +92,22 @@ namespace CodeCake
                 .IsDependentOn( "Check-Repository" )
                 .Does( () =>
                 {
-                    //using( var tempSln = Cake.CreateTemporarySolutionFile( solutionFileName ) )
-                    //{
-                    //    tempSln.ExcludeProjectsFromBuild( "CodeCakeBuilder" );
-                    //    Cake.MSBuild( tempSln.FullPath, settings =>
-                    //    {
-                    //        settings.Configuration = configuration;
-                    //        settings.Verbosity = Verbosity.Minimal;
-                    //        // Always generates Xml documentation. Relies on this definition in the csproj files:
-                    //        //
-                    //        // <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
-                    //        //   <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-                    //        // </PropertyGroup>
-                    //        //
-                    //        settings.Properties.Add( "GenerateDocumentation", new[] { "true" } );
-                    //    } );
-                    //}
+                    using( var tempSln = Cake.CreateTemporarySolutionFile( solutionFileName ) )
+                    {
+                        tempSln.ExcludeProjectsFromBuild( "CodeCakeBuilder" );
+                        Cake.MSBuild( tempSln.FullPath, settings =>
+                        {
+                            settings.Configuration = configuration;
+                            settings.Verbosity = Verbosity.Minimal;
+                            // Always generates Xml documentation. Relies on this definition in the csproj files:
+                            //
+                            // <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+                            //   <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+                            // </PropertyGroup>
+                            //
+                            settings.Properties.Add( "GenerateDocumentation", new[] { "true" } );
+                        } );
+                    }
                 } );
 
             Task( "Unit-Testing" )
@@ -158,7 +158,7 @@ namespace CodeCake
                     IEnumerable<FilePath> nugetPackages = Cake.GetFiles( releasesDir.Path + "/*.nupkg" );
                     if( Cake.IsInteractiveMode() )
                     {
-                        var localFeed = Cake.FindDirectoryAbove( "LocalFeed" );
+                        var localFeed = Cake.FindSiblingDirectoryAbove( Cake.Environment.WorkingDirectory.ToString(), "LocalFeed" );
                         if( localFeed != null )
                         {
                             Cake.Information( "LocalFeed directory found: {0}", localFeed );
