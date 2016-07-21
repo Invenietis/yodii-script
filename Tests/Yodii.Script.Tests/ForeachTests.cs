@@ -92,17 +92,18 @@ namespace Yodii.Script.Tests
             c.Register( "L1", new[] { 1, 2, 3 } );
             c.Register( "L2", new[] { "A", "B", "C" } );
             TestHelper.RunNormalAndStepByStep( @"
-                let s1 = '', s2 = '';
+                let s1 = '', s2 = '', s = '';
                 foreach( i in L1 ) 
                     foreach( j in L2 ) 
                     { 
                         s1 += indexof i;
                         s2 += indexof( j );
+                        s += i.$index.ToString() + j.$index.ToString();
                     }
-                s1+'|'+s2;", o =>
+                s1+'|'+s2+'|'+s;", o =>
             {
                 Assert.That( o is StringObj );
-                Assert.That( o.ToString(), Is.EqualTo( "000111222|012012012" ) );
+                Assert.That( o.ToString(), Is.EqualTo( "000111222|012012012|000102101112202122" ) );
             }, c );
         }
 

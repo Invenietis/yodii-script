@@ -34,13 +34,20 @@ namespace Yodii.Script
 
         readonly string _value;
 
-        public StringObj( string value )
+        StringObj( string value )
         {
             if( value == null ) throw new ArgumentNullException( "value" );
             _value = value;
         }
+        
+        public static StringObj Create( string value )
+        {
+            if( value == null ) throw new ArgumentNullException( nameof( value ) );
+            if( value.Length == 0 ) return EmptyString;
+            return new StringObj( value );
+        }
 
-        public override string Type => RuntimeObj.TypeString;
+        public override string Type => TypeString;
 
         public override object ToNative( GlobalContext c ) => _value;
 
@@ -77,7 +84,7 @@ namespace Yodii.Script
                 {
                     int idx = JSSupport.ToInt32( arg.ToDouble() );
                     if( idx < 0 || idx >= _value.Length ) return f.SetResult( StringObj.EmptyString );
-                    return f.SetResult( f.Global.CreateString( new String( _value[idx], 1 ) ) );
+                    return f.SetResult( StringObj.Create( new string( _value[idx], 1 ) ) );
                 } )
                 .On( "ToString" ).OnCall( ( f, args ) =>
                 {

@@ -41,24 +41,37 @@ namespace Yodii.Script
             _objects = new Dictionary<string, RuntimeObj>();
         }
 
+        /// <summary>
+        /// Registers a external global object.
+        /// </summary>
+        /// <param name="name">Name of the object. Must be unique otherwise an exception is thrown.</param>
+        /// <param name="o">The object to register. Must not be null.</param>
         public void Register( string name, object o )
         {
-            if( name == null ) throw new ArgumentNullException( nameof( name ) );
+            if( string.IsNullOrWhiteSpace( name ) ) throw new ArgumentNullException( nameof( name ) );
             if( o == null ) throw new ArgumentNullException( nameof( o ) );
-            _objects.Add( name, Create( o ) );
+            var oR = o as RuntimeObj;
+            if( oR == null )
+            {
+                IAccessorVisitor v = o as IAccessorVisitor;
+                oR = v != null ? new RuntimeWrapperObj( v ) : Create( o );
+            } 
+            _objects.Add( name, oR );
         }
 
-
+        [Obsolete]
         public JSEvalDate Epoch
         {
             get { return _epoch; }
         }
 
+        [Obsolete]
         public RuntimeObj CreateBoolean( bool value )
         {
             return value ? BooleanObj.True : BooleanObj.False;
         }
 
+        [Obsolete]
         public RuntimeObj CreateBoolean( RuntimeObj o )
         {
             if( o == null ) return BooleanObj.False;
@@ -66,11 +79,13 @@ namespace Yodii.Script
             return CreateBoolean( o.ToBoolean() );
         }
 
+        [Obsolete]
         public RuntimeObj CreateNumber( double value )
         {
             return DoubleObj.Create( value );
         }
 
+        [Obsolete]
         public RuntimeObj CreateNumber( RuntimeObj o )
         {
             if( o == null ) return DoubleObj.Zero;
@@ -78,41 +93,18 @@ namespace Yodii.Script
             return CreateNumber( o.ToDouble() );
         }
 
+        [Obsolete]
         public RuntimeObj CreateString( string value )
         {
             if( value == null ) return RuntimeObj.Null;
-            if( value.Length == 0 ) return StringObj.EmptyString;
-            return new StringObj( value );
+            return StringObj.Create( value );
         }
 
-        public RuntimeObj CreateString( RuntimeObj o )
-        {
-            if( o == null ) return RuntimeObj.Null;
-            if( o is StringObj ) return o;
-            return CreateString( o.ToString() );
-        }
-
+        [Obsolete]
         public RuntimeObj CreateDateTime( DateTime value )
         {
             if( value == JSSupport.JSEpoch ) return _epoch;
             return new JSEvalDate( value );
-        }
-
-        public RuntimeError CreateSyntaxError( Expr e, string message, bool referenceError = false )
-        {
-            return new RuntimeError( e, message, referenceError );
-        }
-
-        public RuntimeError CreateAccessorSyntaxError( AccessorExpr e )
-        {
-            AccessorMemberExpr m = e as AccessorMemberExpr;
-            if( m != null )
-            {
-                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name, referenceError: true );
-                return CreateSyntaxError( e, "Unknown property: " + m.Name, referenceError: true );
-            }
-            if( e is AccessorIndexerExpr ) return CreateSyntaxError( e, "Indexer is not supported." );
-            return CreateSyntaxError( e, "Not a function." );
         }
 
         public RuntimeObj Create( object o )
@@ -127,7 +119,7 @@ namespace Yodii.Script
                 if( o is DateTime ) return CreateDateTime( (DateTime)o );
             }
             string s = o as string;
-            if( s != null ) return CreateString( s );
+            if( s != null ) return StringObj.Create( s );
             return new ExternalObjectObj( this, o );
         }
 
@@ -167,7 +159,7 @@ namespace Yodii.Script
                 .On( "String" ).OnCall( ( f, args ) =>
                 {
                     if( args.Count == 0 ) return f.SetResult( StringObj.EmptyString );
-                    return f.SetResult( CreateString( args[0] ) );
+                    return f.SetResult( StringObj.Create( args[0].ToString() ) );
 
                 } )
                 .On( "Boolean" ).OnCall( ( f, args ) =>

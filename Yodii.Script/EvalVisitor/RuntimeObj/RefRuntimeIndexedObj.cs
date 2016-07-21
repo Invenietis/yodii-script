@@ -41,6 +41,11 @@ namespace Yodii.Script
 
         public RuntimeObj Index => _index ?? (_index = DoubleObj.Create( _rawIndex ));
 
+        public override PExpr Visit( IAccessorFrame frame )
+        {
+            if( frame.Expr.IsMember( "$index" ) ) return new PExpr( Index );
+            return base.Visit( frame );
+        }
     }
 
 }

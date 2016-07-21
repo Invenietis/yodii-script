@@ -72,12 +72,13 @@ namespace Yodii.Script
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => ((IEnumerable<RuntimeObj>)this).GetEnumerator();
 
             #endregion
-        }      
-        
+        }
+
         /// <summary>
-        /// This frame applies to Indexer and Call. 
+        /// This frame applies as-is to Indexer. 
         /// AccessorMemberFrame specializes it to lookup the GlobalContext if the member is unbound.
         /// For let, there is no frame: visiting a let accessor simply does the lookup in the dynamic scope.
+        /// AccessorCallFrame specializes it to register any named functions declared as parameters.
         /// </summary>
         internal class AccessorFrame : Frame<AccessorExpr>, IAccessorFrame
         {
@@ -229,9 +230,17 @@ namespace Yodii.Script
 
             public PExpr SetError( string message = null )
             {
-                if( message != null ) return SetResult( _visitor._global.CreateSyntaxError( Expr, message ) );
-                return SetResult( _visitor._global.CreateAccessorSyntaxError( Expr ) );
+                if( message != null ) return SetResult( new RuntimeError( Expr, message ) );
+                if( NextAccessor != null )
+                {
+                    IAccessorFrame deepest = NextAccessor;
+                    while( deepest.NextAccessor != null ) deepest = deepest.NextAccessor;
+                    return SetResult( new RuntimeError( Expr, "Accessor chain not found: " + deepest.Expr.ToString(), true ) );
+                }
+                return SetResult( new RuntimeError( Expr, GetAccessErrorMessage(), true ) );
             }
+
+            protected virtual string GetAccessErrorMessage() => "Indexer is not supported.";
 
             protected PExpr ReentrantPendingOrSignal( PExpr sub )
             {
@@ -270,11 +279,17 @@ namespace Yodii.Script
             {
             }
 
+            public new AccessorMemberExpr Expr => (AccessorMemberExpr)base.Expr;
+
+            protected override string GetAccessErrorMessage() => Expr.IsUnbound 
+                                                                    ? "Undefined in scope: " + Expr.Name 
+                                                                    : "Unknown property: " + Expr.Name;
+
             protected override PExpr DoVisit()
             {
                 if( !_left.IsResolved )
                 {
-                    if( ((AccessorMemberExpr)Expr).IsUnbound )
+                    if( Expr.IsUnbound )
                     {
                         if( (_left = Global.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
                     }
@@ -306,6 +321,7 @@ namespace Yodii.Script
                     }
                 }
             }
+            protected override string GetAccessErrorMessage() => "Not a function.";
 
             protected override void OnDispose()
             {

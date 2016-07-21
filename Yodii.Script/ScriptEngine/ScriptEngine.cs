@@ -144,7 +144,7 @@ namespace Yodii.Script
         /// <returns>The result of the evaluation.</returns>
         public static RuntimeObj Evaluate( string s, GlobalContext ctx = null )
         {
-            return Evaluate( ExprAnalyser.AnalyseString( s ) );
+            return Evaluate( ExprAnalyser.AnalyseString( s ), ctx );
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ namespace Yodii.Script
                 }
                 catch( Exception ex )
                 {
-                    return _eo._context.CreateSyntaxError( e, ex.Message );
+                    return new RuntimeError( e, ex.Message );
                 }
                 return base.SetValue( e, value );
             }

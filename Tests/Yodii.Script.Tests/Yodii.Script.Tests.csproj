@@ -60,6 +60,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BasicBreakpointSupport.cs" />
+    <Compile Include="TemplateTests.cs" />
     <Compile Include="ForeachTests.cs" />
     <Compile Include="TryCatchTests.cs" />
     <Compile Include="FunctionTests.cs" />

@@ -40,7 +40,7 @@ namespace Yodii.Script
             else x = x.ToValue();
             if( y == RuntimeObj.Null ) y = RuntimeObj.Undefined;
             else y = y.ToValue();
-            if( (Swapped = String.CompareOrdinal( x.Type, y.Type ) > 0) )
+            if( (Swapped = string.CompareOrdinal( x.Type, y.Type ) > 0) )
             {
                 X = y;
                 Y = x;

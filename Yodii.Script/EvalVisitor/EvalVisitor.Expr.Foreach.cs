@@ -53,14 +53,14 @@ namespace Yodii.Script
                 {
                     if( IsPendingOrSignal( ref _generator, Expr.Generator ) ) return PendingOrSignal( _generator );
                     var a = _generator.Result.ToNative( Global ) as IEnumerable;
-                    if( a == null ) return new PExpr(Global.CreateSyntaxError( Expr.Generator, "foreach generator is not an IEnumerable." ));
+                    if( a == null ) return new PExpr( new RuntimeError( Expr.Generator, "foreach generator is not an IEnumerable." ) );
                     try
                     {
                         _nativeEnum = a.GetEnumerator();
                     }
                     catch( Exception ex )
                     {
-                        return new PExpr( Global.CreateSyntaxError( Expr.Generator,ex.Message ) );
+                        return new PExpr( new RuntimeError( Expr.Generator, ex.Message ) );
                     }
                 }
                 for( ; ; )
@@ -74,7 +74,7 @@ namespace Yodii.Script
                         }
                         catch( Exception ex )
                         {
-                            return new PExpr( Global.CreateSyntaxError( Expr.Generator, ex.Message ) );
+                            return new PExpr( new RuntimeError( Expr.Generator, ex.Message ) );
                         }
                         if( !hasNext ) break;
                         _currentVariable = _visitor.ScopeManager.Register( Expr.Variable, _index++ );

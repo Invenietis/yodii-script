@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\EvalVisitor.NonBreakeableExpr.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\RefRuntimeObj.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -24,28 +24,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
 
-using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
-
-    internal partial class EvalVisitor
+    public class RuntimeWrapperObj : RuntimeObj
     {
-        public PExpr Visit( ConstantExpr e )
+        readonly IAccessorVisitor _value;
+
+        public RuntimeWrapperObj( IAccessorVisitor v )
         {
-            if( e.Value == null ) return new PExpr( RuntimeObj.Null );
-            if( e.Value is string ) return new PExpr( StringObj.Create( (string)e.Value ) );
-            if( e == ConstantExpr.UndefinedExpr ) return new PExpr( RuntimeObj.Undefined );
-            if( e.Value is double ) return new PExpr( DoubleObj.Create( (double)e.Value ) );
-            if( e.Value is bool ) return new PExpr( (bool)e.Value ? BooleanObj.True : BooleanObj.False );
-            return new PExpr( new RuntimeError( e, "Unsupported JS type: " + e.Value.GetType().Name ) );
+            if( v == null ) throw new ArgumentNullException( nameof( v ) );
+            _value = v;
         }
 
-        public PExpr Visit( SyntaxErrorExpr e ) => new PExpr( new RuntimeError( e, e.ErrorMessage ) );
+        public override string Type => TypeObject;
 
-        public PExpr Visit( NopExpr e ) => new PExpr( RuntimeObj.Undefined );
+        public override object ToNative( GlobalContext c ) => _value;
+
+        public override bool ToBoolean() => true;
+
+        public override double ToDouble() => 0.0;
+
+        public override PExpr Visit( IAccessorFrame frame ) => _value.Visit( frame );
+
+        public override string ToString() => _value.ToString();
 
     }
+
 }

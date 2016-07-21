@@ -45,11 +45,11 @@ namespace Yodii.Script.Tests
                         if( idx.Type != "number" ) return f.SetError( "Number expected." );
                         int i = JSSupport.ToInt32( idx.ToDouble() );
                         if( i < 0 || i >= AnIntrinsicArray.Length ) return f.SetError( "Index out of range." );
-                        return f.SetResult( CreateNumber( AnIntrinsicArray[i] ) );
+                        return f.SetResult( DoubleObj.Create( AnIntrinsicArray[i] ) );
                     } )
                     .On( "An" ).On( "array" ).On( "with" ).On( "one" ).On( "cell" ).OnIndex( ( f, idx ) =>
                     {
-                        return f.SetResult( CreateString( "An.array.with.one.cell[] => " + idx.ToString() ) );
+                        return f.SetResult( StringObj.Create( "An.array.with.one.cell[] => " + idx.ToString() ) );
                     } )
                     .On( "array" ).OnIndex( ( f, idx ) =>
                     {
@@ -60,7 +60,7 @@ namespace Yodii.Script.Tests
                         Console.WriteLine( "Ghost.M() called with {0} arguments: {1} (=> returns {0}).", 
                                                 args.Count, 
                                                 string.Join( ", ", args.Select( a => a.ToString() )) );
-                        return f.SetResult( f.Global.CreateNumber( args.Count ) );
+                        return f.SetResult( DoubleObj.Create( args.Count ) );
                     } )
                     .On( "Ghost" ).On( "M" ).OnIndex( ( f, idx ) =>
                     {

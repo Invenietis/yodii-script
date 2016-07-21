@@ -74,7 +74,7 @@ namespace Yodii.Script
             var s = frame.GetImplementationState( c =>
                 c.On( "ToString" ).OnCall( ( f, args ) =>
                 {
-                    return f.SetResult( f.Global.CreateString( JSSupport.ToString( _value ) ) );
+                    return f.SetResult( StringObj.Create( JSSupport.ToString( _value ) ) );
                 }
                 ) );
             return s != null ? s.Visit() : frame.SetError();

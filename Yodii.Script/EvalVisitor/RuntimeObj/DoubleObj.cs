@@ -83,7 +83,7 @@ namespace Yodii.Script
                     int radix = 10;
                     if( args.Count == 1 ) radix = JSSupport.ToInt32( args[0].ToDouble() );
                     if( radix < 2 || radix > 36 ) return f.SetError( "Radix must be between 2 and 36." );
-                    return f.SetResult( f.Global.CreateString( JSSupport.ToString( _value, radix ) ) );
+                    return f.SetResult( StringObj.Create( JSSupport.ToString( _value, radix ) ) );
                 }
                 ) );
             return s != null ? s.Visit() : frame.SetError();

@@ -16,7 +16,8 @@
     </TargetFrameworkProfile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>bc5a0d9a</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,6 +100,7 @@
     <Compile Include="EvalVisitor\RuntimeObj\FunctionObj.cs" />
     <Compile Include="EvalVisitor\PExpr.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeIndexedObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeWrapperObj.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeObj.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\RuntimeFlowBreaking.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\RuntimeSignal.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="ScriptEngine\ScriptEngineStatus.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.Result.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.cs" />
+    <Compile Include="Templating\TemplateEngine.cs" />
     <Compile Include="Tokenizer\JSTokeniser.cs" />
     <Compile Include="Tokenizer\JSTokeniserError.cs" />
     <Compile Include="Tokenizer\JSTokeniserToken.cs" />
@@ -138,12 +141,12 @@
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.26.4\build\Fody.targets" Condition="Exists('..\packages\Fody.1.26.4\build\Fody.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.26.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.26.4\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

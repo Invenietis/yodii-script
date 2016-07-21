@@ -76,7 +76,9 @@ namespace Yodii.Script
         /// Resolves this frame with an error and returns a resolved promise.
         /// </summary>
         /// <param name="message">
-        /// An optional error message. When let to null, a default message describing the error is generated ("unknown field or property 'x'." for example).
+        /// An optional error message. When let to null, a default message describing 
+        /// the error is generated ("unknown property: x." for example) with 
+        /// the <see cref="RuntimeError.IsReferenceError"/> sets to true.
         /// </param>
         PExpr SetError( string message = null );
 
