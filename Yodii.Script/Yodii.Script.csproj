@@ -16,7 +16,8 @@
     </TargetFrameworkProfile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>bc5a0d9a</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +39,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\Yodii.Script.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -62,6 +66,7 @@
     <Compile Include="Analyser\Expressions\FunctionExpr.cs" />
     <Compile Include="Analyser\Expressions\TryCatchExpr.cs" />
     <Compile Include="Analyser\Expressions\ListOfExpr.cs" />
+    <Compile Include="Analyser\Expressions\ForeachExpr.cs" />
     <Compile Include="Analyser\Expressions\WhileExpr.cs" />
     <Compile Include="Analyser\Expressions\PrePostIncDecExpr.cs" />
     <Compile Include="Analyser\Expressions\Expr.cs" />
@@ -83,6 +88,7 @@
     <Compile Include="EvalVisitor\EvalVisitor.Expr.ListOf.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Block.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Assign.cs" />
+    <Compile Include="EvalVisitor\EvalVisitor.Expr.Foreach.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.While.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.PrePostIncDec.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Unary.cs" />
@@ -92,11 +98,15 @@
     <Compile Include="EvalVisitor\IAccessorFrameInitializer.cs" />
     <Compile Include="EvalVisitor\IAccessorFrameState.cs" />
     <Compile Include="EvalVisitor\IDeferredExpr.cs" />
-    <Compile Include="EvalVisitor\JSEvalFunction.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\ExternalTypeHandler.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\ExternalObjectObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\FunctionObj.cs" />
     <Compile Include="EvalVisitor\PExpr.cs" />
-    <Compile Include="EvalVisitor\RefRuntimeObj.cs" />
-    <Compile Include="EvalVisitor\RuntimeFlowBreaking.cs" />
-    <Compile Include="EvalVisitor\RuntimeSignal.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeIndexedObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeWrapperObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeFlowBreaking.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeSignal.cs" />
     <Compile Include="ScriptEngine\BreakpointManager.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Frame.cs" />
     <Compile Include="Analyser\Expressions\IfExpr.cs" />
@@ -107,6 +117,7 @@
     <Compile Include="ScriptEngine\ScriptEngineStatus.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.Result.cs" />
     <Compile Include="ScriptEngine\ScriptEngine.cs" />
+    <Compile Include="Templating\TemplateEngine.cs" />
     <Compile Include="Tokenizer\JSTokeniser.cs" />
     <Compile Include="Tokenizer\JSTokeniserError.cs" />
     <Compile Include="Tokenizer\JSTokeniserToken.cs" />
@@ -115,30 +126,30 @@
     <Compile Include="EvalVisitor\GlobalContext.cs" />
     <Compile Include="EvalVisitor\IAccessorFrame.cs" />
     <Compile Include="EvalVisitor\IAccessorVisitor.cs" />
-    <Compile Include="EvalVisitor\JSEvalBoolean.cs" />
-    <Compile Include="EvalVisitor\JSEvalDate.cs" />
-    <Compile Include="EvalVisitor\JSEvalNumber.cs" />
-    <Compile Include="EvalVisitor\JSEvalString.cs" />
-    <Compile Include="EvalVisitor\RuntimeError.cs" />
-    <Compile Include="EvalVisitor\RuntimeObj.cs" />
-    <Compile Include="EvalVisitor\RuntimeObjComparer.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\BooleanObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\JSEvalDate.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\DoubleObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\StringObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeError.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\RuntimeObjComparer.cs" />
     <Compile Include="Tokenizer\SourceLocation.cs" />
     <Compile Include="Analyser\SyntaxErrorCollector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EvalVisitor\RuntimeObj.cd" />
+    <None Include="EvalVisitor\RuntimeObj\RuntimeObj.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.26.4\build\Fody.targets" Condition="Exists('..\packages\Fody.1.26.4\build\Fody.targets')" />
+  <Import Project="..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets" Condition="Exists('..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.26.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.26.4\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SimpleGitVersionTask.0.19.0\build\SimpleGitVersionTask.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

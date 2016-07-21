@@ -62,16 +62,27 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="local">The local or parameter to register.</param>
         /// <returns>The unitialized <see cref="RefRuntimeObj"/> (undefined).</returns>
-        public virtual RefRuntimeObj Register( AccessorLetExpr local )
+        public RefRuntimeObj Register( AccessorLetExpr local ) => Register( local, new RefRuntimeObj() );
+
+        /// <summary>
+        /// Registers an indexed variable.
+        /// </summary>
+        /// <param name="local">The local or parameter to register.</param>
+        /// <param name="index">Index of the variable.</param>
+        /// <returns>The unitialized <see cref="RefRuntimeIndexedObj"/> (undefined).</returns>
+        public RefRuntimeIndexedObj Register( AccessorLetExpr local, int index ) => Register( local, new RefRuntimeIndexedObj( index ) );
+
+        T Register<T>( AccessorLetExpr local, T refObj  ) where T : RefRuntimeObj
         {
             Entry e;
             if( _vars.TryGetValue( local, out e ) )
             {
-                if( e.O == null ) e.O = new RefRuntimeObj();
-                else e = e.Next = new Entry( e.Next, new RefRuntimeObj() );
+                if( e.O == null ) e.O = refObj;
+                else e = e.Next = new Entry( e.Next, refObj );
             }
-            else _vars.Add( local, e = new Entry( null, new RefRuntimeObj() ) );
-            return e.O;
+            else _vars.Add( local, e = new Entry( null, refObj ) );
+            Debug.Assert( e.O == refObj );
+            return refObj;
         }
 
         /// <summary>

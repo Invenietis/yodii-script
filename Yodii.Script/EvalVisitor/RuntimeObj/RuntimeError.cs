@@ -34,12 +34,22 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="culprit">The expression. Can not be null.</param>
         /// <param name="syntaxErrorMessage">A message describing the syntax error. Can not be null.</param>
-        /// <param name="referenceError">True for reference error.</param>    
-        public RuntimeError( Expr culprit, string syntaxErrorMessage, bool referenceError )
+        public RuntimeError( Expr culprit, string syntaxErrorMessage )
             : base( culprit )
         {
             if( syntaxErrorMessage == null ) throw new ArgumentNullException();
             Message = syntaxErrorMessage;
+        }
+
+        /// <summary>
+        /// Initializes a new reference error.
+        /// </summary>
+        /// <param name="culprit">The expression. Can not be null.</param>
+        /// <param name="syntaxErrorMessage">A message describing the syntax error. Can not be null.</param>
+        /// <param name="referenceError">True for reference error.</param>    
+        public RuntimeError( Expr culprit, string syntaxErrorMessage, bool referenceError )
+            : this( culprit, syntaxErrorMessage )
+        {
             IsReferenceError = referenceError;
         }
 
@@ -86,15 +96,15 @@ namespace Yodii.Script
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            if( frame.Expr.IsMember( "message" ) ) return frame.SetResult( frame.Global.CreateString( Message ) );
+            if( frame.Expr.IsMember( "Message" ) ) return frame.SetResult( StringObj.Create( Message ) );
             return frame.SetError();
         }
 
         public override string ToString()
         {
             return IsSyntaxError 
-                    ? String.Format( "Syntax Error: {0} at {1}.", Message, Expr.Location.ToString() )
-                    : String.Format( "Runtime Error at {0}. Error: {1}", Expr.Location.ToString(), ThrownValue.ToString() );
+                    ? string.Format( "Syntax Error: {0} at {1}.", Message, Expr.Location.ToString() )
+                    : string.Format( "Runtime Error at {0}. Error: {1}", Expr.Location.ToString(), ThrownValue.ToString() );
         }
     }
 

@@ -39,7 +39,7 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( result ) );
             } );
         }
@@ -53,7 +53,7 @@ namespace Yodii.Script.Tests
                          j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
             } );
         }
@@ -65,7 +65,7 @@ namespace Yodii.Script.Tests
                          let j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.AreEqual( o.ToString(), "3712" );
             } );
         }
@@ -129,11 +129,11 @@ namespace Yodii.Script.Tests
                             i /= 3.52;
                             if( i !== 8/3.52 ) bug = 'Bug in /';
                         
-                            bug.toString();
+                            bug.ToString();
 ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( String.Empty ) );
             } );
         }
@@ -152,7 +152,7 @@ namespace Yodii.Script.Tests
                          if( j > 3000 ) i = 0;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 0 ) );
             } );
         }
@@ -176,7 +176,7 @@ namespace Yodii.Script.Tests
             string s = @"typeof unexisting";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "undefined" ) );
             } );
         }
@@ -341,7 +341,7 @@ namespace Yodii.Script.Tests
                          k+i+j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "a string1234" ) );
             } );
         }
@@ -357,7 +357,7 @@ namespace Yodii.Script.Tests
                         i+j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
             } );
         }
@@ -372,7 +372,7 @@ namespace Yodii.Script.Tests
                                         ", add );
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( result ) );
             } );
         }

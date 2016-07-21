@@ -1040,6 +1040,7 @@ namespace Yodii.Script
                 case "delete": return (int)JSTokenizerToken.Delete;
                 case "new": return (int)JSTokenizerToken.New;
                 case "typeof": return (int)JSTokenizerToken.TypeOf;
+                case "indexof": return (int)JSTokenizerToken.IndexOf;
                 case "void": return (int)JSTokenizerToken.Void;
                 case "NaN": return (int)JSTokenizerToken.NaN;
                 case "Infinity": return (int)JSTokenizerToken.Infinity;

@@ -45,13 +45,13 @@ namespace Yodii.Script
         {
             _args = arguments ?? Expr.EmptyArray;
             _declaredFunctions = declaredFunctions;
-
         }
 
         public override IReadOnlyList<Expr> Arguments => _args;
 
         /// <summary>
-        /// Gets the declared functions. Can be null.
+        /// Gets the declared functions in the call itself (ie. named callback functions). 
+        /// Can be null.
         /// </summary>
         public IReadOnlyList<AccessorLetExpr> DeclaredFunctions => _declaredFunctions;
 

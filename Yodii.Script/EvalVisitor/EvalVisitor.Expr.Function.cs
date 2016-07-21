@@ -63,7 +63,15 @@ namespace Yodii.Script
                     foreach( var parameter in Expr.Parameters )
                     {
                         var r = _visitor.ScopeManager.Register( parameter );
-                        if( iParam < _arguments.ResolvedParameters.Count ) r.Value = _arguments.ResolvedParameters[iParam];
+                        if( iParam < _arguments.ResolvedParameters.Count )
+                        {
+#if DEBUG
+                            Debug.Assert( r.SetValue( parameter, _arguments.ResolvedParameters[iParam] ).ToValue() == _arguments.ResolvedParameters[iParam].ToValue(), 
+                                "There can be no error while setting parameter value." );
+#else
+                            r.SetValue( parameter, _arguments.ResolvedParameters[iParam] );
+#endif
+                        }
                         ++iParam;
                     }
                 }
@@ -114,7 +122,7 @@ namespace Yodii.Script
                 var v = e.Closures[i];
                 c[i] = new Closure( v, ScopeManager.FindRegistered( v ) );
             }
-            return new PExpr( new JSEvalFunction( e, c ) );
+            return new PExpr( new FunctionObj( e, c ) );
         }
 
     }

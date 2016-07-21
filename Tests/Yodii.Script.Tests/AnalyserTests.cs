@@ -31,7 +31,7 @@ using CK.Core;
 namespace Yodii.Script.Tests
 {
     [TestFixture]
-    public class JSAnalyserTests
+    public class AnalyserTests
     {
         [Test]
         public void EmptyParsing()

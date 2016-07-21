@@ -36,22 +36,16 @@ namespace Yodii.Script
         public PExpr Visit( ConstantExpr e )
         {
             if( e.Value == null ) return new PExpr( RuntimeObj.Null );
-            if( e.Value is string ) return new PExpr( _global.CreateString( (string)e.Value ) );
+            if( e.Value is string ) return new PExpr( StringObj.Create( (string)e.Value ) );
             if( e == ConstantExpr.UndefinedExpr ) return new PExpr( RuntimeObj.Undefined );
-            if( e.Value is Double ) return new PExpr( _global.CreateNumber( (Double)e.Value ) );
-            if( e.Value is Boolean ) return new PExpr( _global.CreateBoolean( (Boolean)e.Value ) );
-            return new PExpr( new RuntimeError( e, "Unsupported JS type: " + e.Value.GetType().Name, false ) );
+            if( e.Value is double ) return new PExpr( DoubleObj.Create( (double)e.Value ) );
+            if( e.Value is bool ) return new PExpr( (bool)e.Value ? BooleanObj.True : BooleanObj.False );
+            return new PExpr( new RuntimeError( e, "Unsupported JS type: " + e.Value.GetType().Name ) );
         }
 
-        public PExpr Visit( SyntaxErrorExpr e )
-        {
-            return new PExpr( _global.CreateSyntaxError( e, e.ErrorMessage ) );
-        }
+        public PExpr Visit( SyntaxErrorExpr e ) => new PExpr( new RuntimeError( e, e.ErrorMessage ) );
 
-        public PExpr Visit( NopExpr e )
-        {
-            return new PExpr( RuntimeObj.Undefined );
-        }
+        public PExpr Visit( NopExpr e ) => new PExpr( RuntimeObj.Undefined );
 
     }
 }

@@ -126,6 +126,7 @@ namespace Yodii.Script
                 if( _parser.MatchIdentifier( "return" ) ) return new FlowBreakingExpr( _parser.PrevNonCommentLocation, Expression( 0 ), false );
                 if( _parser.MatchIdentifier( "throw" ) ) return new FlowBreakingExpr( _parser.PrevNonCommentLocation, Expression( 0 ), true );
                 if( _parser.MatchIdentifier( "do" ) ) return HandleDoWhile();
+                if( _parser.MatchIdentifier( "foreach" ) ) return HandleForeach();
                 if( _parser.MatchIdentifier( "function" ) ) return HandleFunction();
                 if( _parser.MatchIdentifier( "try" ) ) return HandleTryCatch();
                 return HandleIdentifier();
@@ -273,28 +274,24 @@ namespace Yodii.Script
             return new AssignExpr( location, a, new BinaryExpr( location, left, binaryTokenType, Expression( 0 ) ) );
         }
 
-
         Expr HandleIf()
         {
             // "if" identifier has already been matched.
             SourceLocation location = _parser.PrevNonCommentLocation;
             Expr c;
-            if( !IsCondition( out c ) ) return c;
+            if( !IsOptionallyEnclosedExpr( out c ) ) return c;
             Expr whenTrue = HandleStatement();
             Expr whenFalse = null;
             if( _parser.MatchIdentifier( "else" ) ) whenFalse = HandleStatement();
             return new IfExpr( location, false, c, whenTrue, whenFalse );
         }
 
-        bool IsCondition( out Expr c )
+        bool IsOptionallyEnclosedExpr( out Expr c )
         {
-            if( !_parser.Match( JSTokenizerToken.OpenPar ) ) c = new SyntaxErrorExpr( _parser.Location, "Expected '('." );
-            else
-            {
-                c = Expression( 0 );
-                if( _parser.Match( JSTokenizerToken.ClosePar ) ) return true;
-                c = new SyntaxErrorExpr( _parser.Location, "Expected ')'." );
-            }
+            bool openPar = _parser.Match( JSTokenizerToken.OpenPar );
+            c = Expression( 0 );
+            if( !openPar || _parser.Match( JSTokenizerToken.ClosePar ) ) return true;
+            c = new SyntaxErrorExpr( _parser.Location, "Expected ')'." );
             return false;
         }
 
@@ -330,12 +327,29 @@ namespace Yodii.Script
             if( statements.Count == 1 && locals.Count == 0 ) return statements[0];
             return new BlockExpr( statements.ToArray(), locals );
         }
-        
+
+        Expr HandleForeach()
+        {
+            SourceLocation location = _parser.PrevNonCommentLocation;
+            bool openPar = _parser.Match( JSTokenizerToken.OpenPar );
+            string name = _parser.ReadIdentifier();
+            if( name == "let" ) name = _parser.ReadIdentifier();
+            if( name == null ) return new SyntaxErrorExpr( _parser.Location, "Expected identifier (variable name)." );
+            AccessorLetExpr var = new AccessorLetExpr( _parser.PrevNonCommentLocation, name );
+            Expr e = _scope.Declare( name, var );
+            if( e is SyntaxErrorExpr ) return e;
+            if( !_parser.MatchIdentifier( "in" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected in keyword." );
+            Expr generator = Expression( 0 );
+            if( openPar && !_parser.Match( JSTokenizerToken.ClosePar ) ) return new SyntaxErrorExpr( _parser.Location, "Expected closing parenthesis." );
+            Expr code = HandleStatement();
+            return new ForeachExpr( location, var, generator, code );
+        }
+
         Expr HandleWhile()
         {
             SourceLocation location = _parser.PrevNonCommentLocation;
             Expr c;
-            if( !IsCondition( out c ) ) return c;
+            if( !IsOptionallyEnclosedExpr( out c ) ) return c;
             Expr code = HandleStatement();
             return new WhileExpr( location, c, code );
         }
@@ -347,11 +361,9 @@ namespace Yodii.Script
             Expr code = HandleBlock();
             if( !_parser.MatchIdentifier( "while" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected 'while'." );
             Expr c;
-            if( !IsCondition( out c ) ) return c;
+            if( !IsOptionallyEnclosedExpr( out c ) ) return c;
             return new WhileExpr( location, true, c, code );
         }
-
-
 
         Expr HandleMember( Expr left )
         {

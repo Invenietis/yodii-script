@@ -40,7 +40,7 @@ namespace Yodii.Script
             else x = x.ToValue();
             if( y == RuntimeObj.Null ) y = RuntimeObj.Undefined;
             else y = y.ToValue();
-            if( (Swapped = String.CompareOrdinal( x.Type, y.Type ) > 0) )
+            if( (Swapped = string.CompareOrdinal( x.Type, y.Type ) > 0) )
             {
                 X = y;
                 Y = x;
@@ -56,14 +56,14 @@ namespace Yodii.Script
         {
             if( ReferenceEquals( X, Y ) )
             {
-                return X != JSEvalNumber.NaN;
+                return X != DoubleObj.NaN;
             }
             if( ReferenceEquals( X.Type, Y.Type ) )
             {
                 Debug.Assert( X != RuntimeObj.Undefined && X != RuntimeObj.Null, "This has been handled by the normalization and the above reference test." );
                 if( ReferenceEquals( X.Type, RuntimeObj.TypeNumber ) )
                 {
-                    Debug.Assert( !(((JSEvalNumber)X).IsNaN && ((JSEvalNumber)Y).IsNaN) );
+                    Debug.Assert( !(((DoubleObj)X).IsNaN && ((DoubleObj)Y).IsNaN) );
                     return X.ToDouble() == Y.ToDouble();
                 }
                 else if( ReferenceEquals( X.Type, RuntimeObj.TypeString ) )
@@ -101,7 +101,7 @@ namespace Yodii.Script
             result = 0;
             if( Y == RuntimeObj.Undefined ) return X == RuntimeObj.Undefined;
 
-            Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( JSEvalString ) ), "JSEvalString is Comparable." );
+            Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( StringObj ) ), "JSEvalString is Comparable." );
             Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( JSEvalDate ) ), "JSEvalDate is Comparable." );
             
             IComparable cmp;
@@ -126,7 +126,7 @@ namespace Yodii.Script
         {
             if( ReferenceEquals( X, Y ) )
             {
-                return X != JSEvalNumber.NaN;
+                return X != DoubleObj.NaN;
             }
 
             if( !ReferenceEquals( X.Type, Y.Type ) ) return false;
@@ -134,7 +134,7 @@ namespace Yodii.Script
 
             if( ReferenceEquals( X.Type, RuntimeObj.TypeNumber ) )
             {
-                if( X == JSEvalNumber.NaN || Y == JSEvalNumber.NaN )
+                if( X == DoubleObj.NaN || Y == DoubleObj.NaN )
                 {
                     return false;
                 }

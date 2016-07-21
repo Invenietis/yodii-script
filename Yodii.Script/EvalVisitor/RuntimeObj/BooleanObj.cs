@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\EvalVisitor\RuntimeSignal.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\EvalVisitor\JSEvalBoolean.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -25,42 +25,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+
 namespace Yodii.Script
 {
-    public abstract class RuntimeSignal : RuntimeObj
+    public class BooleanObj : RuntimeObj
     {
-        public RuntimeSignal( Expr e )
+        public static readonly BooleanObj True = new BooleanObj( true );
+        public static readonly BooleanObj False = new BooleanObj( false );
+        static readonly object OTrue = true;
+        static readonly object OFalse = false;
+
+        bool _value;
+
+        BooleanObj( bool v )
         {
-            if( e == null ) throw new ArgumentNullException( "r" );
-            Expr = e;
+            _value = v;
         }
 
-        public Expr Expr { get; private set; }
+        public override string Type => RuntimeObj.TypeBoolean;
 
-        public override string Type
-        {
-            get { return RuntimeObj.TypeObject; }
-        }
+        public override object ToNative( GlobalContext c ) => _value ? OTrue : OFalse;
 
-        public override double ToDouble()
-        {
-            return Double.NaN;
-        }
+        public override bool ToBoolean() => _value;
 
-        public override bool ToBoolean()
-        {
-            return false;
-        }
+        public override double ToDouble() => _value ? 1.0 : 0.0;
 
-        public override PExpr Visit( IAccessorFrame frame )
-        {
-            return frame.SetError();
-        }
-
-        public override string ToString()
-        {
-            return "Signal: " + Expr.ToString();
-        }
+        public override string ToString() => _value ? JSSupport.TrueString : JSSupport.FalseString;
     }
-
 }

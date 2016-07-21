@@ -50,7 +50,7 @@ namespace Yodii.Script
                         && e.IsReferenceError 
                         && ((int)Expr.TokenType & 15) == ((int)JSTokenizerToken.TypeOf & 15) )
                     {
-                        return SetResult( Global.CreateString( RuntimeObj.TypeUndefined ) );
+                        return SetResult( StringObj.Create( RuntimeObj.TypeUndefined ) );
                     }
                     return PendingOrSignal( _expression );
                 }
@@ -59,11 +59,11 @@ namespace Yodii.Script
                 // Handle those special cases here.
                 if( Expr.TokenType == JSTokenizerToken.Minus )
                 {
-                    result = Global.CreateNumber( -result.ToDouble() );
+                    result = DoubleObj.Create( -result.ToDouble() );
                 }
                 else if( Expr.TokenType == JSTokenizerToken.Plus )
                 {
-                    result = Global.CreateNumber( result.ToDouble() );
+                    result = DoubleObj.Create( result.ToDouble() );
                 }
                 else
                 {
@@ -71,19 +71,26 @@ namespace Yodii.Script
                     {
                         case (int)JSTokenizerToken.Not & 15:
                             {
-                                result = Global.CreateBoolean( !result.ToBoolean() );
+                                result = result.ToBoolean() ? BooleanObj.False : BooleanObj.True;
                                 break;
                             }
                         case (int)JSTokenizerToken.BitwiseNot & 15:
                             {
-                                result = Global.CreateNumber( ~JSSupport.ToInt64( result.ToDouble() ) );
+                                result = DoubleObj.Create( ~JSSupport.ToInt64( result.ToDouble() ) );
                                 break;
                             }
                         case (int)JSTokenizerToken.TypeOf & 15:
                             {
                                 // Well known Javascript bug: typeof null === "object".
-                                if( result == RuntimeObj.Null ) result = Global.CreateString( RuntimeObj.TypeObject );
-                                else result = Global.CreateString( result.Type );
+                                if( result == RuntimeObj.Null ) result = StringObj.Create( RuntimeObj.TypeObject );
+                                else result = StringObj.Create( result.Type );
+                                break;
+                            }
+                        case (int)JSTokenizerToken.IndexOf & 15:
+                            {
+                                RefRuntimeIndexedObj iO = result as RefRuntimeIndexedObj;
+                                if( iO == null ) result = new RuntimeError( Expr, "No associated index. indexof must be used on a foreach variable." );
+                                else result = iO.Index;
                                 break;
                             }
                         case (int)JSTokenizerToken.Void & 15:

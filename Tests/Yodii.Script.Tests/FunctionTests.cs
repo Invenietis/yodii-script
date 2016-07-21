@@ -38,8 +38,8 @@ namespace Yodii.Script.Tests
             string s = @"function yo(a) { return 'yo' + a; }";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalFunction>( o );
-                var f = (JSEvalFunction)o;
+                Assert.IsInstanceOf<FunctionObj>( o );
+                var f = (FunctionObj)o;
                 CollectionAssert.AreEqual( new[] { "a" }, f.Expr.Parameters.Select( p => p.Name ).ToArray() );
             } );
         }
@@ -51,7 +51,7 @@ namespace Yodii.Script.Tests
                          yo('b');";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "yob" ) );
             } );
         }
@@ -64,7 +64,7 @@ namespace Yodii.Script.Tests
 
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 + 4 + 5 + 6 + 7 ) );
             } );
         }
@@ -82,7 +82,7 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "xy" ) );
             } );
         }
@@ -101,7 +101,7 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 ) );
             } );
         }
@@ -118,7 +118,7 @@ namespace Yodii.Script.Tests
                          f(0) + f(0);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 2 ) );
             } );
         }
@@ -142,7 +142,7 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 + 4 ) );
             } );
         }
@@ -155,11 +155,11 @@ namespace Yodii.Script.Tests
                         (function() { 
                           i = j + i; 
                         })();
-                        i.toString();
+                        i.ToString();
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "20" ) );
             } );
         }
@@ -174,7 +174,7 @@ namespace Yodii.Script.Tests
                           fib(20);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 6765 ) );
             } );
         }
@@ -200,7 +200,7 @@ namespace Yodii.Script.Tests
                             m(5) + m(10) + m(20);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalNumber>( o );
+                Assert.IsInstanceOf<DoubleObj>( o );
                 Assert.That( o.ToDouble(), Is.EqualTo( 17.5 ) );
             } );
         }
@@ -225,7 +225,7 @@ namespace Yodii.Script.Tests
                             wtf(5)+','+wtf(6)+','+wtf(42)+','+wtf(3)+','+wtf(1)+','+wtf(0);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<JSEvalString>( o );
+                Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "10,32,148,302,606,1212" ) );
             } );
         }

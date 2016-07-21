@@ -49,8 +49,17 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="configuration">Configuration of resolution handlers.</param>
         /// <returns>Null if no matching configuration have been found.</returns>
-        IAccessorFrameState GetState( Action<IAccessorFrameInitializer> configuration );
- 
+        IAccessorFrameState GetImplementationState( Action<IAccessorFrameInitializer> configuration );
+
+        /// <summary>
+        /// Initializes an accessor state for a call.
+        /// Once arguments are resolved, the <paramref name="call"/> is made.
+        /// </summary>
+        /// <param name="arguments">Arguments of the call.</param>
+        /// <param name="call">Function to call.</param>
+        /// <returns>The frame state that encapsulates the parameters resolution and the call.</returns>
+        IAccessorFrameState GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> call );
+
         /// <summary>
         /// Gets the next accessor if any.
         /// </summary>
@@ -67,7 +76,9 @@ namespace Yodii.Script
         /// Resolves this frame with an error and returns a resolved promise.
         /// </summary>
         /// <param name="message">
-        /// An optional error message. When let to null, a default message describing the error is generated ("unknown field or property 'x'." for example).
+        /// An optional error message. When let to null, a default message describing 
+        /// the error is generated ("unknown property: x." for example) with 
+        /// the <see cref="RuntimeError.IsReferenceError"/> sets to true.
         /// </param>
         PExpr SetError( string message = null );
 

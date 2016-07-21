@@ -53,30 +53,15 @@ namespace Yodii.Script
                 _expr = e;
             }
 
-            public Expr Expr
-            {
-                get { return _expr; }
-            }
+            public Expr Expr => _expr; 
 
-            public RuntimeObj Result
-            {
-                get { return _result; }
-            }
+            public RuntimeObj Result => _result; 
 
-            public bool IsResolved
-            {
-                get { return _result != null; }
-            }
+            public bool IsResolved => _result != null; 
 
-            public PExpr StepOver()
-            {
-                return _visitor.StepOver( this, StepOverKind.ExternalStepOver );
-            }
+            public PExpr StepOver() => _visitor.StepOver( this, StepOverKind.ExternalStepOver );
 
-            public PExpr StepIn()
-            {
-                return _visitor.StepOver( this, StepOverKind.ExternalStepIn );
-            }
+            public PExpr StepIn() => _visitor.StepOver( this, StepOverKind.ExternalStepIn );
 
             internal PExpr VisitAndClean()
             {
@@ -126,20 +111,11 @@ namespace Yodii.Script
                 return new PExpr( (_result = result) );
             }
 
-            public Frame NextFrame
-            {
-                get { return _next; }
-            }
+            public Frame NextFrame => _next; 
 
-            public Frame PrevFrame
-            {
-                get { return _prev; }
-            }
+            public Frame PrevFrame => _prev; 
 
-            public GlobalContext Global
-            {
-                get { return _visitor.Global; }
-            }
+            public GlobalContext Global => _visitor.Global; 
             
             protected virtual void OnDispose()
             {

@@ -53,7 +53,7 @@ namespace Yodii.Script
         /// <summary>
         /// Gets the expression of the index.
         /// </summary>
-        public Expr Index { get { return _args[0]; } }
+        public Expr Index => _args[0];
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -62,27 +62,18 @@ namespace Yodii.Script
         /// <param name="visitor">visitor.</param>
         /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
-        internal protected override T Accept<T>( IExprVisitor<T> visitor )
-        {
-            return visitor.Visit( this );
-        }
+        internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
         /// <summary>
         /// Gets a one-sized argument list that contains the <see cref="Index"/>.
         /// </summary>
-        public override IReadOnlyList<Expr> Arguments
-        {
-            get { return _args; }
-        }
+        public override IReadOnlyList<Expr> Arguments =>  _args; 
 
         /// <summary>
         /// This is just to ease debugging.
         /// </summary>
         /// <returns>Readable expression.</returns>
-        public override string ToString()
-        {
-            return Left.ToString() + '[' + Index.ToString() + ']';
-        }
+        public override string ToString() => Left.ToString() + '[' + Index.ToString() + ']';
 
     }
 

@@ -31,83 +31,117 @@ namespace Yodii.Script
     public class GlobalContext : IAccessorVisitor
     {
         JSEvalDate _epoch;
+        readonly Dictionary<Type, ExternalTypeHandler> _types;
+        readonly Dictionary<string, RuntimeObj> _objects;
 
         public GlobalContext()
         {
             _epoch = new JSEvalDate( JSSupport.JSEpoch );
+            _types = new Dictionary<Type, ExternalTypeHandler>();
+            _objects = new Dictionary<string, RuntimeObj>();
         }
 
+        /// <summary>
+        /// Registers a external global object.
+        /// </summary>
+        /// <param name="name">Name of the object. Must be unique otherwise an exception is thrown.</param>
+        /// <param name="o">The object to register. Must not be null.</param>
+        public void Register( string name, object o )
+        {
+            if( string.IsNullOrWhiteSpace( name ) ) throw new ArgumentNullException( nameof( name ) );
+            if( o == null ) throw new ArgumentNullException( nameof( o ) );
+            var oR = o as RuntimeObj;
+            if( oR == null )
+            {
+                IAccessorVisitor v = o as IAccessorVisitor;
+                oR = v != null ? new RuntimeWrapperObj( v ) : Create( o );
+            } 
+            _objects.Add( name, oR );
+        }
+
+        /// <summary>
+        /// Unregisters a previously <see cref="Register"/>ed object.
+        /// </summary>
+        /// <param name="name">Name of the global to remove from this context.</param>
+        /// <returns>False if the object was not registered.</returns>
+        public bool Unregister( string name )
+        {
+            return _objects.Remove( name );
+        }
+
+        [Obsolete]
         public JSEvalDate Epoch
         {
             get { return _epoch; }
         }
 
+        [Obsolete]
         public RuntimeObj CreateBoolean( bool value )
         {
-            return value ? JSEvalBoolean.True : JSEvalBoolean.False;
+            return value ? BooleanObj.True : BooleanObj.False;
         }
 
+        [Obsolete]
         public RuntimeObj CreateBoolean( RuntimeObj o )
         {
-            if( o == null ) return JSEvalBoolean.False;
-            if( o is JSEvalBoolean ) return o;
+            if( o == null ) return BooleanObj.False;
+            if( o is BooleanObj ) return o;
             return CreateBoolean( o.ToBoolean() );
         }
 
+        [Obsolete]
         public RuntimeObj CreateNumber( double value )
         {
-            if( value == 0 ) return JSEvalNumber.Zero;
-            if( value == -1 ) return JSEvalNumber.MinusOne;
-            if( value == 1 ) return JSEvalNumber.One;
-            if( value == 2 ) return JSEvalNumber.Two;
-            if( Double.IsNaN( value ) ) return JSEvalNumber.NaN;
-            if( Double.IsPositiveInfinity( value ) ) return JSEvalNumber.Infinity;
-            if( Double.IsNegativeInfinity( value ) ) return JSEvalNumber.NegativeInfinity;
-            return new JSEvalNumber( value );
+            return DoubleObj.Create( value );
         }
 
+        [Obsolete]
         public RuntimeObj CreateNumber( RuntimeObj o )
         {
-            if( o == null ) return JSEvalNumber.Zero;
-            if( o is JSEvalNumber ) return o;
+            if( o == null ) return DoubleObj.Zero;
+            if( o is DoubleObj ) return o;
             return CreateNumber( o.ToDouble() );
         }
 
+        [Obsolete]
         public RuntimeObj CreateString( string value )
         {
             if( value == null ) return RuntimeObj.Null;
-            if( value.Length == 0 ) return JSEvalString.EmptyString;
-            return new JSEvalString( value );
+            return StringObj.Create( value );
         }
 
-        public RuntimeObj CreateString( RuntimeObj o )
-        {
-            if( o == null ) return RuntimeObj.Null;
-            if( o is JSEvalString ) return o;
-            return CreateString( o.ToString() );
-        }
-
+        [Obsolete]
         public RuntimeObj CreateDateTime( DateTime value )
         {
             if( value == JSSupport.JSEpoch ) return _epoch;
             return new JSEvalDate( value );
         }
 
-        public RuntimeError CreateSyntaxError( Expr e, string message, bool referenceError = false )
+        public RuntimeObj Create( object o )
         {
-            return new RuntimeError( e, message, referenceError );
+            if( o == null ) return RuntimeObj.Null;
+            if( o is ValueType )
+            {
+                if( o is int ) return DoubleObj.Create( (int)o );
+                if( o is double ) return DoubleObj.Create( (double)o );
+                if( o is float ) return DoubleObj.Create( (float)o );
+                if( o is bool ) return (bool)o ? BooleanObj.True : BooleanObj.False;
+                if( o is DateTime ) return CreateDateTime( (DateTime)o );
+            }
+            string s = o as string;
+            if( s != null ) return StringObj.Create( s );
+            return new ExternalObjectObj( this, o );
         }
 
-        public RuntimeError CreateAccessorSyntaxError( AccessorExpr e )
+        public ExternalTypeHandler FindType( Type type )
         {
-            AccessorMemberExpr m = e as AccessorMemberExpr;
-            if( m != null )
+            ExternalTypeHandler t;
+            if( !_types.TryGetValue( type, out t ) )
             {
-                if( m.IsUnbound ) return CreateSyntaxError( e, "Undefined in scope: " + m.Name, referenceError: true );
-                return CreateSyntaxError( e, "Unknown property: " + m.Name, referenceError: true );
+                t = new ExternalTypeHandler( type );
+                _types.Add( type, t );
             }
-            if( e is AccessorIndexerExpr ) return CreateSyntaxError( e, "Indexer is not supported." );
-            return CreateSyntaxError( e, "Not a function." );
+            return t;
         }
 
         /// <summary>
@@ -119,23 +153,28 @@ namespace Yodii.Script
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
-            var s = frame.GetState( c =>
+            AccessorMemberExpr mE = frame.Expr as AccessorMemberExpr;
+            if( mE != null )
+            {
+                RuntimeObj obj;
+                if( _objects.TryGetValue( mE.Name, out obj ) ) return frame.SetResult( obj );
+            }
+            var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalNumber.Zero );
+                    if( args.Count == 0 ) return f.SetResult( DoubleObj.Zero );
                     return f.SetResult( CreateNumber( args[0] ) );
                 }
                 )
                 .On( "String" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalString.EmptyString );
-                    return f.SetResult( CreateString( args[0] ) );
+                    if( args.Count == 0 ) return f.SetResult( StringObj.EmptyString );
+                    return f.SetResult( StringObj.Create( args[0].ToString() ) );
 
                 } )
                 .On( "Boolean" ).OnCall( ( f, args ) =>
                 {
-                    if( args.Count == 0 ) return f.SetResult( JSEvalBoolean.False );
-                    return f.SetResult( CreateBoolean( args[0] ) );
+                    return f.SetResult( args.Count == 1 && args[0].ToBoolean() ? BooleanObj.True : BooleanObj.False );
                 } )
                 .On( "Date" ).OnCall( ( f, args ) =>
                 {

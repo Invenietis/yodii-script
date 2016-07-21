@@ -55,7 +55,7 @@ namespace Yodii.Script
         /// Gets the left expression.
         /// It can be null: accessor chains are defined with other AccessorExpr and null signals an access to the context.
         /// </summary>
-        public Expr Left { get; private set; }
+        public Expr Left { get; }
 
         /// <summary>
         /// Gets whether this accessor is a member name: only <see cref="AccessorMemberExpr"/>
@@ -63,19 +63,13 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="memberName">Member name to challenge.</param>
         /// <returns>True if this is an AccessorMemberExpr with the given name.</returns>
-        public virtual bool IsMember( string memberName )
-        {
-            return false;
-        }
+        public virtual bool IsMember( string memberName ) => false;
 
         /// <summary>
         /// Gets the argument list: null for <see cref="AccessorMemberExpr"/> and <see cref="AccessorLetExpr"/> (a member, field 
         /// or variable declaration is not callable).
         /// </summary>
-        public virtual IReadOnlyList<Expr> Arguments
-        {
-            get { return null; }
-        }
+        public virtual IReadOnlyList<Expr> Arguments => null; 
     }
 
 }

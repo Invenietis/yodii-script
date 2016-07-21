@@ -46,12 +46,12 @@ namespace Yodii.Script
             {
                 if( IsPendingOrSignal( ref _operand, Expr.Operand ) ) return PendingOrSignal( _operand );
                 RefRuntimeObj r = _operand.Result as RefRuntimeObj;
-                if( r == null ) return SetResult( Global.CreateSyntaxError( Expr.Operand, "Invalid increment or decrement operand." ) );
+                if( r == null ) return SetResult( new RuntimeError( Expr.Operand, "Invalid increment or decrement operand." ) );
                 
-                var newValue = Global.CreateNumber( _operand.Result.ToDouble() + (Expr.Plus ? 1.0 : -1.0) );
-                if( Expr.Prefix ) return SetResult( (r.Value = newValue) );
+                var newValue = DoubleObj.Create( _operand.Result.ToDouble() + (Expr.Plus ? 1.0 : -1.0) );
+                if( Expr.Prefix ) return SetResult( r.SetValue( Expr, newValue ) );
                 var result = SetResult( r.Value );
-                r.Value = newValue;
+                r.SetValue( Expr, newValue );
                 return result;
             }
         }

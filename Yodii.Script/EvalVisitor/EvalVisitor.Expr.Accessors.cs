@@ -47,10 +47,7 @@ namespace Yodii.Script
                 _args = new PExpr[_arguments.Count];
             }
 
-            public bool IsArgumentsResolved
-            {
-                get { return _rpCount == _args.Length; }
-            }
+            public bool IsArgumentsResolved => _rpCount == _args.Length; 
 
             public PExpr VisitArguments()
             {
@@ -66,32 +63,22 @@ namespace Yodii.Script
                 
             public IReadOnlyList<RuntimeObj> ResolvedParameters { get { return this; } }
 
-            RuntimeObj IReadOnlyList<RuntimeObj>.this[int index]
-            {
-                get { return _args[index].Result; }
-            }
+            RuntimeObj IReadOnlyList<RuntimeObj>.this[int index] => _args[index].Result; 
 
-            int IReadOnlyCollection<RuntimeObj>.Count
-            {
-                get { return _args.Length; }
-            }
+            int IReadOnlyCollection<RuntimeObj>.Count => _args.Length; 
 
-            IEnumerator<RuntimeObj> IEnumerable<RuntimeObj>.GetEnumerator()
-            {
-                return _args.Select( e => e.Result ).GetEnumerator();
-            }
+            IEnumerator<RuntimeObj> IEnumerable<RuntimeObj>.GetEnumerator() => _args.Select( e => e.Result ).GetEnumerator();
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                return ((IEnumerable<RuntimeObj>)this).GetEnumerator();
-            }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => ((IEnumerable<RuntimeObj>)this).GetEnumerator();
+
             #endregion
-        }      
-        
+        }
+
         /// <summary>
-        /// This frame applies to Indexer and Call. 
+        /// This frame applies as-is to Indexer. 
         /// AccessorMemberFrame specializes it to lookup the GlobalContext if the member is unbound.
         /// For let, there is no frame: visiting a let accessor simply does the lookup in the dynamic scope.
+        /// AccessorCallFrame specializes it to register any named functions declared as parameters.
         /// </summary>
         internal class AccessorFrame : Frame<AccessorExpr>, IAccessorFrame
         {
@@ -193,14 +180,14 @@ namespace Yodii.Script
                 // if Result is set, we leave.
                 if( Result != null ) return new PExpr( Result );
 
-                Debug.Assert( _left.Result != null, "We are not pendig..." );
+                Debug.Assert( _left.Result != null, "We are not pending..." );
                 var left = _left.Result;
                 Debug.Assert( !_result.IsResolved );
                 if( (_result = left.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _result );
                 return ReentrantSetResult( _result.Result );
             }
 
-            public IAccessorFrameState GetState( Action<IAccessorFrameInitializer> configuration )
+            public IAccessorFrameState GetImplementationState( Action<IAccessorFrameInitializer> configuration )
             {
                 if( ++_initCount < _realInitCount ) return null;
                 if( _state == null )
@@ -213,6 +200,17 @@ namespace Yodii.Script
                 return _state;
             }
             
+            public IAccessorFrameState GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame,IReadOnlyList<RuntimeObj>,PExpr> call )
+            {
+                if( ++_initCount < _realInitCount ) return null;
+                if( _state == null )
+                {
+                    _state = new FrameState( this, null, call, arguments );
+                    ++_realInitCount;
+                }
+                return _state;
+            }
+
             public IAccessorFrame NextAccessor
             {
                 get { return PrevFrame as IAccessorFrame; }
@@ -232,14 +230,17 @@ namespace Yodii.Script
 
             public PExpr SetError( string message = null )
             {
-                if( message != null ) return SetResult( _visitor._global.CreateSyntaxError( Expr, message ) );
-                return SetResult( _visitor._global.CreateAccessorSyntaxError( Expr ) );
+                if( message != null ) return SetResult( new RuntimeError( Expr, message ) );
+                if( NextAccessor != null )
+                {
+                    IAccessorFrame deepest = NextAccessor;
+                    while( deepest.NextAccessor != null ) deepest = deepest.NextAccessor;
+                    return SetResult( new RuntimeError( Expr, "Accessor chain not found: " + deepest.Expr.ToString(), true ) );
+                }
+                return SetResult( new RuntimeError( Expr, GetAccessErrorMessage(), true ) );
             }
 
-            AccessorExpr IAccessorFrame.Expr 
-            { 
-                get { return base.Expr; } 
-            }
+            protected virtual string GetAccessErrorMessage() => "Indexer is not supported.";
 
             protected PExpr ReentrantPendingOrSignal( PExpr sub )
             {
@@ -278,11 +279,17 @@ namespace Yodii.Script
             {
             }
 
+            public new AccessorMemberExpr Expr => (AccessorMemberExpr)base.Expr;
+
+            protected override string GetAccessErrorMessage() => Expr.IsUnbound 
+                                                                    ? "Undefined in scope: " + Expr.Name 
+                                                                    : "Unknown property: " + Expr.Name;
+
             protected override PExpr DoVisit()
             {
                 if( !_left.IsResolved )
                 {
-                    if( ((AccessorMemberExpr)Expr).IsUnbound )
+                    if( Expr.IsUnbound )
                     {
                         if( (_left = Global.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
                     }
@@ -314,6 +321,7 @@ namespace Yodii.Script
                     }
                 }
             }
+            protected override string GetAccessErrorMessage() => "Not a function.";
 
             protected override void OnDispose()
             {
@@ -328,24 +336,12 @@ namespace Yodii.Script
             }
         }
 
-        public PExpr Visit( AccessorMemberExpr e )
-        {
-            return Run( new AccessorMemberFrame( this, e ) );
-        }
+        public PExpr Visit( AccessorMemberExpr e ) => Run( new AccessorMemberFrame( this, e ) );
 
-        public PExpr Visit( AccessorIndexerExpr e )
-        {
-            return Run( new AccessorFrame( this, e ) );
-        }
+        public PExpr Visit( AccessorIndexerExpr e ) => Run( new AccessorFrame( this, e ) );
 
-        public PExpr Visit( AccessorCallExpr e )
-        {
-            return Run( new AccessorCallFrame( this, e ) );
-        }
+        public PExpr Visit( AccessorCallExpr e ) => Run( new AccessorCallFrame( this, e ) );
 
-        public PExpr Visit( AccessorLetExpr e )
-        {
-            return new PExpr( ScopeManager.FindRegistered( e ) );
-        }
+        public PExpr Visit( AccessorLetExpr e ) => new PExpr( ScopeManager.FindRegistered( e ) );
     }
 }

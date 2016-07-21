@@ -150,6 +150,14 @@ namespace Yodii.Script
             return cV == e.Condition && oV == e.Code ? e : new WhileExpr( e.Location, cV, oV );
         }
 
+        public virtual Expr Visit( ForeachExpr e )
+        {
+            var vV = (AccessorLetExpr)VisitExpr( e.Variable );
+            var gV = VisitExpr( e.Generator );
+            var cV = VisitExpr( e.Code );
+            return vV == e.Variable && gV == e.Generator && cV == e.Code ? e : new ForeachExpr( e.Location, vV, gV, cV );
+        }
+
         public virtual Expr Visit( FlowBreakingExpr e )
         {
             var rV = e.ReturnedValue != null ? VisitExpr( e.ReturnedValue ) : null;

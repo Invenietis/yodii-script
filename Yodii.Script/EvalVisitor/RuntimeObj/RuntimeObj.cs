@@ -38,55 +38,32 @@ namespace Yodii.Script
         public readonly static string TypeString = "string";
         public readonly static string TypeUndefined = "undefined";
 
-        class JSUndefined : RuntimeObj
+        class UndefinedObj : RuntimeObj
         {            
-            public override string Type
-            {
-                get { return TypeUndefined; }
-            }
+            public override string Type => TypeUndefined; 
 
-            public override string ToString()
-            {
-                return "undefined";
-            }
+            public override object ToNative( GlobalContext c ) => null;
 
-            public override bool ToBoolean()
-            {
-                return false;
-            }
+            public override string ToString() => "undefined";
 
-            public override double ToDouble()
-            {
-                return double.NaN;
-            }
+            public override bool ToBoolean() => false;
+
+            public override double ToDouble() => double.NaN;
         }
         
-        class JSNull : RuntimeObj
+        class NullObj : RuntimeObj
         {
-            public override string Type
-            {
-                get { return RuntimeObj.TypeObject; }
-            }
+            public override string Type => TypeObject;
 
-            public override bool ToBoolean()
-            {
-                return false;
-            }
+            public override object ToNative( GlobalContext c ) => null;
 
-            public override double ToDouble()
-            {
-                return 0;
-            }
+            public override bool ToBoolean() => false;
 
-            public override string ToString()
-            {
-                return String.Empty;
-            }
+            public override double ToDouble() => 0.0;
 
-            public override int GetHashCode()
-            {
-                return 0;
-            }
+            public override string ToString() => string.Empty;
+
+            public override int GetHashCode() => 0;
 
             public override bool Equals( object obj )
             {
@@ -94,8 +71,8 @@ namespace Yodii.Script
             }
         }
 
-        public static readonly RuntimeObj Undefined = new JSUndefined();
-        public static readonly RuntimeObj Null = new JSNull();
+        public static readonly RuntimeObj Undefined = new UndefinedObj();
+        public static readonly RuntimeObj Null = new NullObj();
 
         public abstract string Type { get; }
 
@@ -103,20 +80,16 @@ namespace Yodii.Script
 
         public abstract double ToDouble();
 
+        public abstract object ToNative( GlobalContext c ); 
+
         /// <summary>
-        /// Resolves a potential reference: only <see cref="RefRuntimeObject"/> overrides this method, by default all runtime objects 
-        /// are their own value.
+        /// Resolves a potential reference: only <see cref="RefRuntimeObject"/> overrides this method, by default all 
+        /// runtime objects are their own value.
         /// </summary>
         /// <returns>This object or the referenced object if this is a reference.</returns>
-        public virtual RuntimeObj ToValue()
-        {
-            return this;
-        }
+        public virtual RuntimeObj ToValue() => this;
 
-        public virtual PExpr Visit( IAccessorFrame frame )
-        {
-            return frame.SetError();
-        }
+        public virtual PExpr Visit( IAccessorFrame frame ) => frame.SetError();
 
     }
 

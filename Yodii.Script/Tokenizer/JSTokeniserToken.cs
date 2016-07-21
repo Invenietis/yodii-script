@@ -322,8 +322,8 @@ namespace Yodii.Script
         And = IsLogical | OpLevel05 | 2,
         #endregion
 
-        UnaryOperatorCount = 8,
-        #region IsUnaryOperator: !, ~, --, ++, Delete, New, TypeOf, Void.
+        UnaryOperatorCount = 9,
+        #region IsUnaryOperator: !, ~, --, ++, Delete, New, TypeOf, Void, IndexOf.
         /// <summary>
         /// Unary (!). Logical not operator.
         /// </summary>
@@ -348,6 +348,7 @@ namespace Yodii.Script
         New = IsUnaryOperator | OpLevel14 | 6,
         TypeOf = IsUnaryOperator | OpLevel14 | 7,
         Void = IsUnaryOperator | OpLevel14 | 8,
+        IndexOf = IsUnaryOperator | OpLevel14 | 9,
 
         #endregion
 

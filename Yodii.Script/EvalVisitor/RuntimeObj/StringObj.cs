@@ -28,68 +28,65 @@ using System.Text;
 
 namespace Yodii.Script
 {
-    public class JSEvalString : RuntimeObj, IComparable
+    public class StringObj : RuntimeObj, IComparable
     {
-        static public readonly JSEvalString EmptyString = new JSEvalString( String.Empty );
+        static public readonly StringObj EmptyString = new StringObj( string.Empty );
 
         readonly string _value;
 
-        public JSEvalString( string value )
+        StringObj( string value )
         {
             if( value == null ) throw new ArgumentNullException( "value" );
             _value = value;
         }
-
-        public override string Type
+        
+        public static StringObj Create( string value )
         {
-            get { return RuntimeObj.TypeString; }
+            if( value == null ) throw new ArgumentNullException( nameof( value ) );
+            if( value.Length == 0 ) return EmptyString;
+            return new StringObj( value );
         }
 
-        public override bool ToBoolean()
-        {
-            return JSSupport.ToBoolean( _value );
-        }
+        public override string Type => TypeString;
+
+        public override object ToNative( GlobalContext c ) => _value;
+
+        public override bool ToBoolean() => _value.Length > 0;
 
         public override double ToDouble()
         {
             return JSSupport.ToNumber( _value );
         }
 
-        public override string ToString()
-        {
-            return _value;
-        }
+        public override string ToString() => _value;
 
         public override bool Equals( object obj )
         {
             if( obj == this ) return true;
-            JSEvalString s = obj as JSEvalString;
+            StringObj s = obj as StringObj;
             return s != null ? s._value == _value : false;
         }
 
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
+        public override int GetHashCode() => _value.GetHashCode();
 
         public int CompareTo( object obj )
         {
-            JSEvalString s = obj as JSEvalString;
-            if( s != null ) return String.Compare( _value, s._value, StringComparison.InvariantCulture );
-            if( obj is String ) return String.Compare( _value, (String)obj, StringComparison.InvariantCulture );
+            StringObj s = obj as StringObj;
+            if( s != null ) return string.Compare( _value, s._value, StringComparison.Ordinal );
+            if( obj is String ) return string.Compare( _value, (string)obj, StringComparison.Ordinal );
             throw new ArgumentException( "Must be a string.", "obj" );
         }
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            var s = frame.GetState( c =>
-                c.On( "charAt" ).OnCall( ( f, args ) =>
+            var s = frame.GetImplementationState( c =>
+                c.OnIndex( ( f, arg ) =>
                 {
-                    int idx = args.Count > 0 ? JSSupport.ToInt32( args[0].ToDouble() ) : 0;
-                    if( idx < 0 || idx >= _value.Length ) return f.SetResult( JSEvalString.EmptyString );
-                    return f.SetResult( f.Global.CreateString( new String( _value[idx], 1 ) ) );
+                    int idx = JSSupport.ToInt32( arg.ToDouble() );
+                    if( idx < 0 || idx >= _value.Length ) return f.SetResult( StringObj.EmptyString );
+                    return f.SetResult( StringObj.Create( new string( _value[idx], 1 ) ) );
                 } )
-                .On( "toString" ).OnCall( ( f, args ) =>
+                .On( "ToString" ).OnCall( ( f, args ) =>
                 {
                     return f.SetResult( this );
                 }

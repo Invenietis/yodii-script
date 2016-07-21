@@ -123,64 +123,64 @@ namespace Yodii.Script
                                 {
                                     if( ReferenceEquals( left.Type, RuntimeObj.TypeNumber ) && ReferenceEquals( right.Type, RuntimeObj.TypeNumber ) )
                                     {
-                                        result = Global.CreateNumber( left.ToDouble() + right.ToDouble() );
+                                        result = DoubleObj.Create( left.ToDouble() + right.ToDouble() );
                                     }
                                     else
                                     {
-                                        result = Global.CreateString( String.Concat( left.ToString(), right.ToString() ) );
+                                        result = StringObj.Create( left.ToString() + right.ToString() );
                                     }
                                     break;
                                 }
                             case (int)JSTokenizerToken.Minus & 15:
                                 {
-                                    result = Global.CreateNumber( left.ToDouble() - right.ToDouble() );
+                                    result = DoubleObj.Create( left.ToDouble() - right.ToDouble() );
                                     break;
                                 }
                             case (int)JSTokenizerToken.Mult & 15:
                                 {
-                                    result = Global.CreateNumber( left.ToDouble() * right.ToDouble() );
+                                    result = DoubleObj.Create( left.ToDouble() * right.ToDouble() );
                                     break;
                                 }
                             case (int)JSTokenizerToken.Divide & 15:
                                 {
-                                    result = Global.CreateNumber( left.ToDouble() / right.ToDouble() );
+                                    result = DoubleObj.Create( left.ToDouble() / right.ToDouble() );
                                     break;
                                 }
                             case (int)JSTokenizerToken.Modulo & 15:
                                 {
-                                    if( right == JSEvalNumber.Zero || left == JSEvalNumber.NegativeInfinity || left == JSEvalNumber.Infinity )
+                                    if( right == DoubleObj.Zero || left == DoubleObj.NegativeInfinity || left == DoubleObj.Infinity )
                                     {
-                                        result = JSEvalNumber.NaN;
+                                        result = DoubleObj.NaN;
                                     }
-                                    else if( left == JSEvalNumber.NegativeInfinity || left == JSEvalNumber.Infinity )
+                                    else if( left == DoubleObj.NegativeInfinity || left == DoubleObj.Infinity )
                                     {
                                         result = right;
                                     }
                                     else
                                     {
-                                        result = Global.CreateNumber( left.ToDouble() % right.ToDouble() );
+                                        result = DoubleObj.Create( left.ToDouble() % right.ToDouble() );
                                     }
                                     break;
                                 }
                             case (int)JSTokenizerToken.BitwiseAnd & 15:
                                 {
-                                    Int64 l = JSSupport.ToInt64( left.ToDouble() );
-                                    Int64 rO = JSSupport.ToInt64( right.ToDouble() );
-                                    result = Global.CreateNumber( l & rO );
+                                    long l = JSSupport.ToInt64( left.ToDouble() );
+                                    long rO = JSSupport.ToInt64( right.ToDouble() );
+                                    result = DoubleObj.Create( l & rO );
                                     break;
                                 }
                             case (int)JSTokenizerToken.BitwiseOr & 15:
                                 {
-                                    Int64 l = JSSupport.ToInt64( left.ToDouble() );
-                                    Int64 rO = JSSupport.ToInt64( right.ToDouble() );
-                                    result = Global.CreateNumber( l | rO );
+                                    long l = JSSupport.ToInt64( left.ToDouble() );
+                                    long rO = JSSupport.ToInt64( right.ToDouble() );
+                                    result = DoubleObj.Create( l | rO );
                                     break;
                                 }
                             case (int)JSTokenizerToken.BitwiseXOr & 15:
                                 {
-                                    Int64 l = JSSupport.ToInt64( left.ToDouble() );
-                                    Int64 rO = JSSupport.ToInt64( right.ToDouble() );
-                                    result = Global.CreateNumber( l ^ rO );
+                                    long l = JSSupport.ToInt64( left.ToDouble() );
+                                    long rO = JSSupport.ToInt64( right.ToDouble() );
+                                    result = DoubleObj.Create( l ^ rO );
                                     break;
                                 }
                             case (int)JSTokenizerToken.BitwiseShiftLeft & 15:
@@ -215,36 +215,33 @@ namespace Yodii.Script
 
             RuntimeObj BitwiseShift( RuntimeObj val, RuntimeObj shift, bool right )
             {
-                if( val == JSEvalNumber.Zero ) return val;
+                if( val == DoubleObj.Zero ) return val;
                 double dR = shift.ToDouble();
                 int iShift;
                 if( Double.IsNaN( dR ) || (iShift = (dR < 0 ? (int)Math.Ceiling( dR ) : (int)Math.Floor( dR )) % 64) == 0 ) return Global.CreateNumber( val );
-                if( right && iShift < 0 ) return JSEvalNumber.Zero;
+                if( right && iShift < 0 ) return DoubleObj.Zero;
                 Int32 lN = JSSupport.ToInt32( val.ToDouble() );
-                if( lN == 0 ) return JSEvalNumber.Zero;
-                return Global.CreateNumber( right ? lN >> iShift : lN << iShift );
+                if( lN == 0 ) return DoubleObj.Zero;
+                return DoubleObj.Create( right ? lN >> iShift : lN << iShift );
             }
 
             RuntimeObj BitwiseShiftRightUnsigned( RuntimeObj left, RuntimeObj right )
             {
-                if( left == JSEvalNumber.Zero ) return left;
+                if( left == DoubleObj.Zero ) return left;
                 
                 double dR = right.ToDouble();
-                if( Double.IsNaN( dR ) ) return Global.CreateNumber( left );
+                if( double.IsNaN( dR ) ) return left is DoubleObj ? left : DoubleObj.Create( left.ToDouble() );
                 int iShift = (dR < 0 ? (int)Math.Ceiling( dR ) : (int)Math.Floor( dR )) % 64;
-                if( iShift < 0 ) return JSEvalNumber.Zero;
+                if( iShift < 0 ) return DoubleObj.Zero;
 
-                UInt32 lN = (UInt32)JSSupport.ToInt64( left.ToDouble() );
-                if( lN == 0 ) return JSEvalNumber.Zero;
+                uint lN = (uint)JSSupport.ToInt64( left.ToDouble() );
+                if( lN == 0 ) return DoubleObj.Zero;
 
-                return Global.CreateNumber( lN >> iShift );
+                return DoubleObj.Create( lN >> iShift );
             }
         }
 
-        public PExpr Visit( BinaryExpr e )
-        {
-            return Run( new BinaryExprFrame( this, e ) );
-        }
+        public PExpr Visit( BinaryExpr e ) => Run( new BinaryExprFrame( this, e ) );
 
     }
 }

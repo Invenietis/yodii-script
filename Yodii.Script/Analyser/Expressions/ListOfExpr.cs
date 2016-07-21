@@ -39,7 +39,7 @@ namespace Yodii.Script
             List = multi;
         }
 
-        public IReadOnlyList<Expr> List { get; private set; }
+        public IReadOnlyList<Expr> List { get; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -48,15 +48,9 @@ namespace Yodii.Script
         /// <param name="visitor">visitor.</param>
         /// <returns>The result of the visit.</returns>
         [DebuggerStepThrough]
-        internal protected override T Accept<T>( IExprVisitor<T> visitor )
-        {
-            return visitor.Visit( this );
-        }
+        internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
-        public override string ToString()
-        {
-            return String.Join( ", ", List.Select( s => s.ToString() ) );
-        }
+        public override string ToString() => string.Join( ", ", List.Select( s => s.ToString() ) );
 
     }
 

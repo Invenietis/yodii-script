@@ -28,42 +28,29 @@ using System.Text;
 
 namespace Yodii.Script
 {
-    public class JSEvalFunction : RuntimeObj
+    public class FunctionObj : RuntimeObj
     {
         readonly FunctionExpr _expr;
         readonly IReadOnlyList<Closure> _closures;
 
-        internal JSEvalFunction( FunctionExpr e, IReadOnlyList<Closure> closures )
+        internal FunctionObj( FunctionExpr e, IReadOnlyList<Closure> closures )
         {
             if( e == null ) throw new ArgumentNullException();
             _expr = e;
             _closures = closures;
         }
 
-        public FunctionExpr Expr 
-        { 
-            get { return _expr; } 
-        }
+        public FunctionExpr Expr  => _expr; 
 
-        public override string Type
-        {
-            get { return RuntimeObj.TypeFunction; }
-        }
+        public override string Type => RuntimeObj.TypeFunction;
 
-        public override bool ToBoolean()
-        {
-            return true;
-        }
+        public override object ToNative( GlobalContext c ) => null;
 
-        public override double ToDouble()
-        {
-            return Double.NaN;
-        }
+        public override bool ToBoolean() => true;
 
-        public override string ToString()
-        {
-            return _expr.ToString();
-        }
+        public override double ToDouble() => double.NaN;
+
+        public override string ToString() => _expr.ToString();
 
         public override PExpr Visit( IAccessorFrame frame )
         {

@@ -57,7 +57,8 @@ namespace Yodii.Script
                     {
                         if( Expr.ExceptionParameter != null )
                         {
-                            _visitor.ScopeManager.Register( Expr.ExceptionParameter ).Value = e.ThrownValue;
+                            // There can be no error when setting a standard, variable, RefRuntimeObject.
+                            _visitor.ScopeManager.Register( Expr.ExceptionParameter ).SetValue( Expr.ExceptionParameter, e.ThrownValue );
                         }
                         _visitor.FirstChanceError = null;
                         _catching = true;
