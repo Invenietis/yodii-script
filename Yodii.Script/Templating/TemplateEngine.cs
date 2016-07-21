@@ -66,7 +66,6 @@ namespace Yodii.Script
         {
             _writer = new Writer();
             _ctx = ctx;
-            _ctx.Register( "$writer", _writer );
         }
 
         /// <summary>
@@ -133,8 +132,16 @@ namespace Yodii.Script
                 script.Append( "$writer" ).Append( '[' ).Append( _writer.AddText( lastTextIdx, lenRemain ) ).Append( "];" );
             }
             var s = script.ToString();
-            var error = ScriptEngine.Evaluate( s, _ctx ) as RuntimeError;
-            return error != null ? new Result( null, error.Message, s ) : new Result( _writer.ToString(), null, s );
+            try
+            {
+                _ctx.Register( "$writer", _writer );
+                var error = ScriptEngine.Evaluate( s, _ctx ) as RuntimeError;
+                return error != null ? new Result( null, error.Message, s ) : new Result( _writer.ToString(), null, s );
+            }
+            finally
+            {
+                _ctx.Unregister( "$writer" );
+            }
         }
     }
 }

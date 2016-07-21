@@ -59,6 +59,16 @@ namespace Yodii.Script
             _objects.Add( name, oR );
         }
 
+        /// <summary>
+        /// Unregisters a previously <see cref="Register"/>ed object.
+        /// </summary>
+        /// <param name="name">Name of the global to remove from this context.</param>
+        /// <returns>False if the object was not registered.</returns>
+        public bool Unregister( string name )
+        {
+            return _objects.Remove( name );
+        }
+
         [Obsolete]
         public JSEvalDate Epoch
         {

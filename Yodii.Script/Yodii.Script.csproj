@@ -40,6 +40,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\Yodii.Script.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" $(GenerateDocumentation) != '' ">
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>

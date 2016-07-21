@@ -17,7 +17,7 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <StartAction>Program</StartAction>
-    <StartProgram>$(SolutionDir)packages\NUnit.Runners.2.6.4\tools\nunit.exe</StartProgram>
+    <StartProgram>$(SolutionDir)packages\NUnit.Runners.Net4.2.6.4\tools\nunit.exe</StartProgram>
     <StartArguments>Yodii.Script.Tests.dll</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -40,9 +40,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CK.Core, Version=4.1.0.0, Culture=neutral, PublicKeyToken=edfa2f62fc978217, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\CK.Core.4.1.0\lib\net45\CK.Core.dll</HintPath>
+    <Reference Include="CK.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CK.Core.5.0.0\lib\net45\CK.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CK.Text, Version=1.0.0.0, Culture=neutral, PublicKeyToken=731c291b31fb8d27, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CK.Text.5.0.0\lib\net45\CK.Text.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

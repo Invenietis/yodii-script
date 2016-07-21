@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata >
-    <id>Sample.Library.Core</id>
+    <id>Yodii.Script</id>
     <version>$version$</version>
     <authors>Sample Inc.</authors>
     <owners>Sample Inc.</owners>
@@ -9,28 +9,18 @@
     <projectUrl>https://github.com/SampleInc/Project</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>
-      Short description.
+      Simple script and template engine.
     </summary>
     <description>
-      Longer description.
+      Yodii.Script is a purely interpreted script language loosely based on javascript that supports function
+      with closures. One of its major specificty is to be implemnted as a state machine.
     </description>
     <language>en-US</language>
     <dependencies>
-      <dependency id="A.Great.Library.Core" version="4.2.0" />
     </dependencies>
   </metadata>
   <files>
-    <!--
-    
-    This is commented out to make the build script work without errors.
-
-    The BasePath is set to the Solution directory.
-    This allows the NuSpec to easily pickup files anywhere in the Solution but 
-    this can be changed in the Build script.
-    
-    
-    <file src="Sample.Library.Core\bin\Release\Sample.Library.Core.dll" target="lib\net45" />
-    <file src="Sample.Library.Core\bin\Release\Sample.Library.Core.xml" target="lib\net45" />
-    -->
+    <file src="Yodii.Script\bin\{{Configuration}}\Yodii.Script.dll" target="lib\net45" />
+    <file src="Yodii.Script\bin\{{Configuration}}\Yodii.Script.xml" target="lib\net45" />
   </files>
 </package>
