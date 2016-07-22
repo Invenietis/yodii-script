@@ -211,19 +211,12 @@ namespace Yodii.Script
                 return _state;
             }
 
-            public IAccessorFrame NextAccessor
-            {
-                get { return PrevFrame as IAccessorFrame; }
-            }
-
-            IAccessorFrame PrevAccessor
-            {
-                get { return NextFrame as IAccessorFrame; }
-            }
+            public IAccessorFrame NextAccessor => PrevFrame as IAccessorFrame; 
 
             public override PExpr SetResult( RuntimeObj result )
             {
-                IAccessorFrame p = PrevAccessor;
+                // NextFrame is actualy the PreviousAccessor
+                IAccessorFrame p = NextFrame as IAccessorFrame;
                 if( p != null && !p.IsResolved ) p.SetResult( result );
                 return base.SetResult( result );
             }
@@ -272,7 +265,7 @@ namespace Yodii.Script
 
         }
 
-        class AccessorMemberFrame : AccessorFrame
+        class AccessorMemberFrame : AccessorFrame, IAccessorMemberFrame
         {
             internal protected AccessorMemberFrame( EvalVisitor visitor, AccessorMemberExpr e )
                 : base( visitor, e )
@@ -280,6 +273,8 @@ namespace Yodii.Script
             }
 
             public new AccessorMemberExpr Expr => (AccessorMemberExpr)base.Expr;
+
+            public IAccessorMemberFrame PrevMemberAccessor => NextFrame as IAccessorMemberFrame; 
 
             protected override string GetAccessErrorMessage() => Expr.IsUnbound 
                                                                     ? "Undefined in scope: " + Expr.Name 

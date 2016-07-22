@@ -128,8 +128,8 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            string sP = Deferred != null ? String.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, DeferredStatus ) : null;
-            string sR = Result != null ? String.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
+            string sP = Deferred != null ? string.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, DeferredStatus ) : null;
+            string sR = Result != null ? string.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
             return sP ?? sR ?? "(Unknown)";
         }
     }

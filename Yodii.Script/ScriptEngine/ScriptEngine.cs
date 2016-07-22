@@ -90,6 +90,8 @@ namespace Yodii.Script
 
         /// <summary>
         /// Executes a string by first calling <see cref="ExprAnalyser.AnalyseString"/>.
+        /// The result object must be disposed before executing another piece of code.
+        /// You can use the static <see cref="Evaluate(string, GlobalContext)"/> for simple scenarios.
         /// </summary>
         /// <param name="s">The string to execute.</param>
         /// <returns>A result that may be pending...</returns>
@@ -100,6 +102,8 @@ namespace Yodii.Script
 
         /// <summary>
         /// Executes an already analysed script.
+        /// The result object must be disposed before executing another piece of code.
+        /// You can use the static <see cref="Evaluate(Expr, GlobalContext)"/> for simple scenarios.
         /// </summary>
         /// <param name="s">The string to execute.</param>
         /// <returns>A result that may be pending...</returns>

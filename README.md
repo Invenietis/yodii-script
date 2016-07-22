@@ -15,18 +15,19 @@ It is under developpement and any contributions are welcome.
 - Inspired from javascript but with important differences to be more *.Net compliant*.
 
 ## To Do list
-- Introduce a dynamic namespace:
- - One must be able to Register( "Invenietis.Support.Func", ... ). As soon as one level is registered,
-   this locks the subordinated namespace (responsibility is given to the registered object).
 - Enable API securization (currently any properties or methods of external objects are callable).
   - A simple call validation hook should minimally do the job.
-  - White/Black list and support of a kind of [SafeScript] attribute may be useful.
+  - White/Black list and support of a kind of [SafeScript] attribute or ISafeScript marker interface may be useful.
 - Stop supporting javascript operators === and !==
   - Current == and != operators must simply use .Net object.Equals method: no implicit conversion must be made.
 - "Number" must be replaced with "Integer" and "Double". Integer must be the default but implicit conversion between 
   the two must be supported.
+- Replace JSEvalDate object with a more like DateTime .Net object.
 - String currently supports only indexer [] (instead of charAt() javascript method) and ToString() :).
   - StringObj must support all other useful methods (Contains, Substring, etc.).
 - Export script functions as native functions (NativeFunctionObj does the job in the opposite way):
   - From the script to the external world (FunctionObj.ToNative() must return a callable delegate). 
     Evaluation of such delegate must take place on the primary thread on dedicated frame stacks.
+- Transparently support async/await (actually any awaitable return) with the defined 
+  but not implemented PExpr.DeferredKind.AsyncCall.
+

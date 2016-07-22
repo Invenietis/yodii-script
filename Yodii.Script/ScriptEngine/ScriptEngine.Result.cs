@@ -55,34 +55,22 @@ namespace Yodii.Script
             /// Gets the result of the execution. When an execution is pending, this is the 
             /// result of the top frame that has just been resolved.
             /// </summary>
-            public RuntimeObj CurrentResult
-            {
-                get { return _result; }
-            }
+            public RuntimeObj CurrentResult => _result; 
 
             /// <summary>
             /// Gets the error that stopped the execution if any.
             /// </summary>
-            public RuntimeError Error
-            {
-                get { return _error; }
-            }
+            public RuntimeError Error => _error; 
 
             /// <summary>
             /// Gets the current engine status. When <see cref="ScriptEngineStatus.IsPending"/>, <see cref="Continue"/> can be called.
             /// </summary>
-            public ScriptEngineStatus Status
-            {
-                get { return _status; }
-            }
+            public ScriptEngineStatus Status => _status; 
 
             /// <summary>
             /// Gets whether <see cref="Continue"/> can be called (<see cref="Status"/> has <see cref="ScriptEngineStatus.CanContinue"/> bit set).
             /// </summary>
-            public bool CanContinue
-            {
-                get { return (_status & ScriptEngineStatus.CanContinue) != 0; }
-            }
+            public bool CanContinue => (_status & ScriptEngineStatus.CanContinue) != 0; 
 
             /// <summary>
             /// Continue the execution of the script. 
