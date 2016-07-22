@@ -130,6 +130,8 @@ namespace Yodii.Script
             }
             string s = o as string;
             if( s != null ) return StringObj.Create( s );
+            Delegate func = o as Delegate;
+            if( func != null ) return new NativeFunctionObj( func );
             return new ExternalObjectObj( this, o );
         }
 

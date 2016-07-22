@@ -100,6 +100,7 @@
     <Compile Include="EvalVisitor\IDeferredExpr.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\ExternalTypeHandler.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\ExternalObjectObj.cs" />
+    <Compile Include="EvalVisitor\RuntimeObj\NativeFunctionObj.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\FunctionObj.cs" />
     <Compile Include="EvalVisitor\PExpr.cs" />
     <Compile Include="EvalVisitor\RuntimeObj\RefRuntimeIndexedObj.cs" />

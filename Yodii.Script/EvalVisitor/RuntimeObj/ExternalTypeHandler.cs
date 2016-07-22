@@ -87,7 +87,6 @@ namespace Yodii.Script
             /// </summary>
             /// <param name="ctx">Current global context.</param>
             /// <param name="parameters">Call parameters.</param>
-            /// <param name="actualParameters">The actual parameters to use.</param>
             /// <returns>The resulting most appropriate overload and its parameters.</returns>
             MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters );
         }
@@ -165,13 +164,10 @@ namespace Yodii.Script
             {
                 var m = _methods.FirstOrDefault( candidate => candidate.MinParameterCount == parameters.Count );
                 if( m.M == null ) return new MethodCallInfo();
-                var actualParameters = new object[parameters.Count];
-                for( int i = 0; i < actualParameters.Length; ++i )
-                {
-                    actualParameters[i] = Convert.ChangeType( parameters[i].ToNative( ctx ), m.Parameters[i].ParameterType );
-                }
+                object[] actualParameters = NativeFunctionObj.MapCallParameters( ctx, parameters, m.Parameters );
                 return new MethodCallInfo( m.M, actualParameters );
             }
+
         }
 
         public IHandler GetHandler( string name )

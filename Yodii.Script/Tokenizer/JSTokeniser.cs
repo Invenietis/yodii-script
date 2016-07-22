@@ -966,7 +966,11 @@ namespace Yodii.Script
             {
                 int ic = Read();
                 if( ic == -1 ) return (int)JSTokenizerError.ErrorStringUnterminated;
-                if( ic == quote ) break;
+                if( ic == quote )
+                {
+                    if( Peek() != quote ) break;
+                    Read();
+                }
                 else if( ic == '\\' )
                 {
                     ic = Read();
