@@ -34,7 +34,7 @@ namespace Yodii.Script.Tests
     public class AnalyserTests
     {
         [Test]
-        public void EmptyParsing()
+        public void an_empty_string_is_a_syntax_error()
         {
             ExprAnalyser a = new ExprAnalyser();
             JSTokenizer p = new JSTokenizer();
@@ -50,72 +50,6 @@ namespace Yodii.Script.Tests
                 Expr e = a.Analyse( p );
                 Assert.That( e is SyntaxErrorExpr );
             }
-        }
-
-        [Test]
-        public void BadNumbers()
-        {
-            ExprAnalyser a = new ExprAnalyser();
-            JSTokenizer p = new JSTokenizer();
-
-            {
-                p.Reset( "45DD" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( "45.member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( ".45.member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( "45.01member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( ".45.member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( ".45.01member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-            {
-                p.Reset( "45.01e23member" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.True );
-                Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
-            }
-        }
-
-        [Test]
-        public void RoundtripParsing()
-        {
-            JSTokenizer p = new JSTokenizer();
-            Assert.That( JSTokenizer.Explain( JSTokenizerToken.Integer ), Is.EqualTo( "42" ) );
-
-            string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x === z !== x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
-            p.Reset( s );
-            string recompose = "";
-            while( !p.IsEndOfInput )
-            {
-                recompose += " " + JSTokenizer.Explain( p.CurrentToken );
-                p.Forward();
-            }
-            s = s.Replace( "if", "identifier" )
-                .Replace( "function", "identifier" )
-                .Replace( "x", "identifier" )
-                .Replace( "z", "identifier" )
-                .Replace( "return", "identifier" );
-
-            Assert.That( recompose, Is.EqualTo( s ) );
         }
 
         [Test]

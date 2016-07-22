@@ -30,26 +30,56 @@ namespace Yodii.Script
 {
     public class GlobalContext : IAccessorVisitor
     {
+        readonly static char[] _invalidNameChars = new char[] { ' ', '\t', '\r', '\n', '{', '}', '(', ')', '[', ']', ',', ':', ';' };
+
         JSEvalDate _epoch;
         readonly Dictionary<Type, ExternalTypeHandler> _types;
         readonly Dictionary<string, RuntimeObj> _objects;
+        readonly HashSet<string> _namespaces;
 
         public GlobalContext()
         {
             _epoch = new JSEvalDate( JSSupport.JSEpoch );
             _types = new Dictionary<Type, ExternalTypeHandler>();
             _objects = new Dictionary<string, RuntimeObj>();
+            _namespaces = new HashSet<string>();
         }
 
         /// <summary>
         /// Registers a external global object.
         /// </summary>
-        /// <param name="name">Name of the object. Must be unique otherwise an exception is thrown.</param>
+        /// <param name="name">
+        /// Name of the object including an optional namespace prefix ("System.FileSystem.FileReader"). 
+        /// Must be unique and none of its namespaces must be the same as as already registered object 
+        /// otherwise an exception is thrown.
+        /// Must not ne null, empty, starts or ends with a dot nor contains double dots or space.
+        /// </param>
         /// <param name="o">The object to register. Must not be null.</param>
         public void Register( string name, object o )
         {
-            if( string.IsNullOrWhiteSpace( name ) ) throw new ArgumentNullException( nameof( name ) );
             if( o == null ) throw new ArgumentNullException( nameof( o ) );
+            if( string.IsNullOrEmpty( name ) ) throw new ArgumentNullException( nameof( name ) );
+            if( name.IndexOfAny( _invalidNameChars ) >= 0 ) throw new ArgumentException( "Invalid namespace (no white space, comma, parens allowed).", nameof( name ) );
+
+            var nsName = SplitNamespace( name );
+            List<string> validNamespaces = null;
+            if( !string.IsNullOrEmpty( nsName.Key ) )
+            {
+                validNamespaces = new List<string>();
+                // Checks that none of the above parents are objects.
+                string ns = nsName.Key;
+                int idx;
+                for( ; ; )
+                {
+                    if( _objects.ContainsKey( ns ) ) throw new ArgumentException( $"Object '{nsName.Value}' cannot be registered in namespace '{nsName.Key}' since '{ns}' is already a registered object.", nameof( name ) );
+                    validNamespaces.Add( ns );
+                    idx = ns.LastIndexOf( '.' );
+                    if( idx < 0 ) break;
+                    if( idx == 0 || idx == ns.Length-1 ) throw new ArgumentException( "Invalid dots in namespace.", nameof( name ) );
+                    ns = ns.Substring( 0, idx );
+                }
+            }
+            if( _namespaces.Contains( name ) ) throw new ArgumentException( $"Object '{name}' is already registered as a namespace.", nameof( name ) );
             var oR = o as RuntimeObj;
             if( oR == null )
             {
@@ -57,6 +87,19 @@ namespace Yodii.Script
                 oR = v != null ? new RuntimeWrapperObj( v ) : Create( o );
             } 
             _objects.Add( name, oR );
+            // Time to register the valid namespaces if any.
+            if( validNamespaces != null )
+            {
+                foreach( var n in validNamespaces ) _namespaces.Add( n ); 
+            }
+        }
+
+        static KeyValuePair<string,string> SplitNamespace( string name )
+        {
+            int idx = name.LastIndexOf( '.' );
+            if( idx < 0 ) return new KeyValuePair<string, string>( null, name );
+            if( idx == 0 || idx == name.Length-1 ) throw new ArgumentException( "Invalid dots in namespace.", nameof( name ) );
+            return new KeyValuePair<string, string>( name.Substring( 0, idx ), name.Substring( idx + 1 ) );
         }
 
         /// <summary>
@@ -67,12 +110,6 @@ namespace Yodii.Script
         public bool Unregister( string name )
         {
             return _objects.Remove( name );
-        }
-
-        [Obsolete]
-        public JSEvalDate Epoch
-        {
-            get { return _epoch; }
         }
 
         [Obsolete]
@@ -130,6 +167,8 @@ namespace Yodii.Script
             }
             string s = o as string;
             if( s != null ) return StringObj.Create( s );
+            Delegate func = o as Delegate;
+            if( func != null ) return new NativeFunctionObj( func );
             return new ExternalObjectObj( this, o );
         }
 
@@ -153,11 +192,18 @@ namespace Yodii.Script
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
-            AccessorMemberExpr mE = frame.Expr as AccessorMemberExpr;
-            if( mE != null )
+            var deepestMemberFrame = frame.NextAccessors( true )
+                                            .Select( f => f as IAccessorMemberFrame )
+                                            .TakeWhile( f => f != null )
+                                            .LastOrDefault();
+            while( deepestMemberFrame != null )
             {
                 RuntimeObj obj;
-                if( _objects.TryGetValue( mE.Name, out obj ) ) return frame.SetResult( obj );
+                if( _objects.TryGetValue( deepestMemberFrame.Expr.MemberFullName, out obj ) )
+                {
+                    return deepestMemberFrame.SetResult( obj );
+                }
+                deepestMemberFrame = deepestMemberFrame.PrevMemberAccessor;
             }
             var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>

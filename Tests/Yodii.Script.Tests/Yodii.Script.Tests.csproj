@@ -63,7 +63,9 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="TokenizerTests.cs" />
     <Compile Include="BasicBreakpointSupport.cs" />
+    <Compile Include="NativeFunctionTests.cs" />
     <Compile Include="TemplateTests.cs" />
     <Compile Include="ForeachTests.cs" />
     <Compile Include="TryCatchTests.cs" />
@@ -75,7 +77,7 @@
     <Compile Include="StaticScopeTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="ObjectSupportTests.cs" />
-    <Compile Include="WithGlobalContext.cs" />
+    <Compile Include="GlobalContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

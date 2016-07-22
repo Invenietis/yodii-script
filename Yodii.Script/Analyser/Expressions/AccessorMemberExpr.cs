@@ -41,12 +41,32 @@ namespace Yodii.Script
             : base( location, left, isStatement, false )
         {
             Name = fieldOrVariableName;
+            var mLeft = left as AccessorMemberExpr;
+            MemberFullName = mLeft != null ? mLeft.MemberFullName + '.' + fieldOrVariableName : fieldOrVariableName;
         }
 
+        /// <summary>
+        /// Gets the name of this member.
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets the full name of this member: this is the <see cref="Name"/> or
+        /// the dotted separated names of all other AccessorMemberExpr on the <see cref="AccessorExpr.Left"/>.
+        /// </summary>
+        public string MemberFullName { get; }
+
+        /// <summary>
+        /// Gets whether this memeber is unbound: its <see cref="AccessorExpr.Left"/> is null.
+        /// An unbound accessor can only resolved by the global context.
+        /// </summary>
         public bool IsUnbound => Left == null;
 
+        /// <summary>
+        /// True is this <see cref="Name"/> matches.
+        /// </summary>
+        /// <param name="memberName">Member name to match.</param>
+        /// <returns>True on success, false otherwise.</returns>
         public override bool IsMember( string memberName ) => memberName == Name;
 
         /// <summary>
@@ -59,9 +79,10 @@ namespace Yodii.Script
         internal protected override T Accept<T>( IExprVisitor<T> visitor ) => visitor.Visit( this );
 
         /// <summary>
-        /// This is just to ease debugging.
+        /// This is just to ease debugging: the whole <see cref="AccessorExpr.Left"/> chain of accessor 
+        /// is displayed.
         /// </summary>
-        /// <returns>Readable expression.</returns>
+        /// <returns>No more than a human readable expression.</returns>
         public override string ToString() => Left == null ? Name : Left.ToString() + '.' + Name;
 
     }

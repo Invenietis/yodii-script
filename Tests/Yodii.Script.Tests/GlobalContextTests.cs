@@ -31,8 +31,44 @@ using NUnit.Framework;
 namespace Yodii.Script.Tests
 {
     [TestFixture]
-    public class WithGlobalContext
+    public class GlobalContextTests
     {
+        [Test]
+        public void successful_namespace_registration()
+        {
+            GlobalContext c = new GlobalContext();
+            c.Register( "Numbers.One", 1 );
+            Assert.That( ScriptEngine.Evaluate( "Numbers.One", c ).ToString(), Is.EqualTo( "1" ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "Numbers.One", 1 ) );
+            c.Register( "Numbers.Two", 2 );
+            Assert.That( ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString(), Is.EqualTo( "3" ) );
+        }
+
+        [Test]
+        public void namespace_can_not_be_registered_on_or_below_a_registered_object()
+        {
+            GlobalContext c = new GlobalContext();
+            c.Register( "Numbers", 1 );
+            Assert.Throws<ArgumentException>( () => c.Register( "Numbers", 2 ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "Numbers.One", 3 ) );
+            c.Register( "X.Numbers", 1 );
+            Assert.Throws<ArgumentException>( () => c.Register( "X.Numbers", 2 ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "X.Numbers.One", 3 ) );
+            Assert.That( ScriptEngine.Evaluate( "X.Numbers", c ).ToString(), Is.EqualTo( "1" ) );
+        }
+
+        [Test]
+        public void object_can_not_be_regitered_on_or_below_a_registered_namespace()
+        {
+            GlobalContext c = new GlobalContext();
+            c.Register( "NS.Sub.NS.Obj", 1 );
+            Assert.Throws<ArgumentException>( () => c.Register( "NS", 2 ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub", 3 ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub.NS", 4 ) );
+            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub.NS.Obj", 5 ) );
+            Assert.That( ScriptEngine.Evaluate( "NS.Sub.NS.Obj", c ).ToString(), Is.EqualTo( "1" ) );
+        }
+
         class Context : GlobalContext
         {
             public double [] AnIntrinsicArray = new double[0];

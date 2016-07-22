@@ -72,5 +72,52 @@ namespace Yodii.Script.Tests
             Assert.That( r.Script, Is.Null );
             Assert.That( r.Text, Is.EqualTo( "There is no tag here." ) );
         }
+
+        class Column
+        {
+            public string Name { get; set; }
+
+            public string Type { get; set; }
+
+            public bool IsPrimaryKey { get; set; }
+        }
+
+        class Table
+        {
+            public List<Column> Columns { get; set; }
+            public string Schema { get; set; }
+
+            public string TableName { get; set; }
+        }
+
+        [Test]
+        public void simple_template_from_Model_object()
+        {
+            var t = new Table()
+            {
+                Schema = "CK",
+                TableName = "tToto",
+                Columns = new List<Column>()
+                {
+                    new Column() { Name = "Id", Type = "int", IsPrimaryKey = true },
+                    new Column() { Name = "Name", Type = "varchar(40)" }
+                }
+            };
+            var c = new GlobalContext();
+            c.Register( "Model", t );
+            var e = new TemplateEngine( c );
+            var r = e.Process(
+                @"create table <%=Model.Schema%>.<%=Model.TableName%> (<%foreach c in Model.Columns {%>
+<%=c.Name%> <%=c.Type%><%if c.IsPrimaryKey {%> primary key<%} if( c.$index < Model.Columns.Count - 1) {%>,<%}}%>
+);" );
+            Assert.That( r.ErrorMessage, Is.Null );
+            Assert.That( r.Script, Is.Not.Null );
+            Assert.That( r.Text, Is.EqualTo( @"create table CK.tToto (
+Id int primary key,
+Name varchar(40)
+);" ) );
+        }
+
+
     }
 }
