@@ -58,6 +58,16 @@ namespace Yodii.Script.Tests
         }
 
         [Test]
+        public void namespace_and_function_simple_demo()
+        {
+            var c = new GlobalContext();
+            Func<string, string> func = s => "N'" + s.Replace( "'", "''" ) + "'";
+            c.Register( "SqlHelper.ToSqlNString", func );
+            Assert.That( ScriptEngine.Evaluate( @" 'hop = ' + SqlHelper.ToSqlNString( ""Aujourd'hui"" )", c ).ToString(),
+                         Is.EqualTo( "hop = N'Aujourd''hui'" ) );
+        }
+
+        [Test]
         public void object_can_not_be_regitered_on_or_below_a_registered_namespace()
         {
             GlobalContext c = new GlobalContext();
