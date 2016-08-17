@@ -337,12 +337,16 @@ namespace Yodii.Script.Tests
         [Test]
         public void multiple_variables_declaration_is_supported_and_they_can_reference_previous_ones()
         {
-            string s = @"let i = 1, j = i*200+34, k = 'a string';
-                         k+i+j;";
+            string s = @"let i = 1, j = 2, k = 'a', sScope;
+                         {
+                            let i *= 10, j = i*1000, k += 'a';
+                            sScope = k+i+j;
+                         }
+                         sScope + '|' + k+i+j";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
                 Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "a string1234" ) );
+                Assert.That( o.ToString(), Is.EqualTo( "aa101000|a12" ) );
             } );
         }
 
@@ -367,9 +371,9 @@ namespace Yodii.Script.Tests
         [TestCase( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
         public void ambiguous_postfix_increment_and_addition_works_like_in_javascript( string add, string result )
         {
-            string s = String.Format( @"let a = 0, b = 0, r = {0};
-                                        'r='+r+', a='+a+', b='+b
-                                        ", add );
+            string s = $@"let a = 0, b = 0;
+                          let r = {add};
+                          'r='+r+', a='+a+', b='+b";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
                 Assert.IsInstanceOf<StringObj>( o );

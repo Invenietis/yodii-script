@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Yodii.Script.AssignExpr" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\AssignExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.BinaryExpr" Collapsed="true">
+    <Position X="7.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAkAAAAAAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\BinaryExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.BlockExpr" Collapsed="true">
+    <Position X="11.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\BlockExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.ConstantExpr" Collapsed="true">
+    <Position X="23" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAABAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\ConstantExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.Expr" Collapsed="true">
+    <Position X="15.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAEAAAAAIAAgAAAAAAQAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\Expr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.FlowBreakingExpr" Collapsed="true">
+    <Position X="9.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAACAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\FlowBreakingExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.ForeachExpr" Collapsed="true">
+    <Position X="16.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAQAAAEAAAgAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\ForeachExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.FunctionExpr" Collapsed="true">
+    <Position X="25.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAABAAQAAAAAAAAAAIAACAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\FunctionExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.IfExpr" Collapsed="true">
+    <Position X="2.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAgAAACAAAAEAAAAAAABAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\IfExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.ListOfExpr" Collapsed="true">
+    <Position X="11.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Analyser\Expressions\ListOfExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.NopExpr" Collapsed="true">
+    <Position X="18.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAACAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\NopExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.PrePostIncDecExpr" Collapsed="true">
+    <Position X="27.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAACAAAAAAAAACAAAAEAAAA=</HashCode>
+      <FileName>Analyser\Expressions\PrePostIncDecExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.SyntaxErrorExpr" Collapsed="true">
+    <Position X="5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AYAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\SyntaxErrorExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.TryCatchExpr" Collapsed="true">
+    <Position X="14" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICAAAAAAAABAAAEAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\TryCatchExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.UnaryExpr" Collapsed="true">
+    <Position X="20.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAEAAAAAAAAAAAAAAAQAAAAAAAAAgA=</HashCode>
+      <FileName>Analyser\Expressions\UnaryExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.WhileExpr" Collapsed="true">
+    <Position X="29.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAAAAAAACAAAAEAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\WhileExpr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

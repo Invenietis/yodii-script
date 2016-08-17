@@ -58,7 +58,6 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Analyser\Expressions\AccessorIndexerExpr.cs" />
     <Compile Include="Analyser\Expressions\AccessorCallExpr.cs" />
     <Compile Include="Analyser\Expressions\AccessorLetExpr.cs" />
     <Compile Include="Analyser\Expressions\AccessorMemberExpr.cs" />
@@ -140,6 +139,8 @@
     <Compile Include="Analyser\SyntaxErrorCollector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Accessor Model.cd" />
+    <None Include="AST.cd" />
     <None Include="EvalVisitor\RuntimeObj\RuntimeObj.cd" />
     <None Include="packages.config" />
   </ItemGroup>

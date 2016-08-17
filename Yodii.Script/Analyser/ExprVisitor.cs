@@ -42,18 +42,11 @@ namespace Yodii.Script
             return lV == e.Left ? e : new AccessorMemberExpr( e.Location, lV, e.Name, e.IsStatement );
         }
 
-        public virtual Expr Visit( AccessorIndexerExpr e )
-        {
-            Expr lV = VisitExpr( e.Left );
-            Expr iV = VisitExpr( e.Index );
-            return lV == e.Left && iV == e.Index ? e : new AccessorIndexerExpr( e.Location, lV, iV, e.IsStatement );
-        }
-
         public virtual Expr Visit( AccessorCallExpr e )
         {
             var lV = VisitExpr( e.Left );
             var aV = Visit( e.Arguments );
-            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV, e.DeclaredFunctions, e.IsStatement );
+            return lV == e.Left && aV == e.Arguments ? e : new AccessorCallExpr( e.Location, lV, aV, e.DeclaredFunctions, e.IsStatement, e.IsIndexer );
         }
 
         public IReadOnlyList<Expr> Visit( IReadOnlyList<Expr> multi )

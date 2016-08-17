@@ -196,16 +196,15 @@ namespace Yodii.Script
         /// Declares an expression in the current scope. Returns either the given <see cref="AccessorLetExpr"/>
         /// or a <see cref="SyntaxErrorExpr"/>.
         /// </summary>
-        /// <param name="name">Name of the expression.</param>
-        /// <param name="e">The expression to register.</param>
-        /// <returns>The expression to register or a syntax error if it can not be registered.</returns>
-        public Expr Declare( string name, AccessorLetExpr e )
+        /// <param name="e">The <see cref="AccessorLetExpr"/> to register.</param>
+        /// <returns>The registered accessor or a syntax error if it can not be registered.</returns>
+        public Expr Declare( AccessorLetExpr e )
         {
             if( _firstScope == null ) return new SyntaxErrorExpr( e.Location, "Invalid declaration (a scope must be opened first)." );
             if( _disallowRegistration ) return new SyntaxErrorExpr( e.Location, "Invalid declaration." );
             var curScope = _firstScope.NextScope ?? _firstScope;
             NameEntry first, newOne;
-            if( _vars.TryGetValue( name, out first ) )
+            if( _vars.TryGetValue( e.Name, out first ) )
             {
                 if( first.E == null )
                 {
@@ -232,7 +231,7 @@ namespace Yodii.Script
                     }
                 }
             }
-            else _vars.Add( name, (first = newOne = new NameEntry( null, e )) );
+            else _vars.Add( e.Name, (first = newOne = new NameEntry( null, e )) );
             curScope.Add( newOne, first );
             return e;
         }

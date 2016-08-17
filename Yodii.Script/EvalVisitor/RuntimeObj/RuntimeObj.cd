@@ -1,19 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Yodii.Script.RefRuntimeObj" Collapsed="true">
-    <Position X="6.5" Y="2.5" Width="1.5" />
+    <Position X="9.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAAAAAAwEAAAAAAAAAAAAAAAAAZAgAAAAAAA=</HashCode>
+      <HashCode>ABAIAAAAAAAAAgwEAAAAAAAAAAAAAAAAAZAgAAAAAAA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\RefRuntimeObj.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Yodii.Script.RuntimeObj" Collapsed="true">
-    <Position X="9.25" Y="1.5" Width="1.5" />
+    <Position X="7" Y="1.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
+    <NestedTypes>
+      <Class Name="Yodii.Script.RuntimeObj.UndefinedObj" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\RuntimeObj\RuntimeObj.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.RuntimeObj.NullObj" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\RuntimeObj\RuntimeObj.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AgAAAEAAAAAgAAwAAAAAAAAAAAIAAAAAAZIAAQAAAKA=</HashCode>
+      <HashCode>AgAIAEAAAAAgAAwAAAAAAAAAAAIAAAAAAZIAAQAAAKA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\RuntimeObj.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -21,7 +33,7 @@
   <Class Name="Yodii.Script.RuntimeSignal" Collapsed="true">
     <Position X="4.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAACZAAAAAAAAA=</HashCode>
+      <HashCode>AAAIAAAAAAAAAAQEAAAAAAAAAAAAAAAACZAAAAAAAAA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\RuntimeSignal.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -40,33 +52,122 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Yodii.Script.BooleanObj" Collapsed="true">
-    <Position X="8.25" Y="2.5" Width="1.5" />
+    <Position X="9" Y="5" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="9.324" Y="2.26" />
+        <Point X="9.324" Y="4.746" />
+        <Point X="9.75" Y="4.746" />
+        <Point X="9.75" Y="5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAZgAAAAAAAA=</HashCode>
+      <HashCode>ABAIAAAAQACAAAAEAAAAAAAAAAAAAAAAAZgAIAAAAAA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\BooleanObj.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Yodii.Script.DoubleObj" Collapsed="true">
-    <Position X="10" Y="2.5" Width="1.5" />
+    <Position X="7.25" Y="5" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="8.684" Y="2.26" />
+        <Point X="8.684" Y="4.746" />
+        <Point X="8" Y="4.746" />
+        <Point X="8" Y="5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAIAAAAQEAAAgAAAAAQAIAEAIAZgAAAAAAIg=</HashCode>
+      <HashCode>ABAIAAAAAIAAAAQEAAAgAAAAAQAIAEAIAZgAAAAAAIg=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\DoubleObj.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Yodii.Script.FunctionObj" Collapsed="true">
-    <Position X="11.75" Y="2.5" Width="1.5" />
+    <Position X="5.5" Y="5" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="8.61" Y="2.26" />
+        <Point X="8.61" Y="4.666" />
+        <Point X="6.438" Y="4.666" />
+        <Point X="6.438" Y="5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAgAAAAAQEAAAAABAAAAAAAAAACZAAAAAAAAA=</HashCode>
+      <HashCode>AAAIAAAAgAAAAAQEAAAAABAAAAAAAAAACZAAAAAAAAA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\FunctionObj.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Yodii.Script.StringObj" Collapsed="true">
-    <Position X="13.5" Y="2.5" Width="1.5" />
+    <Position X="4.5" Y="6" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="8.504" Y="2.26" />
+        <Point X="8.504" Y="4.562" />
+        <Point X="5.25" Y="4.562" />
+        <Point X="5.25" Y="6" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAAAAAAQEgAAAAAQAAAAAAIAAAZAAAAAAAAA=</HashCode>
+      <HashCode>ABAIAAAAAAAAAAQEgAAAAAQAAAAAAMAAAZAAAAAAAAA=</HashCode>
       <FileName>EvalVisitor\RuntimeObj\StringObj.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="1.3" Collapsed="true" />
+    <Lollipop Position="1.3" />
+  </Class>
+  <Class Name="Yodii.Script.NativeFunctionObj" Collapsed="true">
+    <Position X="6.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AgAIAAAAAAAEAAQEAAAAAAAAAEAAAAABAZAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj\NativeFunctionObj.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.RefRuntimeIndexedObj" Collapsed="true">
+    <Position X="9.5" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAQAAAAgAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj\RefRuntimeIndexedObj.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.ExternalObjectObj" Collapsed="true">
+    <Position X="3.5" Y="5" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="8.422" Y="2.26" />
+        <Point X="8.422" Y="4.458" />
+        <Point X="4.25" Y="4.458" />
+        <Point X="4.25" Y="5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAFKQEgAAAAAAAAAAAEIAAAZAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj\ExternalObjectObj.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.JSEvalDate" Collapsed="true">
+    <Position X="8.25" Y="6" Width="1.5" />
+    <InheritanceLine Type="Yodii.Script.RuntimeObj" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="7.75" Y="2.062" />
+        <Point X="7.75" Y="2.26" />
+        <Point X="8.879" Y="2.26" />
+        <Point X="8.879" Y="5.846" />
+        <Point X="8.875" Y="5.846" />
+        <Point X="8.875" Y="6" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>ABAIAAAAAAAAAAQEgAAAAAAAIAgAIIAAAZAAAAAAAgA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj\JSEvalDate.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Right" Position="0.1" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

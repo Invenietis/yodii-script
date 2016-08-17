@@ -124,6 +124,26 @@ namespace Yodii.Script.Tests
         }
 
         [Test]
+        public void intializing_a_masking_variable_from_the_one_it_masks()
+        {
+            string s = @"let x = 10;
+                         function counterBasedOnX()
+                         {
+                             let x = x;
+                             return function() { return ++x; };
+                         }
+                         let f = counterBasedOnX();
+                         // First call to f returns 11, second 12.
+                         // While x here is still 10.
+                         f() + f() + 1000*x;";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                Assert.IsInstanceOf<DoubleObj>( o );
+                Assert.That( o.ToDouble(), Is.EqualTo( 11 + 12 + 1000*10 ) );
+            } );
+        }
+
+        [Test]
         public void closure_with_two_levels()
         {
             string s = @"
@@ -167,11 +187,11 @@ namespace Yodii.Script.Tests
         [Test]
         public void recursive_function()
         {
-            string s = @" function fib(n)
-                          {
-                              return n <= 2 ? 1 : fib(n-2)+fib(n-1);
-                          }
-                          fib(20);";
+            string s = @"function fib(n)
+                         {
+                            return n <= 2 ? 1 : fib(n-2)+fib(n-1);
+                         }
+                         fib(20);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
                 Assert.IsInstanceOf<DoubleObj>( o );

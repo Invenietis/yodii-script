@@ -40,11 +40,12 @@ namespace Yodii.Script
         /// </summary>
         /// <param name="left">Left scope. Must not be null.</param>
         /// <param name="arguments">When null, it is normalized to <see cref="Expr.EmptyArray"/>.</param>
-        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, IReadOnlyList<AccessorLetExpr> declaredFunctions, bool isStatement )
+        public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, IReadOnlyList<AccessorLetExpr> declaredFunctions, bool isStatement, bool isIndexer )
             : base( location, left, isStatement, true )
         {
             _args = arguments ?? Expr.EmptyArray;
             _declaredFunctions = declaredFunctions;
+            IsIndexer = isIndexer;
         }
 
         public override IReadOnlyList<Expr> Arguments => _args;
@@ -54,6 +55,11 @@ namespace Yodii.Script
         /// Can be null.
         /// </summary>
         public IReadOnlyList<AccessorLetExpr> DeclaredFunctions => _declaredFunctions;
+
+        /// <summary>
+        /// Gets whether this call is actually an index: [] instead of ().
+        /// </summary>
+        public bool IsIndexer { get; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -71,7 +77,7 @@ namespace Yodii.Script
         public override string ToString()
         {
             StringBuilder b = new StringBuilder( Left.ToString() );
-            b.Append( '(' );
+            b.Append( IsIndexer ? '[' : '(' );
             bool first = true;
             foreach( var e in Arguments )
             {
@@ -79,7 +85,7 @@ namespace Yodii.Script
                 else b.Append( ',' );
                 b.Append( e.ToString() );
             }
-            b.Append( ')' );
+            b.Append( IsIndexer ? ']' : ')' );
             return b.ToString();
         }
     }

@@ -32,9 +32,10 @@ namespace Yodii.Script
 {
 
     /// <summary>
-    /// There are 4 type of concrete Accessors: <see cref="AccessorMemberExpr"/> for member access, <see cref="AccessorIndexerExpr"/>
-    /// that handles brackets with one and only one [expression], <see cref="AccessorCallExpr"/> that handles calls with parens that 
-    /// contain zero or more arguments and <see cref="AccessorLetExpr"/> that is the definition of a variable.
+    /// There are 4 type of concrete Accessors: <see cref="AccessorMemberExpr"/> for member access, 
+    /// <see cref="AccessorCallExpr"/> that handles calls with parens (or square brackets: this handles indexer
+    /// as well as actual calls) that contain zero or more arguments and <see cref="AccessorLetExpr"/> 
+    /// that is the definition of a variable.
     /// </summary>
     public abstract class AccessorExpr : Expr
     {

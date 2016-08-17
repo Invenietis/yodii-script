@@ -52,14 +52,14 @@ namespace Yodii.Script.Tests
             StaticScope s = new StaticScope();
 
             var v = new AccessorLetExpr( SourceLocation.Empty, "V" );
-            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( "toto", v ) );
+            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( v ) );
             
             s.OpenScope();
-            Assert.AreSame( s.Declare( "toto", v ), v );
-            Assert.AreSame( s.Find( "toto" ), v );
-            CheckClose( s.CloseScope(), "V" );
+            Assert.AreSame( s.Declare( v ), v );
+            Assert.AreSame( s.Find( "V" ), v );
+            CheckClose( s.CloseScope(), v );
             
-            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( "toto", v ) );
+            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( v ) );
         }
 
         [Test]
@@ -68,23 +68,23 @@ namespace Yodii.Script.Tests
             StaticScope s = new StaticScope();
 
             var v = new AccessorLetExpr( SourceLocation.Empty, "V" );
-            var v1 = new AccessorLetExpr( SourceLocation.Empty, "V (redefined)" );
-            var v2 = new AccessorLetExpr( SourceLocation.Empty, "V (redefined again)" );
-            var vFailed = new AccessorLetExpr( SourceLocation.Empty, "V (failed)" );
+            var v1 = new AccessorLetExpr( SourceLocation.Empty, "V" );
+            var v2 = new AccessorLetExpr( SourceLocation.Empty, "V" );
+            var vFailed = new AccessorLetExpr( SourceLocation.Empty, "V" );
 
             s.OpenScope();
 
-            Assert.AreSame( s.Declare( "V", v ), v );
-            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( "V", vFailed ) );
+            Assert.AreSame( s.Declare( v ), v );
+            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( vFailed ) );
 
             s.AllowLocalRedefinition = true;
-            Assert.AreSame( s.Declare( "V", v1 ), v1 );
-            Assert.AreSame( s.Declare( "V", v2 ), v2 );
+            Assert.AreSame( s.Declare( v1 ), v1 );
+            Assert.AreSame( s.Declare( v2 ), v2 );
 
             s.AllowLocalRedefinition = false;
-            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( "V", vFailed ) );
+            Assert.IsInstanceOf<SyntaxErrorExpr>( s.Declare( vFailed ) );
             
-            CheckClose( s.CloseScope(), "V", "V (redefined)", "V (redefined again)" );
+            CheckClose( s.CloseScope(), v, v1, v2 );
         }
 
         [Test]
@@ -93,60 +93,55 @@ namespace Yodii.Script.Tests
             StaticScope s = new StaticScope();
 
             s.OpenScope();
-            s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°1" ) );
-            s.Declare( "V2", new AccessorLetExpr( SourceLocation.Empty, "V2 from scope n°1" ) );
-            s.Declare( "V3", new AccessorLetExpr( SourceLocation.Empty, "V3 from scope n°1" ) );
+            var v1From1 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V1" ) );
+            var v2From1 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V2" ) );
+            var v3From1 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V3" ) );
 
-            CheckDeclVarName( s, "V1", "V1 from scope n°1" );
-            CheckDeclVarName( s, "V2", "V2 from scope n°1" );
-            CheckDeclVarName( s, "V3", "V3 from scope n°1" );
+            Assert.That( s.Find( "V1" ) == v1From1 );
+            Assert.That( s.Find( "V2" ) == v2From1 );
+            Assert.That( s.Find( "V3" ) == v3From1 );
 
             s.OpenScope();
             {
-                s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°2" ) );
-                CheckDeclVarName( s, "V1", "V1 from scope n°2" );
-                CheckDeclVarName( s, "V2", "V2 from scope n°1" );
-                CheckDeclVarName( s, "V3", "V3 from scope n°1" );
+                var v1From2 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V1" ) );
+                Assert.That( s.Find( "V1" ) == v1From2 );
+                Assert.That( s.Find( "V2" ) == v2From1 );
+                Assert.That( s.Find( "V3" ) == v3From1 );
 
                 s.OpenScope();
                 {
-                    s.Declare( "V1", new AccessorLetExpr( SourceLocation.Empty, "V1 from scope n°3" ) );
-                    s.Declare( "V2", new AccessorLetExpr( SourceLocation.Empty, "V2 from scope n°3" ) );
-                    CheckDeclVarName( s, "V1", "V1 from scope n°3" );
-                    CheckDeclVarName( s, "V2", "V2 from scope n°3" );
-                    CheckDeclVarName( s, "V3", "V3 from scope n°1" );
+                    var v1From3 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V1" ) );
+                    var v2From3 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V2" ) );
+                    Assert.That( s.Find( "V1" ) == v1From3 );
+                    Assert.That( s.Find( "V2" ) == v2From3 );
+                    Assert.That( s.Find( "V3" ) == v3From1 );
 
                     s.OpenScope();
                     {
-                        s.Declare( "V3", new AccessorLetExpr( SourceLocation.Empty, "V3 from scope n°4" ) );
-                        CheckDeclVarName( s, "V1", "V1 from scope n°3" );
-                        CheckDeclVarName( s, "V2", "V2 from scope n°3" );
-                        CheckDeclVarName( s, "V3", "V3 from scope n°4" );
-                        CheckClose( s.CloseScope(), "V3 from scope n°4" );
+                        var v3From4 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V3" ) );
+                        Assert.That( s.Find( "V1" ) == v1From3 );
+                        Assert.That( s.Find( "V2" ) == v2From3 );
+                        Assert.That( s.Find( "V3" ) == v3From4 );
+                        CheckClose( s.CloseScope(), v3From4 );
                     }
-                    CheckDeclVarName( s, "V1", "V1 from scope n°3" );
-                    CheckDeclVarName( s, "V2", "V2 from scope n°3" );
-                    CheckDeclVarName( s, "V3", "V3 from scope n°1" );
-                    s.Declare( "V4", new AccessorLetExpr( SourceLocation.Empty, "V4" ) );
-                    s.Declare( "V5", new AccessorLetExpr( SourceLocation.Empty, "V5" ) );
-                    CheckClose( s.CloseScope(), "V1 from scope n°3", "V2 from scope n°3", "V4", "V5" );
+                    Assert.That( s.Find( "V1" ) == v1From3 );
+                    Assert.That( s.Find( "V2" ) == v2From3 );
+                    Assert.That( s.Find( "V3" ) == v3From1 );
+                    var v4From3 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V4" ) );
+                    var v5From3 = (AccessorLetExpr)s.Declare( new AccessorLetExpr( SourceLocation.Empty, "V5" ) );
+                    CheckClose( s.CloseScope(), v1From3, v2From3, v4From3, v5From3 );
                 }
                 Assert.IsNull( s.Find( "V4" ) );
                 Assert.IsNull( s.Find( "V5" ) );
-                CheckClose( s.CloseScope(), "V1 from scope n°2" );
+                CheckClose( s.CloseScope(), v1From2 );
             }
 
-            CheckClose( s.CloseScope(), "V1 from scope n°1", "V2 from scope n°1", "V3 from scope n°1" );
+            CheckClose( s.CloseScope(), v1From1, v2From1, v3From1 );
         }
 
-        static void CheckClose( IReadOnlyList<Expr> close, params string[] names )
+        static void CheckClose( IReadOnlyList<Expr> close, params AccessorLetExpr[] decl )
         {
-            CollectionAssert.AreEqual( names, close.Cast<AccessorLetExpr>().Select( e => e.Name ).ToArray() );
-        }
-
-        static void CheckDeclVarName( StaticScope s, string varName, string name )
-        {
-            Assert.That( ((AccessorLetExpr)s.Find( varName )).Name == name );
+            CollectionAssert.AreEqual( decl, close.Cast<AccessorLetExpr>() );
         }
 
     }

@@ -135,9 +135,10 @@ namespace Yodii.Script
                 {
                     if( _state == null )
                     {
-                        if( _current != null && _current.Expr is AccessorIndexerExpr )
+                        AccessorCallExpr c = _current?.Expr as AccessorCallExpr;
+                        if( c != null && c.IsIndexer && c.Arguments.Count == 1 )
                         {
-                            _state = new FrameState( _current, code, null, _current.Expr.Arguments );
+                            _state = new FrameState( _current, code, null, c.Arguments );
                         }
                         _current = _frame;
                     }
@@ -332,8 +333,6 @@ namespace Yodii.Script
         }
 
         public PExpr Visit( AccessorMemberExpr e ) => Run( new AccessorMemberFrame( this, e ) );
-
-        public PExpr Visit( AccessorIndexerExpr e ) => Run( new AccessorFrame( this, e ) );
 
         public PExpr Visit( AccessorCallExpr e ) => Run( new AccessorCallFrame( this, e ) );
 
