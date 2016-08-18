@@ -22,8 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 
 namespace Yodii.Script
@@ -43,22 +41,6 @@ namespace Yodii.Script
         /// Gets the global context.
         /// </summary>
         GlobalContext Global { get; }
-
-        /// <summary>
-        /// Initializes an accessor state based on a configuration. Returns null if no matching configuration have been found.
-        /// </summary>
-        /// <param name="configuration">Configuration of resolution handlers.</param>
-        /// <returns>Null if no matching configuration have been found.</returns>
-        IAccessorFrameState GetImplementationState( Action<IAccessorFrameInitializer> configuration );
-
-        /// <summary>
-        /// Initializes an accessor state for a call.
-        /// Once arguments are resolved, the <paramref name="call"/> is made.
-        /// </summary>
-        /// <param name="arguments">Arguments of the call.</param>
-        /// <param name="call">Function to call.</param>
-        /// <returns>The frame state that encapsulates the parameters resolution and the call.</returns>
-        IAccessorFrameState GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> call );
 
         /// <summary>
         /// Gets the next accessor if any.
@@ -83,9 +65,27 @@ namespace Yodii.Script
         PExpr SetError( string message = null );
 
         /// <summary>
-        /// Gets whether this frame has been resolved: either <see cref="SetError"/> or <see cref="SetResult"/> has been called.
+        /// Gets whether this frame has been resolved: either <see cref="SetError"/> 
+        /// or <see cref="SetResult"/> has been called.
         /// </summary>
         bool IsResolved { get; }
+
+        /// <summary>
+        /// Initializes an accessor state based on a configuration. 
+        /// Returns null if no matching configuration have been found.
+        /// </summary>
+        /// <param name="configuration">Configuration of resolution handlers.</param>
+        /// <returns>Null if no matching configuration have been found.</returns>
+        IAccessorFrameState GetImplementationState( Action<IAccessorFrameInitializer> configuration );
+
+        /// <summary>
+        /// Initializes an accessor state for a call.
+        /// Once arguments are resolved, the <paramref name="call"/> itself is made.
+        /// </summary>
+        /// <param name="arguments">Arguments of the call.</param>
+        /// <param name="call">Function to call.</param>
+        /// <returns>The frame state that encapsulates the parameters resolution and the call.</returns>
+        IAccessorFrameState GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> call );
 
     }
 

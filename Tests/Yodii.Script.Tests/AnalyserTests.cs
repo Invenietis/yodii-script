@@ -151,17 +151,18 @@ namespace Yodii.Script.Tests
                 p.Reset( "a[9]" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.False );
                 Expr e = a.Analyse( p );
-                Assert.That( e is AccessorIndexerExpr );
-                AccessorIndexerExpr ac = e as AccessorIndexerExpr;
-                IsConstant( ac.Index, 9 );
+                Assert.That( e is AccessorCallExpr );
+                AccessorCallExpr ac = e as AccessorCallExpr;
+                IsConstant( ac.Arguments[0], 9 );
             }
             {
-                p.Reset( "array['Hello World!']" );
+                p.Reset( "array['Hello World!','H']" );
                 Assert.That( p.IsErrorOrEndOfInput, Is.False );
                 Expr e = a.Analyse( p );
-                Assert.That( e is AccessorIndexerExpr );
-                AccessorIndexerExpr ac = e as AccessorIndexerExpr;
-                IsConstant( ac.Index, "Hello World!" );
+                Assert.That( e is AccessorCallExpr );
+                AccessorCallExpr ac = e as AccessorCallExpr;
+                IsConstant( ac.Arguments[0], "Hello World!" );
+                IsConstant( ac.Arguments[1], "H" );
             }
         }
 

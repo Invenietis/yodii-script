@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace Yodii.Script
 {
     /// <summary>
-    /// Manages variables declaration and closures.
+    /// Manages variables declarations and closures.
     /// </summary>
     public class DynamicScope
     {
@@ -72,6 +72,14 @@ namespace Yodii.Script
         /// <returns>The unitialized <see cref="RefRuntimeIndexedObj"/> (undefined).</returns>
         public RefRuntimeIndexedObj Register( AccessorLetExpr local, int index ) => Register( local, new RefRuntimeIndexedObj( index ) );
 
+        /// <summary>
+        /// Registers a <see cref="Closure"/>: its actual <see cref="Closure.Ref"/> hides any current registration
+        /// for its <see cref="Closure.Variable"/>.
+        /// </summary>
+        /// <param name="c">Closure to register.</param>
+        /// <returns>The closure <see cref="RefRuntimeObj"/>.</returns>
+        public virtual RefRuntimeObj Register( Closure c ) => Register( c.Variable, c.Ref );
+
         T Register<T>( AccessorLetExpr local, T refObj  ) where T : RefRuntimeObj
         {
             Entry e;
@@ -83,24 +91,6 @@ namespace Yodii.Script
             else _vars.Add( local, e = new Entry( null, refObj ) );
             Debug.Assert( e.O == refObj );
             return refObj;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Closure"/>: its actual <see cref="Closure.Ref"/> hides any current registration
-        /// for its <see cref="Closure.Variable"/>.
-        /// </summary>
-        /// <param name="c">Closure to register.</param>
-        /// <returns>The closure <see cref="RefRuntimeObj"/>.</returns>
-        public virtual RefRuntimeObj Register( Closure c )
-        {
-            Entry e;
-            if( _vars.TryGetValue( c.Variable, out e ) )
-            {
-                if( e.O == null ) e.O = c.Ref;
-                else e = e.Next = new Entry( e.Next, c.Ref );
-            }
-            else _vars.Add( c.Variable, new Entry( null, c.Ref ) );
-            return c.Ref;
         }
 
         /// <summary>
@@ -127,7 +117,8 @@ namespace Yodii.Script
         }
         
         /// <summary>
-        /// Gets the current value for a given declaration that must have been registered at least once.
+        /// Gets the current value for a given declaration that has necessarily been 
+        /// registered at least once.
         /// </summary>
         /// <param name="r">The declaration.</param>
         /// <returns>The current <see cref="RefRuntimeObj"/> to consider.</returns>

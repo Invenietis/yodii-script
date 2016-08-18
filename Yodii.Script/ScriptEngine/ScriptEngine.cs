@@ -50,26 +50,22 @@ namespace Yodii.Script
         /// <summary>
         /// Gets the breakpoint manager that is used by this engine.
         /// </summary>
-        public BreakpointManager Breakpoints
-        {
-            get { return _breakpoints; }
-        }
+        public BreakpointManager Breakpoints => _breakpoints; 
 
         /// <summary>
-        /// Gets the <see cref="DynamicScope"/>.
+        /// Gets or sets the execution timeout.
+        /// This can be changed at any time.
         /// </summary>
-        protected DynamicScope ScopeManager
+        public TimeSpan Timeout
         {
-            get { return _visitor.ScopeManager; }
+            get { return _visitor.Timeout; }
+            set { _visitor.Timeout = value; }
         }
 
         /// <summary>
         /// Gets the <see cref="GlobalContext"/>.
         /// </summary>
-        public GlobalContext Context
-        {
-            get { return _globalContext; }
-        }
+        public GlobalContext Context => _globalContext; 
 
         /// <summary>
         /// Gets or sets whether the engine should break whenever a runtime error occurred.
@@ -87,6 +83,11 @@ namespace Yodii.Script
         {
             get { return _currentResult != null; }
         }
+
+        /// <summary>
+        /// Gets the <see cref="DynamicScope"/> (for specialized script engine).
+        /// </summary>
+        protected DynamicScope ScopeManager => _visitor.ScopeManager;
 
         /// <summary>
         /// Executes a string by first calling <see cref="ExprAnalyser.AnalyseString"/>.

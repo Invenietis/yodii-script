@@ -149,9 +149,14 @@ namespace Yodii.Script
             if( _parser.IsLogical ) return HandleLogicalExpr( left );
             if( _parser.Match( JSTokenizerToken.Dot ) ) return HandleMember( left );
             if( _parser.Match( JSTokenizerToken.QuestionMark ) ) return HandleTernaryConditional( left );
-            if( _parser.Match( JSTokenizerToken.OpenPar ) ) return HandleCall( left );
-            if( _parser.Match( JSTokenizerToken.OpenSquare ) ) return HandleIndexer( left );
-            if( _parser.IsAssignOperator ) return HandleAssign( left );
+            if( _parser.Match( JSTokenizerToken.OpenPar ) ) return HandleCallOrIndex( left, JSTokenizerToken.ClosePar );
+            if( _parser.Match( JSTokenizerToken.OpenSquare ) ) return HandleCallOrIndex( left, JSTokenizerToken.CloseSquare );
+            if( _parser.IsAssignOperator )
+            {
+                AccessorExpr a = left as AccessorExpr;
+                if( a == null ) return new SyntaxErrorExpr( _parser.Location, "Invalid assignment left-hand side." );
+                return HandleAssign( a, a );
+            }
             if( _parser.CurrentToken == JSTokenizerToken.PlusPlus || _parser.CurrentToken == JSTokenizerToken.MinusMinus ) return HandlePostIncDec( left );
             return new SyntaxErrorExpr( _parser.Location, "Syntax Error." );
         }
@@ -182,19 +187,41 @@ namespace Yodii.Script
 
         Expr HandleLet()
         {
-            var multi = new List<Expr>();
-            do
+            List<AccessorLetExpr> decl = null;
+            List<Expr> multi = null;
+            for( ;;)
             {
                 string name = _parser.ReadIdentifier();
                 if( name == null ) return new SyntaxErrorExpr( _parser.Location, "Expected identifier (variable name)." );
-                Expr e = _scope.Declare( name, new AccessorLetExpr( _parser.PrevNonCommentLocation, name ) );
-                if( _parser.Match( JSTokenizerToken.Assign ) ) e = HandleAssign( e, true );
-                multi.Add( e );
-                if( e is SyntaxErrorExpr ) break;
+                var v = new AccessorLetExpr( _parser.PrevNonCommentLocation, name );
+                Expr e = _parser.IsAssignOperator
+                            ? HandleAssign( v, _scope.Find( name ), name )
+                            : v;
+                Debug.Assert( !(e is SyntaxErrorExpr) );
+                if( _parser.Match( JSTokenizerToken.Comma ) )
+                {
+                    if( multi == null )
+                    {
+                        multi = new List<Expr>();
+                        decl = new List<AccessorLetExpr>();
+                    }
+                    multi.Add( e );
+                    decl.Add( v );
+                }
+                else
+                {
+                    Expr reg = _scope.Declare( v );
+                    if( reg is SyntaxErrorExpr ) return reg;
+                    if( multi == null ) return e;
+                    foreach( var var in decl )
+                    {
+                        reg = _scope.Declare( var );
+                        if( reg is SyntaxErrorExpr ) return reg;
+                    }
+                    multi.Add( e );
+                    return new ListOfExpr( multi );
+                }
             }
-            while( _parser.Match( JSTokenizerToken.Comma ) );
-            if( multi.Count == 1 ) return multi[0];
-            return new ListOfExpr( multi );
         }
 
         Expr HandleFunction()
@@ -205,7 +232,7 @@ namespace Yodii.Script
             if( name != null )
             {
                 funcName = new AccessorLetExpr( _parser.PrevNonCommentLocation, name );
-                Expr eRegName = _scope.Declare( name, funcName );
+                Expr eRegName = _scope.Declare( funcName );
                 if( eRegName is SyntaxErrorExpr ) return eRegName;
             }
             IReadOnlyList<AccessorLetExpr> parameters, closures;
@@ -250,7 +277,7 @@ namespace Yodii.Script
                 while( (pName = _parser.ReadIdentifier()) != null )
                 {
                     AccessorLetExpr param = new AccessorLetExpr( _parser.PrevNonCommentLocation, pName );
-                    Expr eRegParam = _scope.Declare( pName, param );
+                    Expr eRegParam = _scope.Declare( param );
                     if( eRegParam is SyntaxErrorExpr ) return eRegParam;
                     if( !_parser.Match( JSTokenizerToken.Comma ) ) break;
                 }
@@ -260,18 +287,18 @@ namespace Yodii.Script
             return null;
         }
 
-        Expr HandleAssign( Expr left, bool pureAssign = false )
+        Expr HandleAssign( AccessorExpr left, AccessorExpr leftSource, string unboundName = null )
         {
+            Debug.Assert( left != null );
             var location = _parser.Location;
-            AccessorExpr a = left as AccessorExpr;
-            if( a == null ) return new SyntaxErrorExpr( location, "Invalid assignment left-hand side." );
-            if( pureAssign || _parser.Match( JSTokenizerToken.Assign ) )
+            if( _parser.Match( JSTokenizerToken.Assign ) )
             {
-                return new AssignExpr( location, a, Expression( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) ) );
+                return new AssignExpr( location, left, Expression( JSTokenizer.PrecedenceLevel( JSTokenizerToken.Comma ) ) );
             }
+            if( leftSource == null ) leftSource = new AccessorMemberExpr( _parser.Location, null, unboundName, false );
             JSTokenizerToken binaryTokenType = JSTokenizer.FromAssignOperatorToBinary( _parser.CurrentToken );
             _parser.Forward();
-            return new AssignExpr( location, a, new BinaryExpr( location, left, binaryTokenType, Expression( 0 ) ) );
+            return new AssignExpr( location, left, new BinaryExpr( location, leftSource, binaryTokenType, Expression( 2 ) ) );
         }
 
         Expr HandleIf()
@@ -336,7 +363,7 @@ namespace Yodii.Script
             if( name == "let" ) name = _parser.ReadIdentifier();
             if( name == null ) return new SyntaxErrorExpr( _parser.Location, "Expected identifier (variable name)." );
             AccessorLetExpr var = new AccessorLetExpr( _parser.PrevNonCommentLocation, name );
-            Expr e = _scope.Declare( name, var );
+            Expr e = _scope.Declare( var );
             if( e is SyntaxErrorExpr ) return e;
             if( !_parser.MatchIdentifier( "in" ) ) return new SyntaxErrorExpr( _parser.Location, "Expected in keyword." );
             Expr generator = Expression( 0 );
@@ -372,24 +399,12 @@ namespace Yodii.Script
             return new AccessorMemberExpr( _parser.PrevNonCommentLocation, left, id, _parser.Match( JSTokenizerToken.SemiColon ) );
         }
 
-        Expr HandleIndexer( Expr left )
-        {
-            SourceLocation loc = _parser.PrevNonCommentLocation;
-            Expr i = Expression( 0 );
-            if( i is SyntaxErrorExpr ) return i;
-            if( !_parser.Match( JSTokenizerToken.CloseSquare ) )
-            {
-                return new SyntaxErrorExpr( _parser.Location, "Expected ] opened at {0}.", loc );
-            }
-            return new AccessorIndexerExpr( loc, left, i, _parser.Match( JSTokenizerToken.SemiColon ) );
-        }
-
-        Expr HandleCall( Expr left )
+        Expr HandleCallOrIndex( Expr left, JSTokenizerToken closer )
         {
             SourceLocation loc = _parser.PrevNonCommentLocation;
             IList<Expr> parameters = null;
             IReadOnlyList<AccessorLetExpr> declaredFunctions = null;
-            if( !_parser.Match( JSTokenizerToken.ClosePar ) )
+            if( !_parser.Match( closer ) )
             {
                 _scope.OpenScope();
                 for( ;;)
@@ -400,16 +415,16 @@ namespace Yodii.Script
                     if( parameters == null ) parameters = new List<Expr>();
                     parameters.Add( e );
 
-                    if( _parser.Match( JSTokenizerToken.ClosePar ) ) break;
+                    if( _parser.Match( closer ) ) break;
                     if( !_parser.Match( JSTokenizerToken.Comma ) )
                     {
-                        return new SyntaxErrorExpr( _parser.Location, "Expected ) opened at {0}.", loc );
+                        return new SyntaxErrorExpr( _parser.Location, $"Expected {closer} opened at {0}.", loc );
                     }
                 }
                 declaredFunctions = _scope.CloseScope();
             }
             var arguments = parameters != null ? parameters.ToArray() : Expr.EmptyArray;
-            return new AccessorCallExpr( loc, left, arguments, declaredFunctions, _parser.Match( JSTokenizerToken.SemiColon ) );
+            return new AccessorCallExpr( loc, left, arguments, declaredFunctions, _parser.Match( JSTokenizerToken.SemiColon ), closer == JSTokenizerToken.CloseSquare );
         }
 
         Expr HandleIdentifier()

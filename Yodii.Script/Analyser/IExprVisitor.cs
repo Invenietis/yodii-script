@@ -25,14 +25,13 @@ using System;
 namespace Yodii.Script
 {
     /// <summary>
-    /// Basic visitor contract: it is parametrized with the returns type of the visit methods.
+    /// Basic visitor contract: it is parametrized with the return type of the visit methods.
     /// </summary>
-    /// <typeparam name="T">Type of the returns value of the visit methods.</typeparam>
+    /// <typeparam name="T">Type of the visit methods' return value.</typeparam>
     public interface IExprVisitor<out T>
     {
         T VisitExpr( Expr e );
         T Visit( AccessorMemberExpr e );
-        T Visit( AccessorIndexerExpr e );
         T Visit( AccessorCallExpr e );
         T Visit( BinaryExpr e );
         T Visit( ConstantExpr e );

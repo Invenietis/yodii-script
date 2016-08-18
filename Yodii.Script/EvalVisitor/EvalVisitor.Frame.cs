@@ -88,7 +88,7 @@ namespace Yodii.Script
             public PExpr PendingOrSignal( PExpr sub )
             {
                 Debug.Assert( sub.IsPendingOrSignal );
-                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.DeferredStatus );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.PendingStatus );
             }
 
             public bool IsPendingOrSignal( ref PExpr current, Expr e )
@@ -106,7 +106,7 @@ namespace Yodii.Script
                 if( e != null && !(e.Expr is SyntaxErrorExpr) && _visitor.EnableFirstChanceError )
                 {
                     _visitor.FirstChanceError = e;
-                    return new PExpr( this, PExpr.DeferredKind.FirstChanceError );
+                    return new PExpr( this, PExprKind.FirstChanceError );
                 }
                 return new PExpr( (_result = result) );
             }

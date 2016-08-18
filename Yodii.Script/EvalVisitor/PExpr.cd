@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Yodii.Script.Expr">
+    <Position X="6.25" Y="2.5" Width="2" />
+    <Members>
+      <Field Name="EmptyArray" Hidden="true" />
+      <Method Name="Expr" Hidden="true" />
+      <Property Name="IsNop" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAEAAAAAIAAgAAAAAAQAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Analyser\Expressions\Expr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.RuntimeObj" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAIAEAAAAAgAAwAAAAAAAAAAAIAAAAAAZIAAQAAAKA=</HashCode>
+      <FileName>EvalVisitor\RuntimeObj\RuntimeObj.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Struct Name="Yodii.Script.PExpr">
+    <Position X="0.5" Y="0.5" Width="2.25" />
+    <Members>
+      <Field Name="Frame" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <AssociationLine Name="Deferred" Type="Yodii.Script.IDeferredExpr">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.034" Y="0.081" Height="0.182" Width="0.871" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Result" Type="Yodii.Script.RuntimeObj">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.235" Y="0.088" Height="0.182" Width="0.798" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="PendingStatus" Type="Yodii.Script.PExprKind">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.214" Y="0.074" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAYEAEAAgAQAAAABAAAAAAAAAAAMBAE=</HashCode>
+      <FileName>EvalVisitor\PExpr.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Result" />
+      <Field Name="PendingStatus" />
+      <Property Name="Deferred" />
+    </ShowAsAssociation>
+  </Struct>
+  <Interface Name="Yodii.Script.IDeferredExpr">
+    <Position X="3.75" Y="2.25" Width="1.75" />
+    <AssociationLine Name="Expr" Type="Yodii.Script.Expr">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.075" Y="0.074" Height="0.162" Width="0.597" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAQAAAAFAAAACAAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\IDeferredExpr.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Expr" />
+    </ShowAsAssociation>
+  </Interface>
+  <Enum Name="Yodii.Script.PExprKind">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAEAAAAAAIAAAAIAAAAAAAEAAAA=</HashCode>
+      <FileName>EvalVisitor\PExprKind.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

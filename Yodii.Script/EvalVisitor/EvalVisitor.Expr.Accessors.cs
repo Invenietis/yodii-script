@@ -27,6 +27,7 @@ using System.Text;
 using System.Diagnostics;
 
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
@@ -75,12 +76,12 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// This frame applies as-is to Indexer. 
+        /// This is the base frame for accessors. 
         /// AccessorMemberFrame specializes it to lookup the GlobalContext if the member is unbound.
         /// For let, there is no frame: visiting a let accessor simply does the lookup in the dynamic scope.
         /// AccessorCallFrame specializes it to register any named functions declared as parameters.
         /// </summary>
-        internal class AccessorFrame : Frame<AccessorExpr>, IAccessorFrame
+        internal abstract class AccessorFrame : Frame<AccessorExpr>, IAccessorFrame
         {
             class FrameState : ArgumentResolver, IAccessorFrameState
             {
@@ -135,9 +136,10 @@ namespace Yodii.Script
                 {
                     if( _state == null )
                     {
-                        if( _current != null && _current.Expr is AccessorIndexerExpr )
+                        AccessorCallExpr c = _current?.Expr as AccessorCallExpr;
+                        if( c != null && c.IsIndexer && c.Arguments.Count == 1 )
                         {
-                            _state = new FrameState( _current, code, null, _current.Expr.Arguments );
+                            _state = new FrameState( _current, code, null, c.Arguments );
                         }
                         _current = _frame;
                     }
@@ -170,7 +172,7 @@ namespace Yodii.Script
             }
 
             /// <summary>
-            /// Implementation valid for AccessorIndexerFrame and AccessorCallFrame.
+            /// Implementation valid for AccessorCallFrame.
             /// The AccessorMemberFrame substitutes it.
             /// </summary>
             protected override PExpr DoVisit()
@@ -233,7 +235,7 @@ namespace Yodii.Script
                 return SetResult( new RuntimeError( Expr, GetAccessErrorMessage(), true ) );
             }
 
-            protected virtual string GetAccessErrorMessage() => "Indexer is not supported.";
+            protected abstract string GetAccessErrorMessage();
 
             protected PExpr ReentrantPendingOrSignal( PExpr sub )
             {
@@ -243,7 +245,7 @@ namespace Yodii.Script
                     Debug.Assert( Result == sub.Result );
                     return sub;
                 }
-                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.DeferredStatus );
+                return sub.IsResolved ? SetResult( sub.Result ) : new PExpr( this, sub.PendingStatus );
             }
 
             protected PExpr ReentrantSetResult( RuntimeObj result )
@@ -307,7 +309,7 @@ namespace Yodii.Script
             internal protected AccessorCallFrame( EvalVisitor visitor, AccessorCallExpr e )
                 : base( visitor, e )
             {
-                var declaredFunc = ((AccessorCallExpr)Expr).DeclaredFunctions;
+                var declaredFunc = Expr.DeclaredFunctions;
                 if( declaredFunc != null )
                 {
                     foreach( var df in declaredFunc )
@@ -316,11 +318,14 @@ namespace Yodii.Script
                     }
                 }
             }
-            protected override string GetAccessErrorMessage() => "Not a function.";
+
+            public new AccessorCallExpr Expr => (AccessorCallExpr)base.Expr;
+
+            protected override string GetAccessErrorMessage() => Expr.IsIndexer ? "Indexer is not supported." : "Not a function.";
 
             protected override void OnDispose()
             {
-                var declaredFunc = ((AccessorCallExpr)Expr).DeclaredFunctions;
+                var declaredFunc = Expr.DeclaredFunctions;
                 if( declaredFunc != null )
                 {
                     foreach( var df in declaredFunc )
@@ -332,8 +337,6 @@ namespace Yodii.Script
         }
 
         public PExpr Visit( AccessorMemberExpr e ) => Run( new AccessorMemberFrame( this, e ) );
-
-        public PExpr Visit( AccessorIndexerExpr e ) => Run( new AccessorFrame( this, e ) );
 
         public PExpr Visit( AccessorCallExpr e ) => Run( new AccessorCallFrame( this, e ) );
 

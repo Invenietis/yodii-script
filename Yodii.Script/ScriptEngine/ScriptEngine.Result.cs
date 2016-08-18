@@ -97,13 +97,13 @@ namespace Yodii.Script
                 if( r.AsErrorResult != null ) _status |= ScriptEngineStatus.IsError;
                 if( r.IsPending )
                 {
-                    Debug.Assert( r.DeferredStatus != PExpr.DeferredKind.None );
-                    switch( r.DeferredStatus )
+                    Debug.Assert( r.PendingStatus != PExprKind.None );
+                    switch( r.PendingStatus )
                     {
-                        case PExpr.DeferredKind.Timeout: _status |= ScriptEngineStatus.Timeout; break;
-                        case PExpr.DeferredKind.Breakpoint: _status |= ScriptEngineStatus.Breakpoint; break;
-                        case PExpr.DeferredKind.AsyncCall: _status |= ScriptEngineStatus.AsyncCall; break;
-                        case PExpr.DeferredKind.FirstChanceError: _status |= ScriptEngineStatus.FirstChanceError; break;
+                        case PExprKind.Timeout: _status |= ScriptEngineStatus.Timeout; break;
+                        case PExprKind.Breakpoint: _status |= ScriptEngineStatus.Breakpoint; break;
+                        case PExprKind.AsyncCall: _status |= ScriptEngineStatus.AsyncCall; break;
+                        case PExprKind.FirstChanceError: _status |= ScriptEngineStatus.FirstChanceError; break;
                         default: Debug.Fail( "UpdateStatus" ); break;
                     }
                 }

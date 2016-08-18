@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Yodii.Script.BreakpointManager">
+    <Position X="4.75" Y="0.5" Width="2.25" />
+    <Members>
+      <Field Name="_breakAlways" Hidden="true" />
+      <Field Name="_breakpoints" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAFEAAAAAAAgAAAAAAAAAACAQBIAA=</HashCode>
+      <FileName>ScriptEngine\BreakpointManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Yodii.Script.ScriptEngine">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <Members>
+      <Field Name="_breakpoints" Hidden="true" />
+      <Field Name="_currentResult" Hidden="true" />
+      <Field Name="_globalContext" Hidden="true" />
+      <Field Name="_visitor" Hidden="true" />
+      <Method Name="OnStopExecution" Hidden="true" />
+      <Method Name="StartExecution" Hidden="true" />
+      <Method Name="StopExecution" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="Yodii.Script.ScriptEngine.Result">
+        <Members>
+          <Field Name="_engine" Hidden="true" />
+          <Field Name="_error" Hidden="true" />
+          <Field Name="_result" Hidden="true" />
+          <Field Name="_status" Hidden="true" />
+          <Field Name="_visitor" Hidden="true" />
+          <Method Name="Result" Hidden="true" />
+          <Method Name="UpdateStatus" Hidden="true" />
+        </Members>
+        <TypeIdentifier>
+          <NewMemberFileName>ScriptEngine\ScriptEngine.Result.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <AssociationLine Name="Breakpoints" Type="Yodii.Script.BreakpointManager">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.381" Y="0.074" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAQQAAAgAAgAQAAEAAAwDAAAAAAAIAAAAACQAAAgA=</HashCode>
+      <FileName>ScriptEngine\ScriptEngine.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Breakpoints" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Yodii.Script.GlobalContext">
+    <Position X="6" Y="3.5" Width="3.25" />
+    <Members>
+      <Field Name="_epoch" Hidden="true" />
+      <Field Name="_invalidNameChars" Hidden="true" />
+      <Field Name="_namespaces" Hidden="true" />
+      <Field Name="_objects" Hidden="true" />
+      <Field Name="_types" Hidden="true" />
+      <Method Name="Create" Hidden="true" />
+      <Method Name="CreateBoolean" Hidden="true" />
+      <Method Name="CreateDateTime" Hidden="true" />
+      <Method Name="CreateNumber" Hidden="true" />
+      <Method Name="CreateString" Hidden="true" />
+      <Method Name="SplitNamespace" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQQUAAAQQAAAAAAAAQAABAEAAAAAAAABQMQA=</HashCode>
+      <FileName>EvalVisitor\GlobalContext.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="Yodii.Script.ScriptEngineStatus">
+    <Position X="3.75" Y="4" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAEEAAAAAAIIBAAIABAAAAAEAAAA=</HashCode>
+      <FileName>ScriptEngine\ScriptEngineStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
