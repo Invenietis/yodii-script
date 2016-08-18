@@ -32,7 +32,6 @@ namespace Yodii.Script
     
     public interface IAccessorFrameInitializer
     {
-
         /// <summary>
         /// Register a member name selector.
         /// </summary>

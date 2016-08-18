@@ -28,7 +28,6 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
-
     /// <summary>
     /// Promise of an <see cref="Expr"/>: either a resolved <see cref="RuntimeObj"/> or a <see cref="IDeferredExpr"/>.
     /// </summary>
@@ -36,99 +35,67 @@ namespace Yodii.Script
     {
         internal readonly EvalVisitor.Frame Frame;
         public readonly RuntimeObj Result;
-        public readonly DeferredKind DeferredStatus;
+        public readonly PExprKind PendingStatus;
 
         /// <summary>
-        /// Describes the pending reason.
+        /// Describes the pending reason of a <see cref="PExpr"/>.
         /// </summary>
-        public enum DeferredKind
-        {
-            /// <summary>
-            /// Not pending.
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// A breakpoint has been reached.
-            /// </summary>
-            Breakpoint = 1,
-
-            /// <summary>
-            /// An asynchronous call is being processed.
-            /// </summary>
-            AsyncCall = 2,
-
-            /// <summary>
-            /// A timeout occurred.
-            /// </summary>
-            Timeout = 3,
-
-            /// <summary>
-            /// An error occured.
-            /// </summary>
-            FirstChanceError = 4
-
-        }
-
-        internal PExpr( EvalVisitor.Frame pending, DeferredKind status )
+        internal PExpr( EvalVisitor.Frame pending, PExprKind status )
             : this( pending, null, status )
         {
         }
 
         public PExpr( RuntimeObj resultOrSignal )
-            : this( null, resultOrSignal, DeferredKind.None )
+            : this( null, resultOrSignal, PExprKind.None )
         {
         }
 
-        PExpr( EvalVisitor.Frame pending, RuntimeObj resultOrSignal, DeferredKind status )
+        PExpr( EvalVisitor.Frame pending, RuntimeObj resultOrSignal, PExprKind status )
         {
             Frame = pending;
             Result = resultOrSignal;
-            DeferredStatus = status;
+            PendingStatus = status;
         }
 
         /// <summary>
         /// Gets the <see cref="IDeferredExpr"/> if <see cref="Result"/> is null.
         /// </summary>
-        public IDeferredExpr Deferred
-        {
-            get { return Frame; }
-        }
+        public IDeferredExpr Deferred => Frame; 
 
         /// <summary>
         /// Gets whether this is an unitialized PExpr: its <see cref="Result"/> and <see cref="Deferred"/> are both null.
         /// </summary>
-        public bool IsUnknown { get { return Result == null && Deferred == null; } }
+        public bool IsUnknown => Result == null && Deferred == null;
 
         /// <summary>
         /// Gets whether this PExpr is resolved and <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
         /// </summary>
-        public bool IsSignal { get { return Result is RuntimeSignal; } }
+        public bool IsSignal => Result is RuntimeSignal;
 
         /// <summary>
         /// Gets the resolved <see cref="Result"/> as a <see cref="RuntimeError"/> if it is an error. 
         /// (A RuntimeError is a <see cref="RuntimeSignal"/>.)
         /// </summary>
-        public RuntimeError AsErrorResult { get { return Result as RuntimeError; } }
+        public RuntimeError AsErrorResult => Result as RuntimeError;
 
         /// <summary>
         /// Gets whether the <see cref="Deferred"/> is not null (and the <see cref="Result"/> is null).
         /// </summary>
-        public bool IsPending { get { return Deferred != null; } }
+        public bool IsPending => Deferred != null;
         
         /// <summary>
         /// Gets whether a <see cref="Result"/> exists (it can be a <see cref="RuntimeSignal"/>).
         /// </summary>
-        public bool IsResolved { get { return Result != null; } }
+        public bool IsResolved => Result != null;
 
         /// <summary>
         /// Gets whether this PExpr is pending (<see cref="Deferred"/> is not null) or <see cref="Result"/> is a <see cref="RuntimeSignal"/>.
         /// </summary>
-        public bool IsPendingOrSignal { get { return Deferred != null || IsSignal; } }
+        public bool IsPendingOrSignal => Deferred != null || IsSignal;
 
         public override string ToString()
         {
-            string sP = Deferred != null ? string.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, DeferredStatus ) : null;
+            string sP = Deferred != null ? string.Format( "({2} - {0}), Expr: {1}", Deferred.GetType().Name, Deferred.Expr, PendingStatus ) : null;
             string sR = Result != null ? string.Format( "({0}), Value = {1}", Result.GetType().Name, Result ) : null;
             return sP ?? sR ?? "(Unknown)";
         }

@@ -79,6 +79,7 @@
     <Compile Include="Analyser\Expressions\UnaryExpr.cs" />
     <Compile Include="Analyser\StaticScope.cs" />
     <Compile Include="EvalVisitor\Closure.cs" />
+    <Compile Include="EvalVisitor\PExprKind.cs" />
     <Compile Include="EvalVisitor\DynamicScope.cs" />
     <Compile Include="EvalVisitor\EvalExtensions.cs" />
     <Compile Include="EvalVisitor\EvalVisitor.Expr.Accessors.cs" />
@@ -141,8 +142,11 @@
   <ItemGroup>
     <None Include="Accessor Model.cd" />
     <None Include="AST.cd" />
+    <None Include="EvalVisitor\EvalVisitor.cd" />
+    <None Include="EvalVisitor\PExpr.cd" />
     <None Include="EvalVisitor\RuntimeObj\RuntimeObj.cd" />
     <None Include="packages.config" />
+    <None Include="ScriptEngine\ScriptEngine.cd" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

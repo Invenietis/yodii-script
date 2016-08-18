@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Yodii.Script.EvalVisitor">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <Members>
+      <Field Name="_breakOnNext" Hidden="true" />
+      <Field Name="_breakpoints" Hidden="true" />
+      <Field Name="_currentFrame" Hidden="true" />
+      <Field Name="_enableFirstChanceError" Hidden="true" />
+      <Field Name="_firstChanceError" Hidden="true" />
+      <Field Name="_firstFrame" Hidden="true" />
+      <Field Name="_global" Hidden="true" />
+      <Field Name="_hasTimeout" Hidden="true" />
+      <Field Name="_timeLimit" Hidden="true" />
+      <Field Name="_timeout" Hidden="true" />
+      <Method Name="Run" Hidden="true" />
+      <Field Name="ScopeManager" Hidden="true" />
+      <Method Name="StepOver" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Class Name="Yodii.Script.EvalVisitor.AccessorCallFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Accessors.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.AssignExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Assign.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.AccessorMemberFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Accessors.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Enum Name="Yodii.Script.EvalVisitor.StepOverKind" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="Yodii.Script.EvalVisitor.AccessorFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Accessors.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.ForeachExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Foreach.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.BinaryExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Binary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.FunctionExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Function.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.PrePostIncDecExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.PrePostIncDec.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.UnaryExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Unary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.TryCatchExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.TryCatch.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.BlockExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Block.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.Frame&lt;T&gt;" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Frame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.Frame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Frame.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.ArgumentResolver" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.Accessors.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.FlowBreakingExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.FlowBreaking.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.WhileExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.While.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.ListOfExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.ListOf.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Yodii.Script.EvalVisitor.IfExprFrame" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>EvalVisitor\EvalVisitor.Expr.If.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <AssociationLine Name="CurrentFrame" Type="Yodii.Script.IDeferredExpr">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.214" Y="0.088" Height="0.182" Width="1.193" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AACAAYAAAAAABAQAAkAAAIAAQIQAAEIIAAIAQyABABM=</HashCode>
+      <FileName>EvalVisitor\EvalVisitor.Expr.Assign.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CurrentFrame" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Yodii.Script.IDeferredExpr">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAQAAAAFAAAACAAAAAAAAAA=</HashCode>
+      <FileName>EvalVisitor\IDeferredExpr.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -170,19 +170,20 @@ namespace Yodii.Script.Tests
         [Test]
         public void closure_and_immediately_invoked_function_expression_IIFE()
         {
-            string s = @"
-                        let i = 10, j = 10; 
-                        (function() { 
-                          i = j + i; 
-                        })();
-                        i.ToString();
-                        ";
-            TestHelper.RunNormalAndStepByStep( s, o =>
+            string script = @"
+                            let i = 10, j = 10; 
+                            (function() { 
+                              i = j + i; 
+                            })();
+                            i.ToString();
+                            ";
+            TestHelper.RunNormalAndStepByStep( script, o =>
             {
                 Assert.IsInstanceOf<StringObj>( o );
                 Assert.That( o.ToString(), Is.EqualTo( "20" ) );
             } );
         }
+
 
         [Test]
         public void recursive_function()
@@ -198,6 +199,7 @@ namespace Yodii.Script.Tests
                 Assert.That( o.ToDouble(), Is.EqualTo( 6765 ) );
             } );
         }
+
 
         [Test]
         public void returning_a_closed_variable_does_not_return_the_reference()

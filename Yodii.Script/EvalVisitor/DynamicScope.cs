@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace Yodii.Script
 {
     /// <summary>
-    /// Manages variables declaration and closures.
+    /// Manages variables declarations and closures.
     /// </summary>
     public class DynamicScope
     {
@@ -117,7 +117,8 @@ namespace Yodii.Script
         }
         
         /// <summary>
-        /// Gets the current value for a given declaration that must have been registered at least once.
+        /// Gets the current value for a given declaration that has necessarily been 
+        /// registered at least once.
         /// </summary>
         /// <param name="r">The declaration.</param>
         /// <returns>The current <see cref="RefRuntimeObj"/> to consider.</returns>

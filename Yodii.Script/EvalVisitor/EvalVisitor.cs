@@ -81,7 +81,8 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Gets or sets the timeout limit: <see cref="TimeSpan.Zero"/> and 
+        /// Gets or sets the timeout limit: <see cref="TimeSpan.Zero"/> and <see cref="TimeSpan.MaxValue"/>
+        /// are both no timeout at all.
         /// </summary>
         public TimeSpan Timeout
         {
@@ -159,11 +160,11 @@ namespace Yodii.Script
                 if( _breakOnNext || _breakpoints( f.Expr ) )
                 {
                     _breakOnNext = false;
-                    return new PExpr( f, PExpr.DeferredKind.Breakpoint );
+                    return new PExpr( f, PExprKind.Breakpoint );
                 }
                 if( _hasTimeout && _timeLimit <= DateTime.UtcNow )
                 {
-                    return new PExpr( f, PExpr.DeferredKind.Timeout );
+                    return new PExpr( f, PExprKind.Timeout );
                 }
             }
             return f.VisitAndClean();
