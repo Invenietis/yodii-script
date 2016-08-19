@@ -25,7 +25,7 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("Yodii.Script")]
 [assembly: AssemblyCompany("Invenietis")]
-[assembly: AssemblyCopyright("Copyright (c) Invenietis, IN'TECH INFO 2013-2015")]
+[assembly: AssemblyCopyright("Copyright (c) Invenietis, IN'TECH 2013-2016")]
 [assembly: AssemblyTrademark("")]
 
 

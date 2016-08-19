@@ -3,8 +3,8 @@
   <metadata >
     <id>Yodii.Script</id>
     <version>$version$</version>
-    <authors>Sample Inc.</authors>
-    <owners>Sample Inc.</owners>
+    <authors>Invenietis</authors>
+    <owners>Invenietis</owners>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
     <projectUrl>https://github.com/SampleInc/Project</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
