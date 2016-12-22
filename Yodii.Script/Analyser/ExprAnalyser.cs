@@ -64,7 +64,8 @@ namespace Yodii.Script
 
             /// <summary>
             /// Gets or sets whether redefinition of a name in the same scope is possible. 
-            /// This is allowed in javascript even with "use strict" but here it defaults to false since I consider this a dangerous and useless feature.
+            /// This is allowed in javascript even with "use strict" for 'var' (but not for 'let' or 'const').
+            /// It defaults to false: this a dangerous and useless "feature".
             /// </summary>
             public bool AllowLocalRedefinition { get; set; }
 

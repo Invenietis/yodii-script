@@ -27,6 +27,7 @@ using System.Text;
 using NUnit.Framework;
 using Yodii.Script;
 using CK.Core;
+using System.Globalization;
 
 namespace Yodii.Script.Tests
 {
@@ -34,7 +35,7 @@ namespace Yodii.Script.Tests
     public class TokenizerTests
     {
         [Test]
-        public void RoundtripParsing()
+        public void round_trip_Parsing()
         {
             JSTokenizer p = new JSTokenizer();
             Assert.That( JSTokenizer.Explain( JSTokenizerToken.Integer ), Is.EqualTo( "42" ) );
@@ -68,6 +69,19 @@ namespace Yodii.Script.Tests
             JSTokenizer p = new JSTokenizer( num );
             Assert.That( p.IsErrorOrEndOfInput, Is.True );
             Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
+        }
+
+        [TestCase( "45.98" )]
+        [TestCase( ".0" )]
+        [TestCase( ".0e4" )]
+        [TestCase( "876.098E-3" )]
+        public void parsing_floats( string num )
+        {
+            JSTokenizer p = new JSTokenizer( num );
+            Assert.That( p.CurrentToken, Is.EqualTo( JSTokenizerToken.Float ) );
+            Assert.That( p.ReadDouble(), Is.EqualTo( double.Parse( num, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture ) ) );
+            Assert.That( !p.Forward() );
+            Assert.That( p.IsEndOfInput, Is.True );
         }
 
         [TestCase( @"""a""", "a" )]
