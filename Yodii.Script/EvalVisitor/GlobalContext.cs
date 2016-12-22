@@ -36,6 +36,25 @@ namespace Yodii.Script
         readonly Dictionary<Type, ExternalTypeHandler> _types;
         readonly Dictionary<string, RuntimeObj> _objects;
         readonly HashSet<string> _namespaces;
+        WithScope _currentWithScope;
+
+        class WithScope : IAccessorVisitor, IDisposable
+        {
+            readonly GlobalContext _ctx;
+            readonly WithScope _parent;
+            readonly RuntimeObj _o;
+
+            public WithScope( GlobalContext ctx, RuntimeObj o )
+            {
+                _ctx = ctx;
+                _parent = _ctx._currentWithScope;
+                _ctx._currentWithScope = this;
+                _o = o;
+            }
+            public void Dispose() => _ctx._currentWithScope = _parent;
+
+            public PExpr Visit( IAccessorFrame frame ) => _o.Visit( frame );
+        }
 
         public GlobalContext()
         {
@@ -110,6 +129,16 @@ namespace Yodii.Script
         public bool Unregister( string name )
         {
             return _objects.Remove( name );
+        }
+
+        /// <summary>
+        /// Opens a scope on a object.
+        /// </summary>
+        /// <param name="o">The scope object.</param>
+        /// <returns></returns>
+        public IDisposable OpenWithScope( RuntimeObj o )
+        {
+            return new WithScope( this, o );
         }
 
         [Obsolete]
@@ -192,11 +221,28 @@ namespace Yodii.Script
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
+           IAccessorMemberFrame head = frame as IAccessorMemberFrame;
+            // We can only handle member access at the root level:
+            if( head == null ) return frame.SetError();
+            if( _currentWithScope != null )
+            {
+                var lookup = EvalVisitor.AccessorFrameLookup.Create( head );
+                PExpr p = _currentWithScope.Visit( lookup );
+                if( p.AsErrorResult == null )
+                {
+
+                }
+            }
+
+
+            // Lookup from the longest path to the head in registered objects:
+            // more "precise" objects mask root ones.
             var deepestMemberFrame = frame.NextAccessors( true )
                                             .Select( f => f as IAccessorMemberFrame )
                                             .TakeWhile( f => f != null )
                                             .LastOrDefault();
-            while( deepestMemberFrame != null )
+            // We obtain at least the head, hence the do...while.
+            do
             {
                 RuntimeObj obj;
                 if( _objects.TryGetValue( deepestMemberFrame.Expr.MemberFullName, out obj ) )
@@ -205,6 +251,7 @@ namespace Yodii.Script
                 }
                 deepestMemberFrame = deepestMemberFrame.PrevMemberAccessor;
             }
+            while( deepestMemberFrame != null );
             var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {

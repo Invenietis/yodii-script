@@ -57,8 +57,8 @@ namespace Yodii.Script
         public string MemberFullName { get; }
 
         /// <summary>
-        /// Gets whether this memeber is unbound: its <see cref="AccessorExpr.Left"/> is null.
-        /// An unbound accessor can only resolved by the global context.
+        /// Gets whether this member is unbound: its <see cref="AccessorExpr.Left"/> is null.
+        /// An unbound accessor can be only resolved by the global context.
         /// </summary>
         public bool IsUnbound => Left == null;
 

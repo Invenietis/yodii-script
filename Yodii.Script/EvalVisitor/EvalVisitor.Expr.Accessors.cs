@@ -121,7 +121,7 @@ namespace Yodii.Script
                     _current = _frame = f;
                 }
 
-                public FrameState State { get { return _state; } }
+                public FrameState State => _state;
 
                 public IAccessorFrameInitializer On( string memberName )
                 {
@@ -217,7 +217,7 @@ namespace Yodii.Script
 
             public override PExpr SetResult( RuntimeObj result )
             {
-                // NextFrame is actualy the PreviousAccessor
+                // NextFrame is actually the PreviousAccessor
                 IAccessorFrame p = NextFrame as IAccessorFrame;
                 if( p != null && !p.IsResolved ) p.SetResult( result );
                 return base.SetResult( result );
@@ -235,7 +235,7 @@ namespace Yodii.Script
                 return SetResult( new RuntimeError( Expr, GetAccessErrorMessage(), true ) );
             }
 
-            protected abstract string GetAccessErrorMessage();
+            internal protected abstract string GetAccessErrorMessage();
 
             protected PExpr ReentrantPendingOrSignal( PExpr sub )
             {
@@ -335,6 +335,59 @@ namespace Yodii.Script
                 }
             }
         }
+
+        /// <summary>
+        /// This class implements a "fake" IAccessorMemberFrame on a real one but without the next accessor.
+        /// This is used to lookup the existence of a member name via IAccessorVisitor.Visit( IAccessorFrame frame )
+        /// without the need to support an explicit lookup method on members.
+        /// </summary>
+        internal class AccessorFrameLookup : IAccessorMemberFrame
+        {
+            readonly AccessorMemberFrame _f;
+
+            AccessorFrameLookup( AccessorMemberFrame f )
+            {
+                _f = f;
+            }
+
+            public static AccessorFrameLookup Create( IAccessorMemberFrame f )
+            {
+                return f as AccessorFrameLookup ?? new AccessorFrameLookup( (AccessorMemberFrame)f );
+            }
+
+            public AccessorMemberExpr Expr => _f.Expr;
+
+            public GlobalContext Global => _f.Global;
+
+            public bool IsResolved => false;
+
+            public IAccessorFrame NextAccessor => null;
+
+            public IAccessorMemberFrame PrevMemberAccessor => null;
+
+            AccessorExpr IAccessorFrame.Expr => _f.Expr;
+
+            public IAccessorFrameState GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> call )
+            {
+                return null;
+            }
+
+            public IAccessorFrameState GetImplementationState( Action<IAccessorFrameInitializer> configuration )
+            {
+                return null;
+            }
+
+            public PExpr SetError( string message = null )
+            {
+                return new PExpr( new RuntimeError( Expr, message ?? _f.GetAccessErrorMessage() ) );
+            }
+
+            public PExpr SetResult( RuntimeObj result )
+            {
+                return new PExpr( result );
+            }
+        }
+
 
         public PExpr Visit( AccessorMemberExpr e ) => Run( new AccessorMemberFrame( this, e ) );
 
