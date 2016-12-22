@@ -28,17 +28,18 @@ using NUnit.Framework;
 using Yodii.Script;
 using CK.Core;
 using System.Globalization;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
     [TestFixture]
-    public class TokenizerTests
+    public class JSTokenizerTests
     {
         [Test]
-        public void round_trip_Parsing()
+        public void round_trip_parsing()
         {
             JSTokenizer p = new JSTokenizer();
-            Assert.That( JSTokenizer.Explain( JSTokenizerToken.Integer ), Is.EqualTo( "42" ) );
+            JSTokenizer.Explain( JSTokenizerToken.Integer ).Should().Be( "42" );
 
             string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x === z !== x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
             p.Reset( s );
@@ -54,7 +55,7 @@ namespace Yodii.Script.Tests
                 .Replace( "z", "identifier" )
                 .Replace( "return", "identifier" );
 
-            Assert.That( recompose, Is.EqualTo( s ) );
+            recompose.Should().Be( s );
         }
 
         [TestCase( "45DD" )]
@@ -67,9 +68,10 @@ namespace Yodii.Script.Tests
         public void bad_literal_numbers_are_ErrorNumberIdentifierStartsImmediately( string num )
         {
             JSTokenizer p = new JSTokenizer( num );
-            Assert.That( p.IsErrorOrEndOfInput, Is.True );
-            Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
+            p.IsErrorOrEndOfInput.Should().Be( true );
+            p.ErrorCode.Should().Be( JSTokenizerError.ErrorNumberIdentifierStartsImmediately );
         }
+
 
         [TestCase( "45.98" )]
         [TestCase( ".0" )]
@@ -78,11 +80,12 @@ namespace Yodii.Script.Tests
         public void parsing_floats( string num )
         {
             JSTokenizer p = new JSTokenizer( num );
-            Assert.That( p.CurrentToken, Is.EqualTo( JSTokenizerToken.Float ) );
-            Assert.That( p.ReadDouble(), Is.EqualTo( double.Parse( num, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture ) ) );
-            Assert.That( !p.Forward() );
-            Assert.That( p.IsEndOfInput, Is.True );
+            p.CurrentToken.Should().Be( JSTokenizerToken.Float );
+            p.ReadDouble().Should().Be( double.Parse( num, NumberStyles.Float, CultureInfo.InvariantCulture ) );
+            p.Forward().Should().Be( false );
+            p.IsEndOfInput.Should().Be( true );
         }
+
 
         [TestCase( @"""a""", "a" )]
         [TestCase( @"""a""""b""", @"a""b" )]
@@ -94,8 +97,8 @@ namespace Yodii.Script.Tests
         {
             JSTokenizer p = new JSTokenizer( s );
             string r = p.ReadString();
-            Assert.That( p.IsEndOfInput );
-            Assert.That( r, Is.EqualTo( expected ) );
+            p.IsEndOfInput.Should().Be( true );
+            r.Should().Be( expected );
         }
 
     }

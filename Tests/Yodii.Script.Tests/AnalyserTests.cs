@@ -1,37 +1,10 @@
-#region LGPL License
-/*----------------------------------------------------------------------------
-* This file (Tests\Yodii.Script.Tests\JSAnalyserTests.cs) is part of Yodii-Script. 
-*  
-* Yodii-Script is free software: you can redistribute it and/or modify 
-* it under the terms of the GNU Lesser General Public License as published 
-* by the Free Software Foundation, either version 3 of the License, or 
-* (at your option) any later version. 
-*  
-* Yodii-Script is distributed in the hope that it will be useful, 
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-* GNU Lesser General Public License for more details. 
-* You should have received a copy of the GNU Lesser General Public License 
-* along with Yodii-Script. If not, see <http://www.gnu.org/licenses/>. 
-*  
-* Copyright © 2007-2015, 
-*     Invenietis <http://www.invenietis.com>, IN'TECH INFO <http://www.intechinfo.fr>
-* All rights reserved. 
-*-----------------------------------------------------------------------------*/
-#endregion
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using Yodii.Script;
-using CK.Core;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
     [TestFixture]
-    public class AnalyserTests
+    public class ExprAnalyserTests
     {
         [Test]
         public void an_empty_string_is_a_syntax_error()
@@ -40,15 +13,15 @@ namespace Yodii.Script.Tests
             JSTokenizer p = new JSTokenizer();
             {
                 p.Reset( "" );
-                Assert.That( p.IsEndOfInput );
+                p.IsEndOfInput.Should().Be( true );
                 Expr e = a.Analyse( p );
-                Assert.That( e is SyntaxErrorExpr );
+                e.Should().BeOfType<SyntaxErrorExpr>();
             }
             {
                 p.Reset( " \r\n \n   \r  \n \t  " );
-                Assert.That( p.IsEndOfInput );
+                p.IsEndOfInput.Should().Be( true );
                 Expr e = a.Analyse( p );
-                Assert.That( e is SyntaxErrorExpr );
+                e.Should().BeOfType<SyntaxErrorExpr>();
             }
         }
 
@@ -60,106 +33,107 @@ namespace Yodii.Script.Tests
 
             {
                 p.Reset( "value" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.False );
-                 Expr e = a.Analyse( p );
-                Assert.That( e is AccessorMemberExpr );
+                p.IsErrorOrEndOfInput.Should().Be( false );
+                Expr e = a.Analyse( p );
+                e.Should().BeOfType<AccessorMemberExpr>();
                 AccessorMemberExpr ac = e as AccessorMemberExpr;
-                Assert.That( ac.IsUnbound == true );
+                ac.IsUnbound.Should().Be( true );
             }
             {
                 p.Reset( "!" );
                 Expr e = a.Analyse( p );
-                Assert.That( e is UnaryExpr );
+                e.Should().BeOfType<UnaryExpr>();
                 UnaryExpr u = e as UnaryExpr;
-                Assert.That( u.TokenType == JSTokenizerToken.Not );
-                Assert.That( u.Expression is SyntaxErrorExpr );
-                Assert.That( SyntaxErrorCollector.Collect( e, null ).Count == 1 );
+                u.TokenType.Should().Be( JSTokenizerToken.Not );
+                u.Expression.Should().BeOfType<SyntaxErrorExpr>();
+                SyntaxErrorCollector.Collect( e, null ).Count.Should().Be( 1 );
             }
             {
                 p.Reset( "!value" );
                 Expr e = a.Analyse( p );
-                Assert.That( e is UnaryExpr );
+                e.Should().BeOfType<UnaryExpr>();
                 UnaryExpr u = e as UnaryExpr;
-                Assert.That( u.TokenType == JSTokenizerToken.Not );
-                Assert.That( u.Expression is AccessorExpr );
-                Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
+                u.TokenType.Should().Be( JSTokenizerToken.Not );
+                u.Expression.Should().BeOfType<AccessorMemberExpr>();
+                SyntaxErrorCollector.Collect( e, null ).Should().BeEmpty();
             }
             {
                 p.Reset( " 0.12e43 && ~b " );
                 Expr e = a.Analyse( p );
-                Assert.That( e is BinaryExpr );
+                e.Should().BeOfType<BinaryExpr>();
                 BinaryExpr and = e as BinaryExpr;
-                Assert.That( and.BinaryOperatorToken == JSTokenizerToken.And );
+                and.BinaryOperatorToken.Should().Be( JSTokenizerToken.And );
                 IsConstant( and.Left, 0.12e43 );
-                Assert.That( and.Right is UnaryExpr );
+                and.Right.Should().BeOfType<UnaryExpr>();
                 UnaryExpr u = and.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokenizerToken.BitwiseNot );
-                Assert.That( u.Expression is AccessorExpr );
-
-                Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
+                u.TokenType.Should().Be( JSTokenizerToken.BitwiseNot );
+                u.Expression.Should().BeOfType<AccessorMemberExpr>();
+                AccessorMemberExpr m = u.Expression as AccessorMemberExpr;
+                m.Left.Should().BeNull();
+                SyntaxErrorCollector.Collect( e, null ).Should().BeEmpty();
             }
             {
                 p.Reset( @"!a||~""x""" );
                 Expr e = a.Analyse( p );
-                Assert.That( e is BinaryExpr );
+                e.Should().BeOfType<BinaryExpr>();
                 BinaryExpr or = e as BinaryExpr;
-                Assert.That( or.BinaryOperatorToken == JSTokenizerToken.Or );
-                Assert.That( or.Left is UnaryExpr );
-                Assert.That( or.Right is UnaryExpr );
+                or.BinaryOperatorToken.Should().Be( JSTokenizerToken.Or );
+                or.Left.Should().BeOfType<UnaryExpr>();
+                or.Right.Should().BeOfType<UnaryExpr>();
                 UnaryExpr u = or.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokenizerToken.BitwiseNot );
+                u.TokenType.Should().Be( JSTokenizerToken.BitwiseNot );
                 IsConstant( u.Expression, "x" );
 
-                Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
+                SyntaxErrorCollector.Collect( e, null ).Should().BeEmpty();
             }
             {
                 p.Reset( "(3)" );
                 Expr e = a.Analyse( p );
-                IsConstant( e, 3 );
+                IsConstant( e, 3.0 );
             }
             {
                 p.Reset( "(3+typeof 'x')" );
                 Expr e = a.Analyse( p );
-                Assert.That( e is BinaryExpr );
+                e.Should().BeOfType<BinaryExpr>();
                 BinaryExpr b = e as BinaryExpr;
-                IsConstant( b.Left, 3 );
-                Assert.That( b.Right is UnaryExpr );
+                IsConstant( b.Left, 3.0 );
+                b.Right.Should().BeOfType<UnaryExpr>();
                 UnaryExpr u = b.Right as UnaryExpr;
-                Assert.That( u.TokenType == JSTokenizerToken.TypeOf );
+                u.TokenType.Should().Be( JSTokenizerToken.TypeOf );
                 IsConstant( u.Expression, "x" );
 
-                Assert.That( SyntaxErrorCollector.Collect( e, Util.ActionVoid ).Count == 0 );
+                SyntaxErrorCollector.Collect( e, null ).Should().BeEmpty();
             }
             {
                 p.Reset( "1 ? 2 : 3" );
                 Expr e = a.Analyse( p );
-                Assert.That( e is IfExpr );
+                e.Should().BeOfType<IfExpr>();
                 IfExpr i = e as IfExpr;
-                Assert.That( i.IsTernaryOperator == true );
-                IsConstant( i.Condition, 1 );
-                IsConstant( i.WhenTrue, 2 );
-                IsConstant( i.WhenFalse, 3 );
+                i.IsTernaryOperator.Should().Be( true );
+                IsConstant( i.Condition, 1.0 );
+                IsConstant( i.WhenTrue, 2.0 );
+                IsConstant( i.WhenFalse, 3.0 );
             }
         }
 
         [Test]
-        public void ArraySupport()
+        public void Array_support()
         {
             ExprAnalyser a = new ExprAnalyser();
             JSTokenizer p = new JSTokenizer();
             {
                 p.Reset( "a[9]" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.False );
+                p.IsErrorOrEndOfInput.Should().Be( false );
                 Expr e = a.Analyse( p );
-                Assert.That( e is AccessorCallExpr );
+                e.Should().BeOfType<AccessorCallExpr>();
                 AccessorCallExpr ac = e as AccessorCallExpr;
-                IsConstant( ac.Arguments[0], 9 );
+                IsConstant( ac.Arguments[0], 9.0 );
             }
             {
                 p.Reset( "array['Hello World!','H']" );
-                Assert.That( p.IsErrorOrEndOfInput, Is.False );
+                p.IsErrorOrEndOfInput.Should().Be( false );
                 Expr e = a.Analyse( p );
-                Assert.That( e is AccessorCallExpr );
+                e.Should().BeOfType<AccessorCallExpr>();
                 AccessorCallExpr ac = e as AccessorCallExpr;
                 IsConstant( ac.Arguments[0], "Hello World!" );
                 IsConstant( ac.Arguments[1], "H" );
@@ -168,9 +142,9 @@ namespace Yodii.Script.Tests
 
         void IsConstant( Expr e, object o )
         {
-            Assert.That( e is ConstantExpr );
+            e.Should().BeOfType<ConstantExpr>();
             ConstantExpr c = e as ConstantExpr;
-            Assert.That( c.Value, Is.EqualTo( o ) );
+            c.Value.Should().Be( o );
         }
     }
 }
