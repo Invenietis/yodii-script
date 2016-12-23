@@ -38,7 +38,13 @@ namespace Yodii.Script
         public readonly static string TypeString = "string";
         public readonly static string TypeUndefined = "undefined";
 
-        class UndefinedObj : RuntimeObj
+        /// <summary>
+        /// Simplest possible object.
+        /// This is public in order to be typically used as static 
+        /// internal markers in advanced scenario.
+        /// The static <see cref="Undefined"/> singleton is one of them.
+        /// </summary>
+        public class UndefinedObj : RuntimeObj
         {            
             public override string Type => TypeUndefined; 
 

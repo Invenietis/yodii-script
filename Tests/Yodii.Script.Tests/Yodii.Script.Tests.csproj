@@ -86,6 +86,7 @@
     <Compile Include="TestHelper.cs" />
     <Compile Include="ObjectSupportTests.cs" />
     <Compile Include="GlobalContextTests.cs" />
+    <Compile Include="WithObjectSupportTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

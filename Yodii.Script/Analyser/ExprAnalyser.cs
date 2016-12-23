@@ -130,6 +130,7 @@ namespace Yodii.Script
                 if( _parser.MatchIdentifier( "foreach" ) ) return HandleForeach();
                 if( _parser.MatchIdentifier( "function" ) ) return HandleFunction();
                 if( _parser.MatchIdentifier( "try" ) ) return HandleTryCatch();
+                if( _parser.MatchIdentifier( "with" ) ) return HandleWith();
                 return HandleIdentifier();
             }
             if( _parser.Match( JSTokenizerToken.OpenCurly ) ) return HandleBlock();
@@ -174,6 +175,16 @@ namespace Yodii.Script
             Expr catchExpr = HandleFuncParametersAndBody( out parameters, out closures, true );
             if( parameters.Count > 1 ) return new SyntaxErrorExpr( locCatch, "At most one parameter is expected." );
             return new TryCatchExpr( locTry, tryExpr, parameters.Count == 0 ? null : parameters[0], catchExpr );
+        }
+
+        Expr HandleWith()
+        {
+            // "with" identifier has already been matched.
+            SourceLocation location = _parser.PrevNonCommentLocation;
+            Expr obj;
+            if( !IsOptionallyEnclosedExpr( out obj ) ) return obj;
+            Expr code = HandleStatement();
+            return new WithExpr( location, obj, code );
         }
 
         Expr HandlePostIncDec( Expr left )

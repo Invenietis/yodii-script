@@ -39,14 +39,14 @@ namespace Yodii.Script
             PExpr _body;
 
             public FunctionExprFrame( AccessorFrame callFrame, FunctionExpr e, IReadOnlyList<Closure> closures )
-                : base( callFrame._visitor, e )
+                : base( callFrame.Visitor, e )
             {
                 _arguments = new ArgumentResolver( this, callFrame.Expr.Arguments );
                 _closures = closures;
                 // Registering closed variables.
                 foreach( var c in _closures )
                 {
-                    _visitor.ScopeManager.Register( c );
+                    Visitor.ScopeManager.Register( c );
                 }
             }
 
@@ -62,7 +62,7 @@ namespace Yodii.Script
                     int iParam = 0;
                     foreach( var parameter in Expr.Parameters )
                     {
-                        var r = _visitor.ScopeManager.Register( parameter );
+                        var r = Visitor.ScopeManager.Register( parameter );
                         if( iParam < _arguments.ResolvedParameters.Count )
                         {
 #if DEBUG
@@ -102,13 +102,13 @@ namespace Yodii.Script
             {
                 foreach( var c in _closures )
                 {
-                    _visitor.ScopeManager.Unregister( c.Variable );
+                    Visitor.ScopeManager.Unregister( c.Variable );
                 }
                 if( _arguments.IsArgumentsResolved )
                 {
                     foreach( var local in Expr.Parameters )
                     {
-                        _visitor.ScopeManager.Unregister( local );
+                        Visitor.ScopeManager.Unregister( local );
                     }
                 }
             }

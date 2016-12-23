@@ -37,7 +37,7 @@ namespace Yodii.Script
         /// </summary>
         internal abstract class Frame : IDeferredExpr
         {          
-            internal readonly EvalVisitor _visitor;
+            internal readonly EvalVisitor Visitor;
             readonly Expr _expr;
             Frame _prev;
             Frame _next;
@@ -45,7 +45,7 @@ namespace Yodii.Script
 
             protected Frame( EvalVisitor visitor, Expr e )
             {
-                _visitor = visitor;
+                Visitor = visitor;
                 _prev = visitor._currentFrame;
                 if( _prev != null ) _prev._next = this;
                 else visitor._firstFrame = this;
@@ -59,9 +59,9 @@ namespace Yodii.Script
 
             public bool IsResolved => _result != null; 
 
-            public PExpr StepOver() => _visitor.StepOver( this, StepOverKind.ExternalStepOver );
+            public PExpr StepOver() => Visitor.StepOver( this, StepOverKind.ExternalStepOver );
 
-            public PExpr StepIn() => _visitor.StepOver( this, StepOverKind.ExternalStepIn );
+            public PExpr StepIn() => Visitor.StepOver( this, StepOverKind.ExternalStepIn );
 
             internal PExpr VisitAndClean()
             {
@@ -78,9 +78,9 @@ namespace Yodii.Script
             internal void DoDispose()
             {
                 OnDispose();
-                _visitor._currentFrame = _prev;
+                Visitor._currentFrame = _prev;
                 if( _prev != null ) _prev._next = null;
-                else _visitor._firstFrame = null;
+                else Visitor._firstFrame = null;
             }
 
             protected abstract PExpr DoVisit();
@@ -94,8 +94,8 @@ namespace Yodii.Script
             public bool IsPendingOrSignal( ref PExpr current, Expr e )
             {
                 if( current.IsResolved ) return false;
-                if( current.IsUnknown ) current = _visitor.VisitExpr( e );
-                else current = _visitor.StepOver( current.Frame, StepOverKind.InternalStepOver );
+                if( current.IsUnknown ) current = Visitor.VisitExpr( e );
+                else current = Visitor.StepOver( current.Frame, StepOverKind.InternalStepOver );
                 return current.IsPendingOrSignal;
             }
 
@@ -103,9 +103,9 @@ namespace Yodii.Script
             {
                 Debug.Assert( _result == null );
                 RuntimeError e = result as RuntimeError;
-                if( e != null && !(e.Expr is SyntaxErrorExpr) && _visitor.EnableFirstChanceError )
+                if( e != null && !(e.Expr is SyntaxErrorExpr) && Visitor.EnableFirstChanceError )
                 {
-                    _visitor.FirstChanceError = e;
+                    Visitor.FirstChanceError = e;
                     return new PExpr( this, PExprKind.FirstChanceError );
                 }
                 return new PExpr( (_result = result) );
@@ -115,7 +115,7 @@ namespace Yodii.Script
 
             public Frame PrevFrame => _prev; 
 
-            public GlobalContext Global => _visitor.Global; 
+            public GlobalContext Global => Visitor.Global; 
             
             protected virtual void OnDispose()
             {

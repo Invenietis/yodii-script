@@ -29,7 +29,6 @@ using System.Diagnostics;
 
 namespace Yodii.Script
 {
-
     internal partial class EvalVisitor : IExprVisitor<PExpr>
     {
         internal readonly DynamicScope ScopeManager;

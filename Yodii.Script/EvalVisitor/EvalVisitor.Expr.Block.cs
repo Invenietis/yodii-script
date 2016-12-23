@@ -40,7 +40,7 @@ namespace Yodii.Script
             {
                 foreach( var local in ((BlockExpr)Expr).Locals )
                 {
-                    _visitor.ScopeManager.Register( local );
+                    Visitor.ScopeManager.Register( local );
                 }
             }
 
@@ -48,7 +48,7 @@ namespace Yodii.Script
             {
                 foreach( var local in ((BlockExpr)Expr).Locals )
                 {
-                    _visitor.ScopeManager.Unregister( local );
+                    Visitor.ScopeManager.Unregister( local );
                 }
             }
         }

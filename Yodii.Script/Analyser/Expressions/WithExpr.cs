@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (Yodii.Script\Analyser\Expressions\NopExpr.cs) is part of Yodii-Script. 
+* This file (Yodii.Script\Analyser\Expressions\IfExpr.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -31,22 +31,18 @@ using System.Diagnostics;
 namespace Yodii.Script
 {
 
-    public class NopExpr : Expr
+    public class WithExpr : Expr
     {
-        /// <summary>
-        /// A <see cref="NopExpr"/> with a false <see cref="Expr.IsStatement"/>.
-        /// </summary>
-        public static readonly NopExpr Expression = new NopExpr( false );
-
-        /// <summary>
-        /// A <see cref="NopExpr"/> with a true <see cref="Expr.IsStatement"/>.
-        /// </summary>
-        public static readonly NopExpr Statement = new NopExpr( true );
-
-        NopExpr( bool isStatement )
-            : base( SourceLocation.Empty, isStatement, false )
+        public WithExpr( SourceLocation location, Expr objExpr, Expr code )
+            : base( location, code.IsStatement, true )
         {
+            Obj = objExpr;
+            Code = code;
         }
+
+        public Expr Obj { get; private set; }
+
+        public Expr Code { get; private set; }
 
         /// <summary>
         /// Parametrized implementation of the visitor's double dispatch.
@@ -60,9 +56,14 @@ namespace Yodii.Script
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>Readable expression.</returns>
         public override string ToString()
         {
-            return String.Empty;
+            string s = "with(" + Obj.ToString() + ") {" + Code.ToString() + "}";
+            return s;
         }
     }
 

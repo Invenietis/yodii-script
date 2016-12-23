@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Yodii.Script;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -41,26 +41,8 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 42 ) );
-            } );
-        }
-
-        [Test]
-        public void throw_from_function()
-        {
-            string s = @"   let no = 0;
-                            function t( n ) { ++no; throw n; no = 10000; }
-                            let r;
-                            try { t(42); } catch( e ) { r = e; }
-                            try { t(100); } catch( e ) { r *= e; }
-                            try { t(7); } catch( e ) { r -= e; }
-                            r*no;
-                        ";
-            TestHelper.RunNormalAndStepByStep( s, o =>
-            {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( (42 * 100 - 7)*3 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 42 );
             } );
         }
 
@@ -76,10 +58,41 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStepWithFirstChanceError( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 42 * 100 - 7 ) );
-            }, 3 );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 42 * 100 - 7 );
+            }, 
+            expectedFirstChanceError: 3 );
         }
+
+        [Test]
+        public void throw_from_function()
+        {
+            string s = @"   let no = 0;
+                            function t( n ) { ++no; throw n; no = 10000; }
+                            let r;
+                            try { t(42); } catch( e ) { r = e; }
+                            try { t(100); } catch( e ) { r *= e; }
+                            try { t(7); } catch( e ) { r -= e; }
+                            r*no;
+                        ";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( (42 * 100 - 7) * 3 );
+            } );
+        }
+
+        [Test]
+        public void catching_reference_error_is_not_possible()
+        {
+            string s = @" let msg; try { ++notFound } catch( e ) { msg = 'ref catched'; }; msg;";
+            TestHelper.RunNormalAndStepByStep( s, o =>
+            {
+                o.Should().BeOfType<RuntimeError>().Which.IsReferenceError.Should().Be( true );
+            } );
+        }
+
+
 
     }
 }

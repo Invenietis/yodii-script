@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
@@ -36,25 +37,6 @@ namespace Yodii.Script
         readonly Dictionary<Type, ExternalTypeHandler> _types;
         readonly Dictionary<string, RuntimeObj> _objects;
         readonly HashSet<string> _namespaces;
-        WithScope _currentWithScope;
-
-        class WithScope : IAccessorVisitor, IDisposable
-        {
-            readonly GlobalContext _ctx;
-            readonly WithScope _parent;
-            readonly RuntimeObj _o;
-
-            public WithScope( GlobalContext ctx, RuntimeObj o )
-            {
-                _ctx = ctx;
-                _parent = _ctx._currentWithScope;
-                _ctx._currentWithScope = this;
-                _o = o;
-            }
-            public void Dispose() => _ctx._currentWithScope = _parent;
-
-            public PExpr Visit( IAccessorFrame frame ) => _o.Visit( frame );
-        }
 
         public GlobalContext()
         {
@@ -131,15 +113,86 @@ namespace Yodii.Script
             return _objects.Remove( name );
         }
 
+        #region WithObject scope
+
+        internal WithObjectScope InternalWithObjectScope;
+
+        /// <summary>
+        /// Implements IWithObjectScope that is internally accessible and
+        /// "stable": once obtained, the objects chain is always valid and remains the same 
+        /// regardless of the dispose/open scope that may occur later.
+        /// The AccessorMemberFrame that exploits it can capture the current scope and keeps
+        /// working with it as long as it needs to.
+        /// </summary>
+        internal class WithObjectScope : IWithObjectScope
+        {
+            public readonly WithObjectScope Parent;
+            public readonly RuntimeObj Object;
+            GlobalContext _ctx;
+
+            /// <summary>
+            /// Used as a marker to distinguish null and initialized bnut void scope.
+            /// </summary>
+            static public readonly WithObjectScope None = new WithObjectScope(); 
+
+            WithObjectScope() { }
+
+            public WithObjectScope( GlobalContext ctx, RuntimeObj o )
+            {
+                Debug.Assert( ctx != null && o != null );
+                Object = o;
+                Parent = ctx.InternalWithObjectScope;
+                ctx.InternalWithObjectScope = this;
+                _ctx = ctx;
+            }
+
+            IWithObjectScope IWithObjectScope.Parent
+            {
+                get
+                {
+                    if( _ctx == null ) throw new ObjectDisposedException( nameof( IWithObjectScope ) );
+                    return Parent;
+                }
+            }
+
+            RuntimeObj IWithObjectScope.Object
+            {
+                get
+                {
+                    if( _ctx == null ) throw new ObjectDisposedException( nameof( IWithObjectScope ) );
+                    return Object;
+                }
+            }
+
+            public void Dispose()
+            {
+                if( _ctx != null )
+                {
+                    if( _ctx.InternalWithObjectScope != this ) throw new InvalidOperationException( "With object scope dispose mispatch" );
+                    _ctx.InternalWithObjectScope = Parent;
+                    _ctx = null;
+                }
+            }
+
+        }
+
         /// <summary>
         /// Opens a scope on a object.
         /// </summary>
         /// <param name="o">The scope object.</param>
         /// <returns></returns>
-        public IDisposable OpenWithScope( RuntimeObj o )
+        public IWithObjectScope OpenWithScope( RuntimeObj o )
         {
-            return new WithScope( this, o );
+            return new WithObjectScope( this, o );
         }
+
+        /// <summary>
+        /// Gets the currently opened 'with object' scope.
+        /// </summary>
+        public IWithObjectScope CurrentWithObjectScope => InternalWithObjectScope;
+
+        #endregion
+
 
         [Obsolete]
         public RuntimeObj CreateBoolean( bool value )
@@ -224,16 +277,6 @@ namespace Yodii.Script
            IAccessorMemberFrame head = frame as IAccessorMemberFrame;
             // We can only handle member access at the root level:
             if( head == null ) return frame.SetError();
-            if( _currentWithScope != null )
-            {
-                var lookup = EvalVisitor.AccessorFrameLookup.Create( head );
-                PExpr p = _currentWithScope.Visit( lookup );
-                if( p.AsErrorResult == null )
-                {
-
-                }
-            }
-
 
             // Lookup from the longest path to the head in registered objects:
             // more "precise" objects mask root ones.

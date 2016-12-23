@@ -49,5 +49,6 @@ namespace Yodii.Script
         T Visit( FlowBreakingExpr e );
         T Visit( FunctionExpr e );
         T Visit( TryCatchExpr e );
+        T Visit( WithExpr e );
     }
 }

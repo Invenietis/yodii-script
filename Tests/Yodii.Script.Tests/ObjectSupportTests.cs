@@ -27,12 +27,27 @@ using System.Text;
 using System.Threading.Tasks;
 using CK.Core;
 using NUnit.Framework;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
     [TestFixture]
     public class ObjectSupportTests
     {
+
+        [Test]
+        public void accessing_properties_on_anonymous_class()
+        {
+            var c = new GlobalContext();
+            c.Register( "Pos", new { X = 3, Y = 78 } );
+            TestHelper.RunNormalAndStepByStep( "Pos.X + Pos.Y", o =>
+            {
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 3.0 + 78 );
+            }, c );
+        }
+
+
         class AnObject
         {
             public AnObject()
@@ -78,8 +93,8 @@ namespace Yodii.Script.Tests
             c.Register( "AnObject", new AnObject() );
             TestHelper.RunNormalAndStepByStep( "AnObject.Name + AnObject.NameAsField", o =>
             {
-                Assert.That( o is StringObj );
-                Assert.That( o.ToString(), Is.EqualTo( "Name of the object(Field name)" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "Name of the object(Field name)" );
             }, c );
         }
 
@@ -93,8 +108,8 @@ namespace Yodii.Script.Tests
                 AnObject.NameAsField = AnObject.Name + ""Y"";
                 AnObject.Name + AnObject.NameAsField", o =>
             {
-                Assert.That( o is StringObj );
-                Assert.That( o.ToString(), Is.EqualTo( "XXY" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "XXY" );
             }, c );
         }
 
@@ -105,8 +120,8 @@ namespace Yodii.Script.Tests
             c.Register( "AnObject", new AnObject() );
             TestHelper.RunNormalAndStepByStep( @"AnObject.AnotherObject.OtherName", o =>
             {
-                Assert.That( o is RefRuntimeObj );
-                Assert.That( o.ToString(), Is.EqualTo( "Name of the other" ) );
+                o.Should().BeAssignableTo<RefRuntimeObj>();
+                o.ToString().Should().Be( "Name of the other" );
             }, c );
         }
 
@@ -121,9 +136,9 @@ namespace Yodii.Script.Tests
                 if( anObject.AnotherObject.IntegerField != 90 ) anObject.AnotherObject.IntegerField = 90;
                 anObject.AnotherObject.IntegerField++", o =>
             {
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToString(), Is.EqualTo( "90" ) );
-                Assert.That( anObject.AnotherObject.IntegerField, Is.EqualTo( 91 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToString().Should().Be( "90" );
+                anObject.AnotherObject.IntegerField.Should().Be( 91 );
             }, c );
         }
 
@@ -141,12 +156,11 @@ namespace Yodii.Script.Tests
                 r1 * 1000 + anObject.AnotherObject.TotalMethodCallCount
                 ", o =>
             {
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToString(), Is.EqualTo( "3003" ) );
-                Assert.That( anObject.AnotherObject.TotalMethodCallCount, Is.EqualTo( 3 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToString().Should().Be( "3003" );
+                anObject.AnotherObject.TotalMethodCallCount.Should().Be( 3 );
             }, c );
         }
-
 
     }
 }

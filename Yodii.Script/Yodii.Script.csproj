@@ -63,6 +63,7 @@
     <Compile Include="Analyser\Expressions\AccessorMemberExpr.cs" />
     <Compile Include="Analyser\Expressions\FlowBreakingExpr.cs" />
     <Compile Include="Analyser\Expressions\FunctionExpr.cs" />
+    <Compile Include="Analyser\Expressions\WithExpr.cs" />
     <Compile Include="Analyser\Expressions\TryCatchExpr.cs" />
     <Compile Include="Analyser\Expressions\ListOfExpr.cs" />
     <Compile Include="Analyser\Expressions\ForeachExpr.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="Analyser\Expressions\UnaryExpr.cs" />
     <Compile Include="Analyser\StaticScope.cs" />
     <Compile Include="EvalVisitor\Closure.cs" />
+    <Compile Include="EvalVisitor\EvalVisitor.Expr.With.cs" />
+    <Compile Include="EvalVisitor\IWithObjectScope.cs" />
     <Compile Include="EvalVisitor\PExprKind.cs" />
     <Compile Include="EvalVisitor\DynamicScope.cs" />
     <Compile Include="EvalVisitor\EvalExtensions.cs" />

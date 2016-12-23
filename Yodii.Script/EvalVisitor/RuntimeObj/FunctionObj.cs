@@ -57,7 +57,7 @@ namespace Yodii.Script
             if( frame.Expr is AccessorCallExpr )
             {
                 EvalVisitor.AccessorFrame f = (EvalVisitor.AccessorFrame)frame;
-                return f._visitor.Run( new EvalVisitor.FunctionExprFrame( f, _expr, _closures ) );
+                return f.Visitor.Run( new EvalVisitor.FunctionExprFrame( f, _expr, _closures ) );
             }
             return frame.SetError();
         }
