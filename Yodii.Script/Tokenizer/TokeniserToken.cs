@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
@@ -39,7 +40,7 @@ namespace Yodii.Script
     /// 12  + - +                                   Addition, subtraction, string concatenation
     /// 11  &lt;&lt; &gt;&gt; &gt;&gt;&gt;          Bit shifting
     /// 10  &lt; &lt;= &gt; &gt;= instanceof        Less than, less than or equal, greater than, greater than or equal, instanceof
-    ///  9  == != === !==                           Equality, inequality, strict equality, and strict inequality
+    ///  9  == !=                                   Equality, inequality
     ///  8  &amp;                                   Bitwise AND
     ///  7  ^                                       Bitwise XOR
     ///  6  |                                       Bitwise OR
@@ -50,25 +51,25 @@ namespace Yodii.Script
     ///  1  ,                                       Multiple evaluation
     /// </remarks>
     [Flags]
-    public enum JSTokenizerToken
+    public enum TokenizerToken
     {
         None = 0,
 
         #region JSParserError values bits n°31 to 26.
-        IsErrorOrEndOfInput = JSTokenizerError.IsErrorOrEndOfInput,
-        EndOfInput = JSTokenizerError.EndOfInput,
-        ErrorMask = JSTokenizerError.ErrorMask,
-        ErrorInvalidChar = JSTokenizerError.ErrorInvalidChar,
-        ErrorStringMask = JSTokenizerError.ErrorStringMask,
-        ErrorNumberMask = JSTokenizerError.ErrorNumberMask,
-        ErrorRegexMask = JSTokenizerError.ErrorRegexMask,
-        ErrorStringUnterminated = JSTokenizerError.ErrorStringUnterminated,
-        ErrorStringEmbeddedUnicodeValue = JSTokenizerError.ErrorStringEmbeddedUnicodeValue,
-        ErrorStringEmbeddedHexaValue = JSTokenizerError.ErrorStringEmbeddedHexaValue,
-        ErrorStringUnexpectedCRInLineContinuation = JSTokenizerError.ErrorStringUnexpectedCRInLineContinuation,
-        ErrorNumberUnterminatedValue = JSTokenizerError.ErrorNumberUnterminatedValue,
-        ErrorNumberValue = JSTokenizerError.ErrorNumberValue,
-        ErrorRegexUnterminated = JSTokenizerError.ErrorRegexUnterminated,
+        IsErrorOrEndOfInput = TokenizerError.IsErrorOrEndOfInput,
+        EndOfInput = TokenizerError.EndOfInput,
+        ErrorMask = TokenizerError.ErrorMask,
+        ErrorInvalidChar = TokenizerError.ErrorInvalidChar,
+        ErrorStringMask = TokenizerError.ErrorStringMask,
+        ErrorNumberMask = TokenizerError.ErrorNumberMask,
+        ErrorRegexMask = TokenizerError.ErrorRegexMask,
+        ErrorStringUnterminated = TokenizerError.ErrorStringUnterminated,
+        ErrorStringEmbeddedUnicodeValue = TokenizerError.ErrorStringEmbeddedUnicodeValue,
+        ErrorStringEmbeddedHexaValue = TokenizerError.ErrorStringEmbeddedHexaValue,
+        ErrorStringUnexpectedCRInLineContinuation = TokenizerError.ErrorStringUnexpectedCRInLineContinuation,
+        ErrorNumberUnterminatedValue = TokenizerError.ErrorNumberUnterminatedValue,
+        ErrorNumberValue = TokenizerError.ErrorNumberValue,
+        ErrorRegexUnterminated = TokenizerError.ErrorRegexUnterminated,
         #endregion
 
         #region Operator precedence bits n°25 to 21 (levels from 0 to 15).
@@ -98,7 +99,7 @@ namespace Yodii.Script
         /// Covers =, ~=, |=, &amp;=, &lt;&lt;=, ^=, &gt;&gt;=, &gt;&gt;&gt;=, +=, -=, /=, *= and %=.
         /// </summary>
         IsAssignOperator = 1 << 19,
-        
+
         /// <summary>
         /// Covers |, ^, &amp;, &gt;&gt;, &lt;&lt;, &gt;&gt;&gt;, +, -, /, * and %.
         /// </summary>
@@ -110,7 +111,7 @@ namespace Yodii.Script
         IsBracket = 1 << 17,
 
         /// <summary>
-        /// Covers ==, &lt;, &gt;, &lt;=, &gt;=, !=, === and !==.
+        /// Covers ==, &lt;, &gt;, &lt;=, &gt;= and !=.
         /// </summary>
         IsCompareOperator = 1 << 16,
 
@@ -274,8 +275,8 @@ namespace Yodii.Script
 
         #endregion
 
-        CompareOperatorCount = 8,
-        #region IsCompareOperator: ==, <, >, <=, >=, !=, === and !==.
+        CompareOperatorCount = 6,
+        #region IsCompareOperator: ==, <, >, <=, >=, !=
         /// <summary>
         /// Double = character (==).
         /// </summary>
@@ -300,14 +301,6 @@ namespace Yodii.Script
         /// C-like difference operator !=.
         /// </summary>
         Different = IsCompareOperator | OpLevel09 | 6,
-        /// <summary>
-        /// Strict equality is ===.
-        /// </summary>
-        StrictEqual = IsCompareOperator | OpLevel09 | 7,
-        /// <summary>
-        /// Strict difference is !===.
-        /// </summary>
-        StrictDifferent = IsCompareOperator | OpLevel09 | 8,
         #endregion
 
         LogicalCount = 2,
@@ -383,7 +376,7 @@ namespace Yodii.Script
         /// Identifier token.
         /// </summary>
         Identifier = IsIdentifier | 1,
-        
+
         /// <summary>
         /// Star comment: /*...*/
         /// </summary>
@@ -416,4 +409,97 @@ namespace Yodii.Script
 
     }
 
+
+    public static class TokenizerTokenExtension
+    {
+        /// <summary>
+        /// Computes the precedence with a provision of 1 bit to ease the handling of right associative infix operators.
+        /// </summary>
+        /// <returns>An even precedence level between 30 and 2. 0 if the token has <see cref="TokenizerError.IsErrorOrEndOfInput"/> bit set.</returns>
+        /// <remarks>
+        /// This uses <see cref="TokenizerToken.OpLevelMask"/> and <see cref="TokenizerToken.OpLevelShift"/>.
+        /// </remarks>
+        public static int PrecedenceLevel( this TokenizerToken t )
+        {
+            return t > 0 ? (((int)(t & TokenizerToken.OpLevelMask)) >> (int)TokenizerToken.OpLevelShift) << 1 : 0;
+        }
+
+
+        static string[] _binaryOperator = { "instanceof", "|", "&", "<<", "^", ">>", ">>>", "+", "-", "/", "*", "%", };
+        static string[] _assignOperator = { "=", "|=", "&=", "<<=", "^=", ">>=", ">>>=", "+=", "-=", "/=", "*=", "%=" };
+        static string[] _compareOperator = { "==", "<", ">", "<=", ">=", "!=" };
+        static string[] _punctuations = { ".", ",", "?", ":", ";" };
+        static string[] _specialIdentifiers = { "delete", "new", "typeof", "void" };
+        static string[] _unaryOperator = { "!", "~", "--", "++", "delete", "new", "typeof", "void" };
+        static TokenizerToken[] _assignBinaryMap =
+        {
+            TokenizerToken.BitwiseOr,
+            TokenizerToken.BitwiseAnd,
+            TokenizerToken.BitwiseShiftLeft,
+            TokenizerToken.BitwiseXOr,
+            TokenizerToken.BitwiseShiftRight,
+            TokenizerToken.BitwiseShiftRightNoSignBit,
+            TokenizerToken.Plus,
+            TokenizerToken.Minus,
+            TokenizerToken.Divide,
+            TokenizerToken.Mult,
+            TokenizerToken.Modulo
+        };
+
+        static internal TokenizerToken FromAssignOperatorToBinary( this TokenizerToken assignment )
+        {
+            Debug.Assert( (assignment & TokenizerToken.IsAssignOperator) != 0 && assignment != TokenizerToken.Assign );
+            return _assignBinaryMap[((int)assignment & 15) - 2];
+        }
+
+        /// <summary>
+        /// Express this token as a sample string ("idenfier" for <see cref="TokenizerToken.Identifier"/>,
+        /// 6.02214129e+23 for <see cref="TokenizerToken.Float"/>, etc.)
+        /// </summary>
+        /// <param name="t">This token.</param>
+        /// <returns>A sample string for the token type.</returns>
+        public static string Explain( this TokenizerToken t )
+        {
+            if( t < 0 )
+            {
+                return ((TokenizerError)t).ToString();
+            }
+            if( (t & TokenizerToken.IsAssignOperator) != 0 ) return _assignOperator[((int)t & 15) - 1];
+            if( (t & TokenizerToken.IsBinaryOperator) != 0 ) return _binaryOperator[((int)t & 15) - 1];
+            if( (t & TokenizerToken.IsCompareOperator) != 0 ) return _compareOperator[((int)t & 15) - 1];
+            if( (t & TokenizerToken.IsPunctuation) != 0 ) return _punctuations[((int)t & 15) - 1];
+            if( (t & TokenizerToken.IsUnaryOperator) != 0 ) return _unaryOperator[((int)t & 15) - 1];
+
+            if( t == TokenizerToken.Identifier ) return "identifier";
+            if( t == TokenizerToken.And ) return "&&";
+            if( t == TokenizerToken.Or ) return "||";
+            if( t == TokenizerToken.PlusPlus ) return "++";
+            if( t == TokenizerToken.MinusMinus ) return "--";
+
+            if( t == TokenizerToken.String ) return "\"string\"";
+
+            if( t == TokenizerToken.Float ) return "6.02214129e+23";
+            if( t == TokenizerToken.Integer ) return "42";
+            if( t == TokenizerToken.HexNumber ) return "0x00CF12A4";
+            if( t == TokenizerToken.NaN ) return "NaN";
+            if( t == TokenizerToken.Infinity ) return "Infinity";
+
+            if( t == TokenizerToken.StarComment ) return "/* ... */";
+            if( t == TokenizerToken.LineComment ) return "// ..." + Environment.NewLine;
+
+            if( t == TokenizerToken.Regex ) return "/regex/gi";
+
+            if( t == TokenizerToken.OpenPar ) return "(";
+            if( t == TokenizerToken.ClosePar ) return ")";
+            if( t == TokenizerToken.OpenBracket ) return "[";
+            if( t == TokenizerToken.CloseBracket ) return "]";
+            if( t == TokenizerToken.OpenCurly ) return "{";
+            if( t == TokenizerToken.CloseCurly ) return "}";
+
+
+            return TokenizerToken.None.ToString();
+        }
+
+
+    }
 }

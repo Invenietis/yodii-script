@@ -31,7 +31,7 @@ namespace Yodii.Script
 {
     public class BinaryExpr : Expr
     {
-        public BinaryExpr( SourceLocation location, Expr left, JSTokenizerToken binaryOperatorToken, Expr right )
+        public BinaryExpr( SourceLocation location, Expr left, TokenizerToken binaryOperatorToken, Expr right )
             : base( location, right.IsStatement, true )
         {
             Left = left;
@@ -41,7 +41,7 @@ namespace Yodii.Script
 
         public Expr Left { get; private set; }
 
-        public JSTokenizerToken BinaryOperatorToken { get; private set; }
+        public TokenizerToken BinaryOperatorToken { get; private set; }
 
         public Expr Right { get; private set; }
 
@@ -63,7 +63,7 @@ namespace Yodii.Script
         /// <returns>Readable expression.</returns>
         public override string ToString()
         {
-            return Left.ToString() + JSTokenizer.Explain( BinaryOperatorToken ) + Right.ToString();
+            return Left.ToString() + BinaryOperatorToken.Explain() + Right.ToString();
         }
     }
 }

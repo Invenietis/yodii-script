@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CK.Core;
 using NUnit.Framework;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -38,10 +39,13 @@ namespace Yodii.Script.Tests
         {
             GlobalContext c = new GlobalContext();
             c.Register( "Numbers.One", 1 );
-            Assert.That( ScriptEngine.Evaluate( "Numbers.One", c ).ToString(), Is.EqualTo( "1" ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "Numbers.One", 1 ) );
+            ScriptEngine.Evaluate( "Numbers.One", c ).ToString().Should().Be( "1" );
+
+            Action a = () => c.Register( "Numbers.One", 1 );
+            a.ShouldThrow<ArgumentException>();
+
             c.Register( "Numbers.Two", 2 );
-            Assert.That( ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString(), Is.EqualTo( "3" ) );
+            ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString().Should().Be( "3" );
         }
 
         [Test]
@@ -49,12 +53,21 @@ namespace Yodii.Script.Tests
         {
             GlobalContext c = new GlobalContext();
             c.Register( "Numbers", 1 );
-            Assert.Throws<ArgumentException>( () => c.Register( "Numbers", 2 ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "Numbers.One", 3 ) );
+
+            Action a = () => c.Register( "Numbers", 2 );
+            a.ShouldThrow<ArgumentException>();
+
+            a = () => c.Register( "Numbers.One", 3 );
+            a.ShouldThrow<ArgumentException>();
+
             c.Register( "X.Numbers", 1 );
-            Assert.Throws<ArgumentException>( () => c.Register( "X.Numbers", 2 ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "X.Numbers.One", 3 ) );
-            Assert.That( ScriptEngine.Evaluate( "X.Numbers", c ).ToString(), Is.EqualTo( "1" ) );
+            a = () => c.Register( "X.Numbers", 2 );
+            a.ShouldThrow<ArgumentException>();
+
+            a = () => c.Register( "X.Numbers.One", 3 );
+            a.ShouldThrow<ArgumentException>();
+
+            ScriptEngine.Evaluate( "X.Numbers", c ).ToString().Should().Be( "1" );
         }
 
         [Test]
@@ -63,8 +76,8 @@ namespace Yodii.Script.Tests
             var c = new GlobalContext();
             Func<string, string> func = s => "N'" + s.Replace( "'", "''" ) + "'";
             c.Register( "SqlHelper.ToSqlNString", func );
-            Assert.That( ScriptEngine.Evaluate( @" 'hop = ' + SqlHelper.ToSqlNString( ""Aujourd'hui"" )", c ).ToString(),
-                         Is.EqualTo( "hop = N'Aujourd''hui'" ) );
+            ScriptEngine.Evaluate( @" 'hop = ' + SqlHelper.ToSqlNString( ""Aujourd'hui"" )", c )
+                .ToString().Should().Be( "hop = N'Aujourd''hui'" );
         }
 
         [Test]
@@ -72,11 +85,15 @@ namespace Yodii.Script.Tests
         {
             GlobalContext c = new GlobalContext();
             c.Register( "NS.Sub.NS.Obj", 1 );
-            Assert.Throws<ArgumentException>( () => c.Register( "NS", 2 ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub", 3 ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub.NS", 4 ) );
-            Assert.Throws<ArgumentException>( () => c.Register( "NS.Sub.NS.Obj", 5 ) );
-            Assert.That( ScriptEngine.Evaluate( "NS.Sub.NS.Obj", c ).ToString(), Is.EqualTo( "1" ) );
+            Action a = () => c.Register( "NS", 2 );
+            a.ShouldThrow<ArgumentException>();
+            a = () => c.Register( "NS.Sub", 3 );
+            a.ShouldThrow<ArgumentException>();
+            a = () => c.Register( "NS.Sub.NS", 4 );
+            a.ShouldThrow<ArgumentException>();
+            a = () => c.Register( "NS.Sub.NS.Obj", 5 );
+            a.ShouldThrow<ArgumentException>();
+            ScriptEngine.Evaluate( "NS.Sub.NS.Obj", c ).ToString().Should().Be( "1" );
         }
 
         class Context : GlobalContext
@@ -124,7 +141,7 @@ namespace Yodii.Script.Tests
             string s = "AnIntrinsicArray[0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is RuntimeError );
+                o.Should().BeOfType<RuntimeError>();
             } );
         }
 
@@ -136,19 +153,20 @@ namespace Yodii.Script.Tests
             string s = "An.array.with.one.cell[6]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is StringObj && o.ToString() == "An.array.with.one.cell[] => 6" );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "An.array.with.one.cell[] => 6" );
             }, ctx );
 
             s = "array";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is RuntimeError );
+                o.Should().BeOfType<RuntimeError>();
             }, ctx );
 
             s = "XX.array";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is RuntimeError );
+                o.Should().BeOfType<RuntimeError>();
             }, ctx );
         }
 
@@ -160,7 +178,7 @@ namespace Yodii.Script.Tests
             s = "AnIntrinsicArray[0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+                ((RuntimeError)o).Message.Should().Be( "Index out of range." );
             }, ctx );
 
             ctx.AnIntrinsicArray = new[] { 1.2 };
@@ -168,20 +186,20 @@ namespace Yodii.Script.Tests
             s = "AnIntrinsicArray[-1]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+                ((RuntimeError)o).Message.Should().Be( "Index out of range." );
             }, ctx );            
             
             s = "AnIntrinsicArray[2]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( ((RuntimeError)o).Message, Is.EqualTo( "Index out of range." ) );
+                ((RuntimeError)o).Message.Should().Be( "Index out of range." );
             }, ctx );
             
             s = "AnIntrinsicArray[0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToDouble(), Is.EqualTo( 1.2 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 1.2 );
             }, ctx );
             
             ctx.AnIntrinsicArray = new[] { 3.4, 5.6 };
@@ -189,20 +207,20 @@ namespace Yodii.Script.Tests
             s = "AnIntrinsicArray[0+(7-7)] + AnIntrinsicArray[1+0]";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3.4 + 5.6 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 3.4 + 5.6 );
             }, ctx );
         }
 
         [TestCase( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
-        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], Date(2015, 4, 23) ) == 'number'" )]
+        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], 'a string' ) == 'number'" )]
         public void access_to_a_ghost_object_step_by_step( string s )
         {
             var ctx = new Context();
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.That( o is BooleanObj );
-                Assert.That( o.ToBoolean() );
+                o.Should().BeOfType<BooleanObj>();
+                o.ToBoolean().Should().BeTrue();
             }, ctx );
         }
     }

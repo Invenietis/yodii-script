@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Yodii.Script;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -40,8 +40,8 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( result );
             } );
         }
 
@@ -55,15 +55,15 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                if( result is Double )
+                if( result is double )
                 {
-                    Assert.That( o is DoubleObj );
-                    Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+                    o.Should().BeOfType<DoubleObj>();
+                    o.ToDouble().Should().Be( (double)result );
                 }
                 else
                 {
-                    Assert.That( o is StringObj );
-                    Assert.That( o.ToString(), Is.EqualTo( result ) );
+                    o.Should().BeOfType<StringObj>();
+                    o.ToString().Should().Be( (string)result );
                 }
             } );
         }
@@ -74,8 +74,8 @@ namespace Yodii.Script.Tests
             RuntimeObj o;
             {
                 o = ScriptEngine.Evaluate( "7 + '45' / 2 * '10' / '4'" );
-                Assert.That( o is DoubleObj );
-                Assert.That( o.ToDouble(), Is.EqualTo( 7.0 + 45.0 / 2.0 * 10.0 / 4.0 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 7.0 + 45.0 / 2.0 * 10.0 / 4.0 );
             }
         }
 
@@ -89,8 +89,8 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.That( o is BooleanObj );
-                Assert.That( o.ToBoolean(), Is.EqualTo( result ) );
+                o.Should().BeOfType<BooleanObj>();
+                o.ToBoolean().Should().Be( result );
             } );
         }
 
@@ -101,9 +101,7 @@ namespace Yodii.Script.Tests
             IsBoolean( "(7&3) == 3" );
             IsBoolean( "((7&3)&1)+2 == (1&45)+2*1" );
             IsBoolean( "(1|2|8) == 1+2+8" );
-            IsBoolean( "(1|2.56e2) == 2+'57'" );
-            IsBoolean( "(1|2.56e2) !== 2+'57'" );
-
+            IsBoolean( "(1|2.56e2) == 257" );
             IsNumber( "~7", -8 );
             IsNumber( "~(7|1)", -8 );
             IsNumber( "~7|1", -7 );
@@ -137,7 +135,7 @@ namespace Yodii.Script.Tests
         [TestCase( "-3701.1 >> 2", -926 )]
         public void biwise_shift_right( string s, double v )
         {
-            Console.WriteLine( "{0} === {1}", s, v );
+            Console.WriteLine( "{0} == {1}", s, v );
             IsNumber( s, v );
         }
 
@@ -164,7 +162,7 @@ namespace Yodii.Script.Tests
         [TestCase( "-3701 << -10", 1656750080 )]
         public void biwise_shift_left( string s, double v )
         {
-            Console.WriteLine( "{0} === {1}", s, v );
+            Console.WriteLine( "{0} == {1}", s, v );
             IsNumber( s, v );
         }
 
@@ -186,7 +184,7 @@ namespace Yodii.Script.Tests
         [TestCase( "-3701 >>> 66 ", 1073740898 )]
         public void biwise_unsigned_shift_right( string s, double v )
         {
-            Console.WriteLine( "{0} === {1}", s, v );
+            Console.WriteLine( "{0} == {1}", s, v );
             IsNumber( s, v );
         }
 
@@ -277,20 +275,15 @@ namespace Yodii.Script.Tests
         public void multiple_equalities()
         {
             IsBoolean( "45 == 45", true );
-            IsBoolean( "45 == '45'", true );
-            IsBoolean( "'45' == 45", true );
-            IsBoolean( "'45'+2 == 452", true );
+            IsBoolean( "45 == '45'", false );
+            IsBoolean( "'45' == 45", false );
+            IsBoolean( "'45'+2 == 452", false );
             IsBoolean( "'45DD' != 45", true );
 
-            IsBoolean( "45 === 45", true );
-            IsBoolean( "45 === '45'", false );
-            IsBoolean( "'45' === 45", false );
-            IsBoolean( "'45'+2 === 452", false );
-
-            IsBoolean( "45 !== 45", false );
-            IsBoolean( "45 !== '45'", true );
-            IsBoolean( "'45' !== 45", true );
-            IsBoolean( "'45'+2 !== 452", true );
+            IsBoolean( "45 != 45", false );
+            IsBoolean( "45 != '45'", true );
+            IsBoolean( "'45' != 45", true );
+            IsBoolean( "'45'+2 != 452", true );
 
             IsBoolean( "Infinity == Infinity", true );
             IsBoolean( "Infinity == 45/0", true );
@@ -298,87 +291,43 @@ namespace Yodii.Script.Tests
             IsBoolean( "NaN == NaN", false );
             IsBoolean( "NaN != NaN", true );
             IsBoolean( "Infinity != NaN", true );
-            
-            IsBoolean( "Infinity === Infinity", true );
-            IsBoolean( "Infinity === 45/0", true );
-            IsBoolean( "-Infinity === -45/0", true );
-            IsBoolean( "NaN === NaN", false );
-            IsBoolean( "NaN !== NaN", true );
-            IsBoolean( "Infinity !== NaN", true );
         }
 
-        [TestCase( "(400+50+3).ToString() === '453'", true )]
-        [TestCase( "(-98979).ToString(2) === '-11000001010100011'", true )]
-        [TestCase( "(14714).ToString(3) === '202011222'", true )]
-        [TestCase( "(-1.47e12).ToString(9) === '-5175284306313'", true )]
-        [TestCase( "(1.4756896725e12).ToString(30) === '27e7t31k0'", true )]
-        [TestCase( "(1.4756896725e12).ToString(31) === '1mjn02pj9'", true )]
-        [TestCase( "(1.4756896725e12).ToString(32) === '1auavarpk'", true )]
-        [TestCase( "(1.4756896725e12).ToString(33) === '11kl9kf8l'", true )]
-        [TestCase( "(1.4756896725e12).ToString(34) === 's38se3kg'", true )]
-        [TestCase( "(1.4756896725e12).ToString(35) === 'mwqnd0lf'", true )]
-        [TestCase( "(1.4756896725e12).ToString(36) === 'itx7j2no'", true )]
+        [TestCase( "(400+50+3).ToString() == '453'", true )]
+        [TestCase( "(-98979).ToString(2) == '-11000001010100011'", true )]
+        [TestCase( "(14714).ToString(3) == '202011222'", true )]
+        [TestCase( "(-1.47e12).ToString(9) == '-5175284306313'", true )]
+        [TestCase( "(1.4756896725e12).ToString(30) == '27e7t31k0'", true )]
+        [TestCase( "(1.4756896725e12).ToString(31) == '1mjn02pj9'", true )]
+        [TestCase( "(1.4756896725e12).ToString(32) == '1auavarpk'", true )]
+        [TestCase( "(1.4756896725e12).ToString(33) == '11kl9kf8l'", true )]
+        [TestCase( "(1.4756896725e12).ToString(34) == 's38se3kg'", true )]
+        [TestCase( "(1.4756896725e12).ToString(35) == 'mwqnd0lf'", true )]
+        [TestCase( "(1.4756896725e12).ToString(36) == 'itx7j2no'", true )]
         public void number_toString_method_supports_base_from_2_to_36( string s, bool v)
         {
             IsBoolean( s, v );
         }
 
-        [Test]
-        public void dates_are_actually_DateTime_in_UTC()
-        {
-            IsDate( "Date(2012,4,26)", new DateTime( 2012, 4, 26, 0, 0, 0, DateTimeKind.Utc ) );
-            IsDate( "Date(2012,4)", new DateTime( 2012, 4, 1, 0, 0, 0, DateTimeKind.Utc ) );
-            IsDate( "Date(2012)", new DateTime( 2012, 1, 1, 0, 0, 0, DateTimeKind.Utc ) );
-            IsDate( "Date(2012,-4,-26)", new DateTime( 2012, 1, 1, 0, 0, 0, DateTimeKind.Utc ) );
-        }
-
-        [TestCase( "Date(2012) < Date(2013)", true )]
-        [TestCase( "Date(2012) == Date(2012)", true )]
-        [TestCase( "Date(2012,4,3) == Date(2012,4,3)", true )]
-        [TestCase( "Date(2012,4,3) != Date(2012,4,3,1)", true )]
-        [TestCase( "Date(2012) > '2011'", false )]
-        [TestCase( "Date(2012) < '2011'", false )]
-        [TestCase( "Date(2012,1,1) < Date(2014,1,1).ToString()", false )]
-        [TestCase( "Date(2012,1,1) > Date(2014,1,1).ToString()", false )]
-        public void dates_comparison_uses_IComparable_interface( string s, bool result )
-        {
-            IsBoolean( s, result );
-        }
-
-        [TestCase( "Date(2012) + ' - Hello'", "Sun, 01 Jan 2012 - Hello" )]
-        [TestCase( "6 + Date(2012) + ' - Hello'", "6Sun, 01 Jan 2012 - Hello" )]
-        [TestCase( "1/0 + Date(2012) + ' - Hello'", "InfinitySun, 01 Jan 2012 - Hello" )]
-        public void dates_addition_is_concatenation( string s, string expected )
-        {
-            IsString( s, expected );
-        }
-
         static void IsBoolean( string s, bool v = true, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<BooleanObj>( o );
-            Assert.That( o.ToBoolean(), Is.EqualTo( v ), msg ?? s );
-        }
-
-        static void IsDate( string s, DateTime v, string msg = null )
-        {
-            RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<JSEvalDate>( o );
-            Assert.That( ((JSEvalDate)o).CompareTo( v ), Is.EqualTo( 0 ), msg ?? s );
+            o.Should().BeOfType<BooleanObj>();
+            o.ToBoolean().Should().Be( v, msg ?? s );
         }
 
         static void IsNumber( string s, double v, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<DoubleObj>( o );
-            Assert.That( o.ToDouble(), Is.EqualTo( v ), msg ?? s );
+            o.Should().BeOfType<DoubleObj>();
+            o.ToDouble().Should().Be( v, msg ?? s );
         }
 
         static void IsString( string s, string v, string msg = null )
         {
             RuntimeObj o = ScriptEngine.Evaluate( s );
-            Assert.IsInstanceOf<StringObj>( o );
-            Assert.That( o.ToString(), Is.EqualTo( v ), msg ?? s );
+            o.Should().BeOfType<StringObj>();
+            o.ToString().Should().Be( v, msg ?? s );
         }
 
     }

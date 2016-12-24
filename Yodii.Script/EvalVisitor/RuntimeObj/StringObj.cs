@@ -73,7 +73,7 @@ namespace Yodii.Script
         {
             StringObj s = obj as StringObj;
             if( s != null ) return string.Compare( _value, s._value, StringComparison.Ordinal );
-            if( obj is String ) return string.Compare( _value, (string)obj, StringComparison.Ordinal );
+            if( obj is string ) return string.Compare( _value, (string)obj, StringComparison.Ordinal );
             throw new ArgumentException( "Must be a string.", "obj" );
         }
 
@@ -83,8 +83,8 @@ namespace Yodii.Script
                 c.OnIndex( ( f, arg ) =>
                 {
                     int idx = JSSupport.ToInt32( arg.ToDouble() );
-                    if( idx < 0 || idx >= _value.Length ) return f.SetResult( StringObj.EmptyString );
-                    return f.SetResult( StringObj.Create( new string( _value[idx], 1 ) ) );
+                    if( idx < 0 || idx >= _value.Length ) return f.SetResult( EmptyString );
+                    return f.SetResult( Create( new string( _value[idx], 1 ) ) );
                 } )
                 .On( "ToString" ).OnCall( ( f, args ) =>
                 {

@@ -18,12 +18,10 @@ It is under developpement and any contributions are welcome.
 - Enable API securization (currently any properties or methods of external objects are callable).
   - A simple call validation hook should minimally do the job.
   - White/Black list and support of a kind of [SafeScript] attribute or ISafeScript marker interface may be useful.
-- Stop supporting javascript operators === and !==
-  - Current == and != operators must simply use .Net object.Equals method: no implicit conversion must be made.
 - "Number" must be replaced with "Integer" and "Double". Integer must be the default but implicit conversion between 
   the two must be supported.
-- Replace JSEvalDate object with a more like DateTime .Net object.
-- String currently supports only indexer [] (instead of charAt() javascript method) and ToString() :).
+- Support a DateTime .Net object.
+- String currently supports only indexer [] (instead of charAt() javascript method) and ToString().
   - StringObj must support all other useful methods (Contains, Substring, etc.).
 - Export script functions as native functions (NativeFunctionObj does the job in the opposite way):
   - From the script to the external world (FunctionObj.ToNative() must return a callable delegate). 
@@ -31,3 +29,8 @@ It is under developpement and any contributions are welcome.
 - Transparently support async/await (actually any awaitable return) with the defined 
   but not implemented PExpr.DeferredKind.AsyncCall.
 
+## vNext
+- No more === and !==
+  - Current == and != operators act as strict operators.
+- With object support. 
+  - This (awful) feature can be useful to adapt existing DSL.

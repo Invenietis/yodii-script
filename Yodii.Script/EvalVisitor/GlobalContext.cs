@@ -33,14 +33,12 @@ namespace Yodii.Script
     {
         readonly static char[] _invalidNameChars = new char[] { ' ', '\t', '\r', '\n', '{', '}', '(', ')', '[', ']', ',', ':', ';' };
 
-        JSEvalDate _epoch;
         readonly Dictionary<Type, ExternalTypeHandler> _types;
         readonly Dictionary<string, RuntimeObj> _objects;
         readonly HashSet<string> _namespaces;
 
         public GlobalContext()
         {
-            _epoch = new JSEvalDate( JSSupport.JSEpoch );
             _types = new Dictionary<Type, ExternalTypeHandler>();
             _objects = new Dictionary<string, RuntimeObj>();
             _namespaces = new HashSet<string>();
@@ -194,48 +192,6 @@ namespace Yodii.Script
         #endregion
 
 
-        [Obsolete]
-        public RuntimeObj CreateBoolean( bool value )
-        {
-            return value ? BooleanObj.True : BooleanObj.False;
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateBoolean( RuntimeObj o )
-        {
-            if( o == null ) return BooleanObj.False;
-            if( o is BooleanObj ) return o;
-            return CreateBoolean( o.ToBoolean() );
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateNumber( double value )
-        {
-            return DoubleObj.Create( value );
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateNumber( RuntimeObj o )
-        {
-            if( o == null ) return DoubleObj.Zero;
-            if( o is DoubleObj ) return o;
-            return CreateNumber( o.ToDouble() );
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateString( string value )
-        {
-            if( value == null ) return RuntimeObj.Null;
-            return StringObj.Create( value );
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateDateTime( DateTime value )
-        {
-            if( value == JSSupport.JSEpoch ) return _epoch;
-            return new JSEvalDate( value );
-        }
-
         public RuntimeObj Create( object o )
         {
             if( o == null ) return RuntimeObj.Null;
@@ -245,7 +201,7 @@ namespace Yodii.Script
                 if( o is double ) return DoubleObj.Create( (double)o );
                 if( o is float ) return DoubleObj.Create( (float)o );
                 if( o is bool ) return (bool)o ? BooleanObj.True : BooleanObj.False;
-                if( o is DateTime ) return CreateDateTime( (DateTime)o );
+                return new ExternalObjectObj( this, o );
             }
             string s = o as string;
             if( s != null ) return StringObj.Create( s );
@@ -267,7 +223,7 @@ namespace Yodii.Script
 
         /// <summary>
         /// Default implementation of <see cref="IAccessorVisitor.Visit"/> that supports evaluation of intrinsic 
-        /// functions Number(), String(), Boolean() and Date().
+        /// functions Number(), String(), Boolean().
         /// By overriding this any binding to to external objects can be achieved (recall to call this base
         /// method when overriding).
         /// </summary>
@@ -299,7 +255,7 @@ namespace Yodii.Script
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {
                     if( args.Count == 0 ) return f.SetResult( DoubleObj.Zero );
-                    return f.SetResult( CreateNumber( args[0] ) );
+                    return f.SetResult( args[0] as DoubleObj ?? DoubleObj.Create( args[0].ToDouble() ) );
                 }
                 )
                 .On( "String" ).OnCall( ( f, args ) =>
@@ -311,29 +267,6 @@ namespace Yodii.Script
                 .On( "Boolean" ).OnCall( ( f, args ) =>
                 {
                     return f.SetResult( args.Count == 1 && args[0].ToBoolean() ? BooleanObj.True : BooleanObj.False );
-                } )
-                .On( "Date" ).OnCall( ( f, args ) =>
-                {
-                    try
-                    {
-                        int[] p = new int[7];
-                        for( int i = 0; i < args.Count; ++i )
-                        {
-                            p[i] = (int)args[i].ToDouble();
-                            if( p[i] < 0 ) p[i] = 0;
-                        }
-                        if( p[0] > 9999 ) p[0] = 9999;
-                        if( p[1] < 1 ) p[1] = 1;
-                        else if( p[1] > 12 ) p[1] = 12;
-                        if( p[2] < 1 ) p[2] = 1;
-                        else if( p[2] > 31 ) p[2] = 31;
-                        DateTime d = new DateTime( p[0], p[1], p[2], p[3], p[4], p[5], p[6], DateTimeKind.Utc );
-                        return f.SetResult( CreateDateTime( d ) );
-                    }
-                    catch( Exception ex )
-                    {
-                        return f.SetError( ex.Message );
-                    }
                 } )
             );
             return s != null ? s.Visit() : frame.SetError();

@@ -38,15 +38,15 @@ namespace Yodii.Script.Tests
         [Test]
         public void round_trip_parsing()
         {
-            JSTokenizer p = new JSTokenizer();
-            JSTokenizer.Explain( JSTokenizerToken.Integer ).Should().Be( "42" );
+            Tokenizer p = new Tokenizer();
+            TokenizerToken.Integer.Explain().Should().Be( "42" );
 
-            string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x === z !== x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
+            string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x == z != x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
             p.Reset( s );
             string recompose = "";
             while( !p.IsEndOfInput )
             {
-                recompose += " " + JSTokenizer.Explain( p.CurrentToken );
+                recompose += " " + p.CurrentToken.Explain();
                 p.Forward();
             }
             s = s.Replace( "if", "identifier" )
@@ -67,9 +67,9 @@ namespace Yodii.Script.Tests
         [TestCase( "45.01e23member" )]
         public void bad_literal_numbers_are_ErrorNumberIdentifierStartsImmediately( string num )
         {
-            JSTokenizer p = new JSTokenizer( num );
+            Tokenizer p = new Tokenizer( num );
             p.IsErrorOrEndOfInput.Should().Be( true );
-            p.ErrorCode.Should().Be( JSTokenizerError.ErrorNumberIdentifierStartsImmediately );
+            p.ErrorCode.Should().Be( TokenizerError.ErrorNumberIdentifierStartsImmediately );
         }
 
 
@@ -79,8 +79,8 @@ namespace Yodii.Script.Tests
         [TestCase( "876.098E-3" )]
         public void parsing_floats( string num )
         {
-            JSTokenizer p = new JSTokenizer( num );
-            p.CurrentToken.Should().Be( JSTokenizerToken.Float );
+            Tokenizer p = new Tokenizer( num );
+            p.CurrentToken.Should().Be( TokenizerToken.Float );
             p.ReadDouble().Should().Be( double.Parse( num, NumberStyles.Float, CultureInfo.InvariantCulture ) );
             p.Forward().Should().Be( false );
             p.IsEndOfInput.Should().Be( true );
@@ -95,7 +95,7 @@ namespace Yodii.Script.Tests
         [TestCase( @"'a\u3712b'", "a\u3712b" )]
         public void successful_string_parsing( string s, string expected )
         {
-            JSTokenizer p = new JSTokenizer( s );
+            Tokenizer p = new Tokenizer( s );
             string r = p.ReadString();
             p.IsEndOfInput.Should().Be( true );
             r.Should().Be( expected );

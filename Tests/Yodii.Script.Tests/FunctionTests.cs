@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Yodii.Script;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -38,9 +38,9 @@ namespace Yodii.Script.Tests
             string s = @"function yo(a) { return 'yo' + a; }";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<FunctionObj>( o );
+                o.Should().BeOfType<FunctionObj>();
                 var f = (FunctionObj)o;
-                CollectionAssert.AreEqual( new[] { "a" }, f.Expr.Parameters.Select( p => p.Name ).ToArray() );
+                f.Expr.Parameters.Select( p => p.Name ).Should().Equal( new[] { "a" } );
             } );
         }
 
@@ -51,8 +51,8 @@ namespace Yodii.Script.Tests
                          yo('b');";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "yob" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "yob" );
             } );
         }
 
@@ -64,8 +64,8 @@ namespace Yodii.Script.Tests
 
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 + 4 + 5 + 6 + 7 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 1.0 + 2 + 3 + 4 + 5 + 6 + 7 );
             } );
         }
 
@@ -82,8 +82,8 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "xy" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "xy" );
             } );
         }
 
@@ -101,8 +101,8 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 1.0 + 2 + 3 );
             } );
         }
 
@@ -118,8 +118,8 @@ namespace Yodii.Script.Tests
                          f(0) + f(0);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 2 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 2.0 );
             } );
         }
 
@@ -138,8 +138,8 @@ namespace Yodii.Script.Tests
                          f() + f() + 1000*x;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 11 + 12 + 1000*10 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 11.0 + 12 + 1000 * 10 );
             } );
         }
 
@@ -162,8 +162,8 @@ namespace Yodii.Script.Tests
                         ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 1 + 2 + 3 + 4 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 1.0 + 2 + 3 + 4 );
             } );
         }
 
@@ -179,8 +179,8 @@ namespace Yodii.Script.Tests
                             ";
             TestHelper.RunNormalAndStepByStep( script, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "20" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "20" );
             } );
         }
 
@@ -195,8 +195,8 @@ namespace Yodii.Script.Tests
                          fib(20);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 6765 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 6765.0 );
             } );
         }
 
@@ -222,8 +222,8 @@ namespace Yodii.Script.Tests
                             m(5) + m(10) + m(20);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 17.5 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 17.5 );
             } );
         }
 
@@ -247,8 +247,8 @@ namespace Yodii.Script.Tests
                             wtf(5)+','+wtf(6)+','+wtf(42)+','+wtf(3)+','+wtf(1)+','+wtf(0);";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "10,32,148,302,606,1212" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "10,32,148,302,606,1212" );
             } );
         }
 
@@ -270,8 +270,8 @@ namespace Yodii.Script.Tests
                             ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "18" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 18.0 );
             } );
         }
 

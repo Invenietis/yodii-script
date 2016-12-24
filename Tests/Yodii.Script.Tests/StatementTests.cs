@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Yodii.Script;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -39,8 +39,8 @@ namespace Yodii.Script.Tests
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( result );
             } );
         }
 
@@ -53,8 +53,8 @@ namespace Yodii.Script.Tests
                          j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 3712.0 );
             } );
         }
 
@@ -65,8 +65,8 @@ namespace Yodii.Script.Tests
                          let j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.AreEqual( o.ToString(), "3712" );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToString().Should().Be( "3712" );
             } );
         }
 
@@ -78,8 +78,8 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 3712.0 );
             } );
         }
 
@@ -91,50 +91,50 @@ namespace Yodii.Script.Tests
                             let bug = '';
 
                             i += 0+1; i *= 2*1; i <<= 1<<0; i -= 7-6;
-                            if( i !== (((0+1)*(2*1))<<(1<<0))-(7-6) ) bug = 'Bug in +, *, << or -';
+                            if( i != (((0+1)*(2*1))<<(1<<0))-(7-6) ) bug = 'Bug in +, *, << or -';
 
                             // i = 3
                             i += 4; i &= 2 | 1; 
-                            if( i !== (7&2|1) ) bug = 'Bug in &';
+                            if( i != (7&2|1) ) bug = 'Bug in &';
 
                             // i = 3
                             i |= 7+1;
-                            if( i !== 11 ) bug = 'Bug in |';
+                            if( i != 11 ) bug = 'Bug in |';
 
                             // i = 11
                             i >>= 1+1;
-                            if( i !== 2 ) bug = 'Bug in >>';
+                            if( i != 2 ) bug = 'Bug in >>';
 
                             // i = 2
                             i ^= 1+8;
-                            if( i !== (2^(1+8)) ) bug = 'Bug in ^';
+                            if( i != (2^(1+8)) ) bug = 'Bug in ^';
 
                             // i = 11
                             i ^= -3712;
-                            if( i !== (11^-3712) ) bug = 'Bug in ~';
+                            if( i != (11^-3712) ) bug = 'Bug in ~';
 
                             // i = -3701
                             i >>>= 2;
-                            if( i !== (-3701>>>2) || i !== 1073740898 ) bug = 'Bug in >>>';
+                            if( i != (-3701>>>2) || i != 1073740898 ) bug = 'Bug in >>>';
 
                             // i = 1073740898;
                             i &= 2|4|32|512|4096;
-                            if( i !== 1073740898 & (2|4|32|512|4096) ) bug = 'Bug in &';
+                            if( i != 1073740898 & (2|4|32|512|4096) ) bug = 'Bug in &';
 
                             // i = 4130
                             i %= -(1+5+3);
-                            if( i !== (4130%-(1+5+3)) || i !== 8 ) bug = 'Bug in %';
+                            if( i != (4130%-(1+5+3)) || i != 8 ) bug = 'Bug in %';
                             
                             i = 8;
                             i /= 3.52;
-                            if( i !== 8/3.52 ) bug = 'Bug in /';
+                            if( i != 8/3.52 ) bug = 'Bug in /';
                         
                             bug.ToString();
 ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( String.Empty ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().BeEmpty();
             } );
         }
 
@@ -152,8 +152,8 @@ namespace Yodii.Script.Tests
                          if( j > 3000 ) i = 0;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 0 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 0.0 );
             } );
         }
 
@@ -162,11 +162,11 @@ namespace Yodii.Script.Tests
         {
             string s = @"let ResultAsRefRuntimeObject = 8;
                          let X;
-                         if( X === undefined ) ResultAsRefRuntimeObject;";
+                         if( X == undefined ) ResultAsRefRuntimeObject;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 8 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 8.0 );
             } );
         }
 
@@ -176,8 +176,8 @@ namespace Yodii.Script.Tests
             string s = @"typeof unexisting";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "undefined" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "undefined" );
             } );
         }
 
@@ -188,8 +188,8 @@ namespace Yodii.Script.Tests
                          if( i++ == 0 && i++ == 1 && i++ == 2 ) i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 3.0 );
             } );
         }
 
@@ -200,8 +200,8 @@ namespace Yodii.Script.Tests
                          if( ++i == 1 && ++i == 2 && ++i == 3 && ++i == 4 ) i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 4 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 4.0 );
             } );
         }
 
@@ -214,8 +214,8 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 10.0 );
             } );
         }
         [Test]
@@ -226,8 +226,8 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 11 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 11.0 );
             } );
         }
 
@@ -243,8 +243,8 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 50.0 );
             } );
         }
 
@@ -262,8 +262,8 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 50.0 );
             } );
         }
 
@@ -275,7 +275,7 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RuntimeError>( o );
+                o.Should().BeOfType<RuntimeError>();
             } );
         }
 
@@ -292,8 +292,8 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaaa" );
             } );
         }
 
@@ -310,8 +310,8 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaaa" );
             } );
         }
 
@@ -329,8 +329,8 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaa" );
             } );
         }
 
@@ -345,8 +345,8 @@ namespace Yodii.Script.Tests
                          sScope + '|' + k+i+j";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aa101000|a12" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "aa101000|a12" );
             } );
         }
 
@@ -361,8 +361,8 @@ namespace Yodii.Script.Tests
                         i+j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "0a" );
             } );
         }
 
@@ -376,8 +376,8 @@ namespace Yodii.Script.Tests
                           'r='+r+', a='+a+', b='+b";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( result ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( result );
             } );
         }
 

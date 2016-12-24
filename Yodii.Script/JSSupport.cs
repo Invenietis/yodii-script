@@ -91,8 +91,8 @@ namespace Yodii.Script
         }
 
         /// <summary>
-        /// Converts a double into an int, projecting any out of range values to 0 (<see cref="Double.NaN"/> is always mapped to 0).
-        /// Can optionally map values exceeding [<see cref="Int32.MinValue"/>,<see cref="Int32.MaxValue"/>] to the closest min/max.
+        /// Converts a double into an int, projecting any out of range values to 0 (<see cref="double.NaN"/> is always mapped to 0).
+        /// Can optionally map values exceeding [<see cref="int.MinValue"/>,<see cref="int.MaxValue"/>] to the closest min/max.
         /// </summary>
         /// <param name="d">Double to convert.</param>
         /// <param name="toMinMax">True to map values exceeding [<see cref="Int32.MinValue"/>,<see cref="Int32.MaxValue"/>] to the closest min/max.</param>
@@ -112,7 +112,7 @@ namespace Yodii.Script
         /// <param name="d">Double to convert.</param>
         /// <param name="toMinMax">True to map values exceeding [<see cref="Int64.MinValue"/>,<see cref="Int64.MaxValue"/>] to the closest min/max.</param>
         /// <returns>A signed long.</returns>
-        public static long ToInt64( Double d, bool toMinMax = false )
+        public static long ToInt64( double d, bool toMinMax = false )
         {
             if( double.IsNaN( d ) ) return 0;
             if( d > long.MaxValue ) return toMinMax ? long.MaxValue : 0;
@@ -122,8 +122,8 @@ namespace Yodii.Script
 
         /// <summary>
         /// Handles "Infinity" and "-Infinity". The string may contains leading and/or trailing white spaces and a leading negative sign.
-        /// When <see cref="String.IsNullOrWhiteSpace"/> the result is 0 by default (it is <see cref="Double.NaN"/> for <see cref="ParseFloat"/>). 
-        /// Non parse-able numbers (or "NaN" itself) are returns as <see cref="Double.NaN"/>.
+        /// When <see cref="string.IsNullOrWhiteSpace"/> the result is 0 by default (it is <see cref="double.NaN"/> for <see cref="ParseFloat"/>). 
+        /// Non parse-able numbers (or "NaN" itself) are returns as <see cref="double.NaN"/>.
         /// </summary>
         /// <param name="s">String to convert.</param>
         /// <param name="whenNullOrWhitespace">Defaults to 0.</param>
@@ -141,14 +141,14 @@ namespace Yodii.Script
 
         /// <summary>
         /// Handles "Infinity" and "-Infinity". The string may contains leading and/or trailing white spaces and a leading negative sign.
-        /// When <see cref="String.IsNullOrWhiteSpace"/> the result is <see cref="Double.NaN"/>. 
-        /// Non parse-able numbers (or "NaN" itself) are returns as <see cref="Double.NaN"/>.
+        /// When <see cref="string.IsNullOrWhiteSpace"/> the result is <see cref="double.NaN"/>. 
+        /// Non parse-able numbers (or "NaN" itself) are returns as <see cref="double.NaN"/>.
         /// </summary>
         /// <param name="s">String to convert.</param>
         /// <returns>The double, following javascript parseFloat rules.</returns>
         public static double ParseFloat( string s )
         {
-            return ToNumber( s, Double.NaN );
+            return ToNumber( s, double.NaN );
         }
 
         public static double ToNumber( object o )
@@ -185,11 +185,6 @@ namespace Yodii.Script
         public static string ToString( double v )
         {
             return v.ToString( CultureInfo.InvariantCulture );
-        }
-
-        public static string ToString( DateTime v )
-        {
-            return v.ToString( JSEvalDate.DateFormat, CultureInfo.InvariantCulture );
         }
 
         static readonly char[] _digits36 = {

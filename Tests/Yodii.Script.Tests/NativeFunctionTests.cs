@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CK.Core;
 using NUnit.Framework;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -42,8 +43,8 @@ namespace Yodii.Script.Tests
             c.Register( "CallMe", a );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.That( o, Is.SameAs( RuntimeObj.Undefined ) );
-                Assert.That( called, Is.EqualTo( "I'm famous." ) );
+                o.Should().BeSameAs( RuntimeObj.Undefined );
+                called.Should().Be( "I'm famous." );
             }, c );
         }
 
@@ -54,8 +55,8 @@ namespace Yodii.Script.Tests
             c.Register( "CallMe", (Func<string,string>)StaticFunc );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "Yes! I'm famous." ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "Yes! I'm famous." );
             }, c );
         }
 
@@ -75,8 +76,8 @@ namespace Yodii.Script.Tests
             c.Register( "CallMe", (Func<string, string>)obj.InstanceMethod );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "Oh My... I'm famous." ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "Oh My... I'm famous." );
             }, c );
         }
 
