@@ -25,52 +25,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class TemplateTests
     {
-        [Test]
+        [Fact]
         public void foreach_with_one_write_statement()
         {
             var c = new GlobalContext();
             c.Register( "TheList", new[] { 1, 2, 7, 10, 16 } );
             var e = new TemplateEngine( c );
             var r = e.Process( "<%foreach i in TheList {%>*<%=i%><%}%>" );
-            Assert.That( r.ErrorMessage, Is.Null );
-            Assert.That( r.Script, Is.Not.Null );
-            Assert.That( r.Text, Is.EqualTo( "*1*2*7*10*16" ) );
+            r.ErrorMessage.Should().BeNull();
+            r.Script.Should().NotBeNull();
+            r.Text.Should().Be( "*1*2*7*10*16" );
         }
 
-        [Test]
+        [Fact]
         public void empty_tags_are_ignored()
         {
             var e = new TemplateEngine( new GlobalContext() );
             {
                 var r = e.Process( "<%%>*<%=%>$<%%>" );
-                Assert.That( r.ErrorMessage, Is.Null );
-                Assert.That( r.Script, Is.Not.Null );
-                Assert.That( r.Text, Is.EqualTo( "*$" ) );
+                r.ErrorMessage.Should().BeNull();
+                r.Script.Should().NotBeNull();
+                r.Text.Should().Be( "*$" );
             }
             {
                 var r = e.Process( "<% %>*<%= %>$<% %>" );
-                Assert.That( r.ErrorMessage, Is.Null );
-                Assert.That( r.Script, Is.Not.Null );
-                Assert.That( r.Text, Is.EqualTo( "*$" ) );
+                r.ErrorMessage.Should().BeNull();
+                r.Script.Should().NotBeNull();
+                r.Text.Should().Be( "*$" );
             }
         }
 
-        [Test]
+        [Fact]
         public void when_there_is_no_tag_there_is_no_script()
         {
             var e = new TemplateEngine( new GlobalContext() );
             var r = e.Process( "There is no tag here." );
-            Assert.That( r.ErrorMessage, Is.Null );
-            Assert.That( r.Script, Is.Null );
-            Assert.That( r.Text, Is.EqualTo( "There is no tag here." ) );
+            r.ErrorMessage.Should().BeNull();
+            r.Script.Should().BeNull();
+            r.Text.Should().Be( "There is no tag here." );
         }
 
         class Column
@@ -90,7 +90,7 @@ namespace Yodii.Script.Tests
             public string TableName { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void simple_template_from_Model_object()
         {
             var t = new Table()
@@ -110,12 +110,12 @@ namespace Yodii.Script.Tests
                 @"create table <%=Model.Schema%>.<%=Model.TableName%> (<%foreach c in Model.Columns {%>
 <%=c.Name%> <%=c.Type%><%if c.IsPrimaryKey {%> primary key<%} if( c.$index < Model.Columns.Count - 1) {%>,<%}}%>
 );" );
-            Assert.That( r.ErrorMessage, Is.Null );
-            Assert.That( r.Script, Is.Not.Null );
-            Assert.That( r.Text, Is.EqualTo( @"create table CK.tToto (
+            r.ErrorMessage.Should().BeNull();
+            r.Script.Should().NotBeNull();
+            r.Text.Should().Be( @"create table CK.tToto (
 Id int primary key,
 Name varchar(40)
-);" ) );
+);" );
         }
 
 

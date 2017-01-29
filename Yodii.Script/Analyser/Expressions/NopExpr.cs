@@ -33,7 +33,14 @@ namespace Yodii.Script
 
     public class NopExpr : Expr
     {
+        /// <summary>
+        /// A <see cref="NopExpr"/> with a false <see cref="Expr.IsStatement"/>.
+        /// </summary>
         public static readonly NopExpr Expression = new NopExpr( false );
+
+        /// <summary>
+        /// A <see cref="NopExpr"/> with a true <see cref="Expr.IsStatement"/>.
+        /// </summary>
         public static readonly NopExpr Statement = new NopExpr( true );
 
         NopExpr( bool isStatement )

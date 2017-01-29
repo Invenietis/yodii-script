@@ -121,7 +121,7 @@ namespace Yodii.Script
                     _current = _frame = f;
                 }
 
-                public FrameState State { get { return _state; } }
+                public FrameState State => _state;
 
                 public IAccessorFrameInitializer On( string memberName )
                 {
@@ -217,7 +217,7 @@ namespace Yodii.Script
 
             public override PExpr SetResult( RuntimeObj result )
             {
-                // NextFrame is actualy the PreviousAccessor
+                // NextFrame is actually the PreviousAccessor
                 IAccessorFrame p = NextFrame as IAccessorFrame;
                 if( p != null && !p.IsResolved ) p.SetResult( result );
                 return base.SetResult( result );
@@ -235,7 +235,7 @@ namespace Yodii.Script
                 return SetResult( new RuntimeError( Expr, GetAccessErrorMessage(), true ) );
             }
 
-            protected abstract string GetAccessErrorMessage();
+            internal protected abstract string GetAccessErrorMessage();
 
             protected PExpr ReentrantPendingOrSignal( PExpr sub )
             {
@@ -269,6 +269,9 @@ namespace Yodii.Script
 
         class AccessorMemberFrame : AccessorFrame, IAccessorMemberFrame
         {
+            GlobalContext.WithObjectScope _withScope;
+            ScopeWalker _scopeWalker;
+
             internal protected AccessorMemberFrame( EvalVisitor visitor, AccessorMemberExpr e )
                 : base( visitor, e )
             {
@@ -278,9 +281,81 @@ namespace Yodii.Script
 
             public IAccessorMemberFrame PrevMemberAccessor => NextFrame as IAccessorMemberFrame; 
 
-            protected override string GetAccessErrorMessage() => Expr.IsUnbound 
+            internal protected override string GetAccessErrorMessage() => Expr.IsUnbound 
                                                                     ? "Undefined in scope: " + Expr.Name 
                                                                     : "Unknown property: " + Expr.Name;
+
+            /// <summary>
+            /// This class is a IAccessorMemberFrame that is a façade on the real one. it behaves exactly 
+            /// like the current frame except that it hooks the SetError method to return a special
+            /// NotFound result when called.
+            /// The trick here is that whenever an error is raised by any next accessor (i.e. the head of the
+            /// accessor chain has been resolved), the SetResult is called with the real error.
+            /// Our hooked SetError is called if the scope object can not resolve the head of the chain accessor:
+            /// this is when we walk up the scope chain up to root.
+            /// This is used to lookup the existence of a member name via IAccessorVisitor.Visit( IAccessorFrame frame )
+            /// without the need to support an explicit "lookup member by name" method.
+            /// </summary>
+            class ScopeWalker : IAccessorMemberFrame, IAccessorFrameState
+            {
+                readonly AccessorMemberFrame Frame;
+                GlobalContext.WithObjectScope _scope;
+                PExpr _lookup;
+
+                static public readonly RuntimeObj NotFound = new RuntimeObj.UndefinedObj();
+
+                public ScopeWalker( AccessorMemberFrame frame, GlobalContext.WithObjectScope start )
+                {
+                    Frame = frame;
+                    _scope = start;
+                }
+
+                public PExpr Visit()
+                {
+                    for( ;; )
+                    {
+                        if( (_lookup = _scope.Object.Visit( this )).IsPendingOrSignal ) return Frame.ReentrantPendingOrSignal( _lookup );
+                        if( _lookup.Result == NotFound )
+                        {
+                            if( (_scope = _scope.Parent) == null ) return _lookup;
+                        }
+                        else return _lookup;
+                    }
+                }
+
+                AccessorExpr IAccessorFrame.Expr => Frame.Expr;
+
+                AccessorMemberExpr IAccessorMemberFrame.Expr => Frame.Expr;
+
+                GlobalContext IAccessorFrame.Global => Frame.Global;
+
+                bool IAccessorFrame.IsResolved => _lookup.IsResolved;
+
+                IAccessorFrame IAccessorFrame.NextAccessor => Frame.NextAccessor;
+
+                IAccessorMemberFrame IAccessorMemberFrame.PrevMemberAccessor => Frame.PrevMemberAccessor;
+
+                IAccessorFrameState IAccessorFrame.GetCallState( IReadOnlyList<Expr> arguments, Func<IAccessorFrame, IReadOnlyList<RuntimeObj>, PExpr> call )
+                {
+                    return Frame.GetCallState( arguments, call );
+                }
+
+                IAccessorFrameState IAccessorFrame.GetImplementationState( Action<IAccessorFrameInitializer> configuration )
+                {
+                    return Frame.GetImplementationState( configuration );
+                }
+
+                PExpr IAccessorFrame.SetError( string message )
+                {
+                    return new PExpr( NotFound );
+                }
+
+                PExpr IAccessorFrame.SetResult( RuntimeObj result )
+                {
+                    return Frame.SetResult( result );
+                }
+
+            }
 
             protected override PExpr DoVisit()
             {
@@ -288,7 +363,27 @@ namespace Yodii.Script
                 {
                     if( Expr.IsUnbound )
                     {
-                        if( (_left = Global.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
+                        if( _withScope == null )
+                        {
+                            var c = Global.InternalWithObjectScope;
+                            if( c == null ) _withScope = GlobalContext.WithObjectScope.None;
+                            else
+                            {
+                                _withScope = c;
+                                _scopeWalker = new ScopeWalker( this, c );
+                            }
+                        }
+                        if( _scopeWalker != null )
+                        {
+                            if( (_left = _scopeWalker.Visit()).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
+                            if( _left.Result == ScopeWalker.NotFound )
+                            {
+                                // Not found in scope: forget it and challenge the Global from now on.
+                                _scopeWalker = null;
+                                if( (_left = Global.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
+                            }
+                        }
+                        else if( (_left = Global.Visit( this )).IsPendingOrSignal ) return ReentrantPendingOrSignal( _left );
                     }
                     else
                     {
@@ -314,14 +409,14 @@ namespace Yodii.Script
                 {
                     foreach( var df in declaredFunc )
                     {
-                        _visitor.ScopeManager.Register( df );
+                        Visitor.ScopeManager.Register( df );
                     }
                 }
             }
 
             public new AccessorCallExpr Expr => (AccessorCallExpr)base.Expr;
 
-            protected override string GetAccessErrorMessage() => Expr.IsIndexer ? "Indexer is not supported." : "Not a function.";
+            internal protected override string GetAccessErrorMessage() => Expr.IsIndexer ? "Indexer is not supported." : "Not a function.";
 
             protected override void OnDispose()
             {
@@ -330,7 +425,7 @@ namespace Yodii.Script
                 {
                     foreach( var df in declaredFunc )
                     {
-                        _visitor.ScopeManager.Unregister( df );
+                        Visitor.ScopeManager.Unregister( df );
                     }
                 }
             }

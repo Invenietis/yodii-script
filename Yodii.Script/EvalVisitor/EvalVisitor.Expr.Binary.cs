@@ -48,8 +48,8 @@ namespace Yodii.Script
                 if( IsPendingOrSignal( ref _left, Expr.Left ) ) return PendingOrSignal( _left );
 
                 // Do not evaluate right expression if it is useless: short-circuit boolean evaluation.
-                if( (Expr.BinaryOperatorToken == JSTokenizerToken.And && !_left.Result.ToBoolean())
-                    || (Expr.BinaryOperatorToken == JSTokenizerToken.Or && _left.Result.ToBoolean()) )
+                if( (Expr.BinaryOperatorToken == TokenizerToken.And && !_left.Result.ToBoolean())
+                    || (Expr.BinaryOperatorToken == TokenizerToken.Or && _left.Result.ToBoolean()) )
                 {
                     return SetResult( _left.Result );
                 }
@@ -62,64 +62,54 @@ namespace Yodii.Script
                 // Right value is the result for And and Or.
                 RuntimeObj result = right;
 
-                if( Expr.BinaryOperatorToken != JSTokenizerToken.And && Expr.BinaryOperatorToken != JSTokenizerToken.Or )
+                if( Expr.BinaryOperatorToken != TokenizerToken.And && Expr.BinaryOperatorToken != TokenizerToken.Or )
                 {
-                    if( (Expr.BinaryOperatorToken & JSTokenizerToken.IsCompareOperator) != 0 )
+                    if( (Expr.BinaryOperatorToken & TokenizerToken.IsCompareOperator) != 0 )
                     {
-                        #region ==, <, >, <=, >=, !=, === and !==
+                        #region ==, <, >, <=, >=, !=
                         int compareValue;
                         switch( (int)Expr.BinaryOperatorToken & 15 )
                         {
-                            case (int)JSTokenizerToken.StrictEqual & 15:
+                            case (int)TokenizerToken.Greater & 15:
                                 {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) );
+                                    result = new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue > 0 ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
-                            case (int)JSTokenizerToken.StrictDifferent & 15:
+                            case (int)TokenizerToken.GreaterOrEqual & 15:
                                 {
-                                    result = Global.CreateBoolean( !new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) );
+                                    result = new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue >= 0 ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Greater & 15:
+                            case (int)TokenizerToken.Less & 15:
                                 {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue > 0 );
+                                    result = new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue < 0 ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
-                            case (int)JSTokenizerToken.GreaterOrEqual & 15:
+                            case (int)TokenizerToken.LessOrEqual & 15:
                                 {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue >= 0 );
+                                    result = new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue <= 0 ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Less & 15:
+                            case (int)TokenizerToken.Equal & 15:
                                 {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue < 0 );
+                                    result = new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
-                            case (int)JSTokenizerToken.LessOrEqual & 15:
+                            case (int)TokenizerToken.Different & 15:
                                 {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).Compare( Global, out compareValue ) && compareValue <= 0 );
-                                    break;
-                                }
-                            case (int)JSTokenizerToken.Equal & 15:
-                                {
-                                    result = Global.CreateBoolean( new RuntimeObjComparer( left, right ).AreEqual( Global ) );
-                                    break;
-                                }
-                            case (int)JSTokenizerToken.Different & 15:
-                                {
-                                    result = Global.CreateBoolean( !new RuntimeObjComparer( left, right ).AreEqual( Global ) );
+                                    result = !new RuntimeObjComparer( left, right ).AreEqualStrict( Global ) ? BooleanObj.True : BooleanObj.False;
                                     break;
                                 }
                             default: throw UnsupportedOperatorException();
                         }
                         #endregion
                     }
-                    else if( (Expr.BinaryOperatorToken & JSTokenizerToken.IsBinaryOperator) != 0 )
+                    else if( (Expr.BinaryOperatorToken & TokenizerToken.IsBinaryOperator) != 0 )
                     {
                         #region |, ^, &, >>, <<, >>>, +, -, /, * and %.
                         switch( (int)Expr.BinaryOperatorToken & 15 )
                         {
-                            case (int)JSTokenizerToken.Plus & 15:
+                            case (int)TokenizerToken.Plus & 15:
                                 {
                                     if( ReferenceEquals( left.Type, RuntimeObj.TypeNumber ) && ReferenceEquals( right.Type, RuntimeObj.TypeNumber ) )
                                     {
@@ -131,22 +121,22 @@ namespace Yodii.Script
                                     }
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Minus & 15:
+                            case (int)TokenizerToken.Minus & 15:
                                 {
                                     result = DoubleObj.Create( left.ToDouble() - right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Mult & 15:
+                            case (int)TokenizerToken.Mult & 15:
                                 {
                                     result = DoubleObj.Create( left.ToDouble() * right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Divide & 15:
+                            case (int)TokenizerToken.Divide & 15:
                                 {
                                     result = DoubleObj.Create( left.ToDouble() / right.ToDouble() );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.Modulo & 15:
+                            case (int)TokenizerToken.Modulo & 15:
                                 {
                                     if( right == DoubleObj.Zero || left == DoubleObj.NegativeInfinity || left == DoubleObj.Infinity )
                                     {
@@ -162,38 +152,38 @@ namespace Yodii.Script
                                     }
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseAnd & 15:
+                            case (int)TokenizerToken.BitwiseAnd & 15:
                                 {
                                     long l = JSSupport.ToInt64( left.ToDouble() );
                                     long rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = DoubleObj.Create( l & rO );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseOr & 15:
+                            case (int)TokenizerToken.BitwiseOr & 15:
                                 {
                                     long l = JSSupport.ToInt64( left.ToDouble() );
                                     long rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = DoubleObj.Create( l | rO );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseXOr & 15:
+                            case (int)TokenizerToken.BitwiseXOr & 15:
                                 {
                                     long l = JSSupport.ToInt64( left.ToDouble() );
                                     long rO = JSSupport.ToInt64( right.ToDouble() );
                                     result = DoubleObj.Create( l ^ rO );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseShiftLeft & 15:
+                            case (int)TokenizerToken.BitwiseShiftLeft & 15:
                                 {
                                     result = BitwiseShift( left, right, false );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseShiftRight & 15:
+                            case (int)TokenizerToken.BitwiseShiftRight & 15:
                                 {
                                     result = BitwiseShift( left, right, true );
                                     break;
                                 }
-                            case (int)JSTokenizerToken.BitwiseShiftRightNoSignBit & 15:
+                            case (int)TokenizerToken.BitwiseShiftRightNoSignBit & 15:
                                 {
                                     result = BitwiseShiftRightUnsigned( left, right );
                                     break;
@@ -209,7 +199,7 @@ namespace Yodii.Script
 
             NotImplementedException UnsupportedOperatorException()
             {
-                string msg = String.Format( "Unsupported binary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.BinaryOperatorToken ), (int)Expr.BinaryOperatorToken );
+                string msg = String.Format( "Unsupported binary operator: '{0}' ({1}).", Expr.BinaryOperatorToken.Explain(), (int)Expr.BinaryOperatorToken );
                 return new NotImplementedException( msg );
             }
 
@@ -218,9 +208,12 @@ namespace Yodii.Script
                 if( val == DoubleObj.Zero ) return val;
                 double dR = shift.ToDouble();
                 int iShift;
-                if( Double.IsNaN( dR ) || (iShift = (dR < 0 ? (int)Math.Ceiling( dR ) : (int)Math.Floor( dR )) % 64) == 0 ) return Global.CreateNumber( val );
+                if( double.IsNaN( dR ) || (iShift = (dR < 0 ? (int)Math.Ceiling( dR ) : (int)Math.Floor( dR )) % 64) == 0 )
+                {
+                    return val.ToValue() as DoubleObj ?? DoubleObj.Create( val.ToDouble() );
+                }
                 if( right && iShift < 0 ) return DoubleObj.Zero;
-                Int32 lN = JSSupport.ToInt32( val.ToDouble() );
+                int lN = JSSupport.ToInt32( val.ToDouble() );
                 if( lN == 0 ) return DoubleObj.Zero;
                 return DoubleObj.Create( right ? lN >> iShift : lN << iShift );
             }

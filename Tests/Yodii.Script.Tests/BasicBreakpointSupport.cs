@@ -25,26 +25,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class BasicBreakpointSupport
     {
-
-        [TestCase( "3" )]
-        [TestCase( "3+7" )]
-        [TestCase( "5 < 8" )]
-        [TestCase( "(5&2) <= (7-(4<<2)*5+69)" )]
+        [Theory]
+        [InlineData( "3" )]
+        [InlineData( "3+7" )]
+        [InlineData( "5 < 8" )]
+        [InlineData( "(5&2) <= (7-(4<<2)*5+69)" )]
         public void breaking_and_restarting_an_evaluation( string s )
         {
             ScriptEngine engine = new ScriptEngine();
-            Expr e = ExprAnalyser.AnalyseString( s );
+            Expr e = Analyzer.AnalyseString( s );
             RuntimeObj syncResult;
             using( var r1 = engine.Execute( e ) )
             {
-                Assert.That( r1.Status, Is.EqualTo( ScriptEngineStatus.IsFinished ) );
+                r1.Status.Should().Be( ScriptEngineStatus.IsFinished );
                 syncResult = r1.CurrentResult;
             }
             engine.Breakpoints.BreakAlways = true;
@@ -56,8 +57,8 @@ namespace Yodii.Script.Tests
                     ++nbStep;
                     r2.Continue();
                 }
-                Assert.That( r2.Status, Is.EqualTo( ScriptEngineStatus.IsFinished ) );
-                Assert.That( new RuntimeObjComparer( r2.CurrentResult, syncResult ).AreEqualStrict( engine.Context ) );
+                r2.Status.Should().Be( ScriptEngineStatus.IsFinished );
+                r2.CurrentResult.ToString().Should().Be( syncResult.ToString() );
                 Console.WriteLine( "String '{0}' = {1} evaluated in {2} steps.", s, syncResult.ToString(), nbStep );
             }
         }

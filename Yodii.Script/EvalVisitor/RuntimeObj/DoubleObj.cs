@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -72,7 +73,7 @@ namespace Yodii.Script
 
         public override string ToString()
         {
-            return JSSupport.ToString( _value );
+            return _value.ToString( CultureInfo.InvariantCulture );
         }
 
         public override PExpr Visit( IAccessorFrame frame )

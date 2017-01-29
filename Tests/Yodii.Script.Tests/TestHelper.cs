@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
@@ -12,11 +13,11 @@ namespace Yodii.Script.Tests
 
         static public void RunNormalAndStepByStep( string script, Action<RuntimeObj> test, GlobalContext ctx = null )
         {
-            var e = ExprAnalyser.AnalyseString( script );
+            var e = Analyzer.AnalyseString( script );
 
             // Tests the empty, default, visitor: no change must have been made to the AST. 
             var emptyVisitor = new ExprVisitor();
-            Assert.That( emptyVisitor.VisitExpr( e ), Is.SameAs( e ) );
+            emptyVisitor.VisitExpr( e ).Should().BeSameAs( e );
 
             // Evaluates result directly.
             RuntimeObj syncResult = ScriptEngine.Evaluate( e, ctx );
@@ -30,11 +31,11 @@ namespace Yodii.Script.Tests
 
         static public void RunNormalAndStepByStepWithFirstChanceError( string script, Action<RuntimeObj> test, int expectedFirstChanceError, GlobalContext ctx = null )
         {
-            var e = ExprAnalyser.AnalyseString( script );
+            var e = Analyzer.AnalyseString( script );
 
             // Tests the empty, default, visitor: no change must have been made to the AST. 
             var emptyVisitor = new ExprVisitor();
-            Assert.That( emptyVisitor.VisitExpr( e ), Is.SameAs( e ) );
+            emptyVisitor.VisitExpr( e ).Should().BeSameAs( e );
 
             // Evaluates result directly.
             RuntimeObj syncResult = ScriptEngine.Evaluate( e, ctx );
@@ -63,7 +64,7 @@ namespace Yodii.Script.Tests
                     rAsync.Continue();
                 }
                 test( rAsync.CurrentResult );
-                if( expectedFirstChanceError.HasValue ) Assert.That( nbFirstChanceError, Is.EqualTo( expectedFirstChanceError.Value ) );
+                if( expectedFirstChanceError.HasValue ) nbFirstChanceError.Should().Be( expectedFirstChanceError.Value );
                 if( displayResult ) Console.WriteLine( "Script '{0}' => {1} evaluated in {2} steps ({3} first chance errors).", script, syncResult.ToString(), nbStep, nbFirstChanceError );
             }
         }

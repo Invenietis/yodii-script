@@ -90,7 +90,7 @@ namespace Yodii.Script
         protected DynamicScope ScopeManager => _visitor.ScopeManager;
 
         /// <summary>
-        /// Executes a string by first calling <see cref="ExprAnalyser.AnalyseString"/>.
+        /// Executes a string by first calling <see cref="Analyzer.AnalyseString"/>.
         /// The result object must be disposed before executing another piece of code.
         /// You can use the static <see cref="Evaluate(string, GlobalContext)"/> for simple scenarios.
         /// </summary>
@@ -98,7 +98,7 @@ namespace Yodii.Script
         /// <returns>A result that may be pending...</returns>
         public Result Execute( string s )
         {
-            return Execute( ExprAnalyser.AnalyseString( s ) );
+            return Execute( Analyzer.AnalyseString( s ) );
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Yodii.Script
         /// <returns>The result of the evaluation.</returns>
         public static RuntimeObj Evaluate( string s, GlobalContext ctx = null )
         {
-            return Evaluate( ExprAnalyser.AnalyseString( s ), ctx );
+            return Evaluate( Analyzer.AnalyseString( s ), ctx );
         }
 
         /// <summary>

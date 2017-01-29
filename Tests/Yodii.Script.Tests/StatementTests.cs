@@ -24,27 +24,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
-using Yodii.Script;
+using Xunit;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class StatementTests
     {
-        [TestCase( "6;7+3", 10.0 )]
-        [TestCase( "1+2*(3+1);", 9.0 )]
-        [TestCase( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", 2173.0 )]
+        [Theory]
+        [InlineData( "6;7+3", 10.0 )]
+        [InlineData( "1+2*(3+1);", 9.0 )]
+        [InlineData( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", 2173.0 )]
         public void evaluating_basic_numbers_expressions( string expr, double result )
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( result ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( result );
             } );
         }
 
-        [Test]
+        [Fact]
         public void local_variables_definition_and_assignments()
         {
             string s = @"let i;
@@ -53,24 +54,24 @@ namespace Yodii.Script.Tests
                          j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 3712.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void declaring_a_local_variables_do_not_evaluate_to_undefined_like_in_javascript()
         {
             string s = @"let i = 37;
                          let j = i*100+12;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.AreEqual( o.ToString(), "3712" );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToString().Should().Be( "3712" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void variables_evaluate_to_RefRuntimeObj_objects()
         {
             string s = @"let i = 37;
@@ -78,67 +79,67 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3712 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 3712.0 );
             } );
         }
 
 
-        [Test]
+        [Fact]
         public void number_assignment_operators_are_supported()
         {
             string s = @"   let i = 0;
                             let bug = '';
 
                             i += 0+1; i *= 2*1; i <<= 1<<0; i -= 7-6;
-                            if( i !== (((0+1)*(2*1))<<(1<<0))-(7-6) ) bug = 'Bug in +, *, << or -';
+                            if( i != (((0+1)*(2*1))<<(1<<0))-(7-6) ) bug = 'Bug in +, *, << or -';
 
                             // i = 3
                             i += 4; i &= 2 | 1; 
-                            if( i !== (7&2|1) ) bug = 'Bug in &';
+                            if( i != (7&2|1) ) bug = 'Bug in &';
 
                             // i = 3
                             i |= 7+1;
-                            if( i !== 11 ) bug = 'Bug in |';
+                            if( i != 11 ) bug = 'Bug in |';
 
                             // i = 11
                             i >>= 1+1;
-                            if( i !== 2 ) bug = 'Bug in >>';
+                            if( i != 2 ) bug = 'Bug in >>';
 
                             // i = 2
                             i ^= 1+8;
-                            if( i !== (2^(1+8)) ) bug = 'Bug in ^';
+                            if( i != (2^(1+8)) ) bug = 'Bug in ^';
 
                             // i = 11
                             i ^= -3712;
-                            if( i !== (11^-3712) ) bug = 'Bug in ~';
+                            if( i != (11^-3712) ) bug = 'Bug in ~';
 
                             // i = -3701
                             i >>>= 2;
-                            if( i !== (-3701>>>2) || i !== 1073740898 ) bug = 'Bug in >>>';
+                            if( i != (-3701>>>2) || i != 1073740898 ) bug = 'Bug in >>>';
 
                             // i = 1073740898;
                             i &= 2|4|32|512|4096;
-                            if( i !== 1073740898 & (2|4|32|512|4096) ) bug = 'Bug in &';
+                            if( i != 1073740898 & (2|4|32|512|4096) ) bug = 'Bug in &';
 
                             // i = 4130
                             i %= -(1+5+3);
-                            if( i !== (4130%-(1+5+3)) || i !== 8 ) bug = 'Bug in %';
+                            if( i != (4130%-(1+5+3)) || i != 8 ) bug = 'Bug in %';
                             
                             i = 8;
                             i /= 3.52;
-                            if( i !== 8/3.52 ) bug = 'Bug in /';
+                            if( i != 8/3.52 ) bug = 'Bug in /';
                         
                             bug.ToString();
 ";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( String.Empty ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().BeEmpty();
             } );
         }
 
-        [Test]
+        [Fact]
         public void simple_if_block()
         {
             string s = @"let i = 37;
@@ -152,61 +153,61 @@ namespace Yodii.Script.Tests
                          if( j > 3000 ) i = 0;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<DoubleObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 0 ) );
+                o.Should().BeOfType<DoubleObj>();
+                o.ToDouble().Should().Be( 0.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void comparing_to_undefined_keyword_works()
         {
             string s = @"let ResultAsRefRuntimeObject = 8;
                          let X;
-                         if( X === undefined ) ResultAsRefRuntimeObject;";
+                         if( X == undefined ) ResultAsRefRuntimeObject;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 8 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 8.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void typeof_reference_error_is_undefined()
         {
             string s = @"typeof unexisting";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "undefined" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "undefined" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void post_incrementation_works()
         {
             string s = @"let i = 0;
                          if( i++ == 0 && i++ == 1 && i++ == 2 ) i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 3 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 3.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void pre_incrementation_works()
         {
             string s = @"let i = 0;
                          if( ++i == 1 && ++i == 2 && ++i == 3 && ++i == 4 ) i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 4 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 4.0 );
             } );
         }
 
 
-        [Test]
+        [Fact]
         public void while_loop_works()
         {
             string s = @"let i = 0;
@@ -214,11 +215,11 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 10 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 10.0 );
             } );
         }
-        [Test]
+        [Fact]
         public void while_loop_with_empty_block_works()
         {
             string s = @"let i = 0;
@@ -226,12 +227,12 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 11 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 11.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_with_block_works()
         {
             string s = @"let i = 0;
@@ -243,12 +244,12 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 50.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_with_block_works()
         {
             string s = @"let i = 0;
@@ -262,12 +263,12 @@ namespace Yodii.Script.Tests
                          j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToDouble(), Is.EqualTo( 50 ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToDouble().Should().Be( 50.0 );
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_expects_a_block()
         {
             string s = @"let i = 0;
@@ -275,11 +276,11 @@ namespace Yodii.Script.Tests
                          i;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RuntimeError>( o );
+                o.Should().BeOfType<RuntimeError>();
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_support_break_statement()
         {
             string s = @"
@@ -292,12 +293,12 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaaa" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_support_continue_statement()
         {
             string s = @"
@@ -310,12 +311,12 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaaa" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_support_break_statement()
         {
             string s = @"
@@ -329,12 +330,12 @@ namespace Yodii.Script.Tests
                         j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<RefRuntimeObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aaaa" ) );
+                o.Should().BeOfType<RefRuntimeObj>();
+                o.ToString().Should().Be( "aaaa" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void multiple_variables_declaration_is_supported_and_they_can_reference_previous_ones()
         {
             string s = @"let i = 1, j = 2, k = 'a', sScope;
@@ -345,12 +346,12 @@ namespace Yodii.Script.Tests
                          sScope + '|' + k+i+j";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "aa101000|a12" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "aa101000|a12" );
             } );
         }
 
-        [Test]
+        [Fact]
         public void lexical_scope_is_enough_with_curly()
         {
             string s = @"
@@ -361,14 +362,15 @@ namespace Yodii.Script.Tests
                         i+j;";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "0a" ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "0a" );
             } );
         }
 
-        [TestCase( "a+++b", "r=0, a=1, b=0" )]
-        [TestCase( "a+++b+++a++", "r=1, a=2, b=1" )]
-        [TestCase( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
+        [Theory]
+        [InlineData( "a+++b", "r=0, a=1, b=0" )]
+        [InlineData( "a+++b+++a++", "r=1, a=2, b=1" )]
+        [InlineData( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
         public void ambiguous_postfix_increment_and_addition_works_like_in_javascript( string add, string result )
         {
             string s = $@"let a = 0, b = 0;
@@ -376,8 +378,8 @@ namespace Yodii.Script.Tests
                           'r='+r+', a='+a+', b='+b";
             TestHelper.RunNormalAndStepByStep( s, o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( result ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( result );
             } );
         }
 

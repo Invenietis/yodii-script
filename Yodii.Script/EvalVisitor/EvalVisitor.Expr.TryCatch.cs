@@ -58,9 +58,9 @@ namespace Yodii.Script
                         if( Expr.ExceptionParameter != null )
                         {
                             // There can be no error when setting a standard, variable, RefRuntimeObject.
-                            _visitor.ScopeManager.Register( Expr.ExceptionParameter ).SetValue( Expr.ExceptionParameter, e.ThrownValue );
+                            Visitor.ScopeManager.Register( Expr.ExceptionParameter ).SetValue( Expr.ExceptionParameter, e.ThrownValue );
                         }
-                        _visitor.FirstChanceError = null;
+                        Visitor.FirstChanceError = null;
                         _catching = true;
                     }
                     if( IsPendingOrSignal( ref _catch, Expr.CatchExpr ) ) return PendingOrSignal( _catch );
@@ -72,7 +72,7 @@ namespace Yodii.Script
             {
                 if( _catching && Expr.ExceptionParameter != null )
                 {
-                    _visitor.ScopeManager.Unregister( Expr.ExceptionParameter );
+                    Visitor.ScopeManager.Unregister( Expr.ExceptionParameter );
                 }
             }
         }

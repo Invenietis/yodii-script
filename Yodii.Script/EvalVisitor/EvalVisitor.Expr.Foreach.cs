@@ -77,12 +77,12 @@ namespace Yodii.Script
                             return new PExpr( new RuntimeError( Expr.Generator, ex.Message ) );
                         }
                         if( !hasNext ) break;
-                        _currentVariable = _visitor.ScopeManager.Register( Expr.Variable, _index++ );
+                        _currentVariable = Visitor.ScopeManager.Register( Expr.Variable, _index++ );
                         _currentVariable.SetValue( Expr.Variable, Global.Create( _nativeEnum.Current ) );
                     }
                     if( IsPendingOrSignal( ref _code, Expr.Code ) ) return PendingOrSignal( _code );
                     _code = new PExpr();
-                    _visitor.ScopeManager.Unregister( Expr.Variable );
+                    Visitor.ScopeManager.Unregister( Expr.Variable );
                     _currentVariable = null;
                 }
                 _nativeEnum = null;

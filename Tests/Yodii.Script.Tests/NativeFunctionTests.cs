@@ -25,15 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class NativeFunctionTests
     {
-        [Test]
+        [Fact]
         public void calling_a_void_delegate()
         {
             var c = new GlobalContext();
@@ -42,20 +42,20 @@ namespace Yodii.Script.Tests
             c.Register( "CallMe", a );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.That( o, Is.SameAs( RuntimeObj.Undefined ) );
-                Assert.That( called, Is.EqualTo( "I'm famous." ) );
+                o.Should().BeSameAs( RuntimeObj.Undefined );
+                called.Should().Be( "I'm famous." );
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void calling_a_static_function_requires_an_explicit_cast_to_resolve_method_among_method_group()
         {
             var c = new GlobalContext();
             c.Register( "CallMe", (Func<string,string>)StaticFunc );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "Yes! I'm famous." ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "Yes! I'm famous." );
             }, c );
         }
 
@@ -67,7 +67,7 @@ namespace Yodii.Script.Tests
             public string InstanceMethod( string c ) => Text + c;
         }
 
-        [Test]
+        [Fact]
         public void calling_an_instance_method_requires_an_explicit_cast_to_resolve_method_among_method_group()
         {
             var obj = new O() { Text = "Oh My... " };
@@ -75,8 +75,8 @@ namespace Yodii.Script.Tests
             c.Register( "CallMe", (Func<string, string>)obj.InstanceMethod );
             TestHelper.RunNormalAndStepByStep( @"CallMe( 'I''m famous.' );", o =>
             {
-                Assert.IsInstanceOf<StringObj>( o );
-                Assert.That( o.ToString(), Is.EqualTo( "Oh My... I'm famous." ) );
+                o.Should().BeOfType<StringObj>();
+                o.ToString().Should().Be( "Oh My... I'm famous." );
             }, c );
         }
 

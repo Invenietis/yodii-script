@@ -174,6 +174,13 @@ namespace Yodii.Script
             return tV == e.TryExpr && pV == e.ExceptionParameter && cV == e.CatchExpr ? e : new TryCatchExpr( e.Location, tV, pV, cV );
         }
 
+        public virtual Expr Visit( WithExpr e )
+        {
+            var oV = VisitExpr( e.Obj );
+            var cV = VisitExpr( e.Code );
+            return oV == e.Obj && cV == e.Code ? e : new WithExpr( e.Location, oV, cV );
+        }
+
     }
 
 }

@@ -1,0 +1,31 @@
+{
+  "version": "0.0.0",
+
+  "buildOptions": {
+    "keyFile": "../SharedKey.snk"
+  },
+
+  "packOptions": {
+    "summary": "Simple fully thread-safe script engine and basic template engine.",
+    "description": "Yodii.Script is a purely interpreted script language loosely based on javascript that supports function with closures. One of its major specificty is to be implemnted as a state machine: it evaluates its script in the calling thread, step-by-step or per time-slice without any cross threads concerns. A very simple template engine (based on <% ... %> and <%= ... %> tags) is also available.",
+    "releaseNotes": "https://github.com/Invenietis/Yodii-Script/releases",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Invenietis/Yodii-Script"
+    },
+    "licenseUrl": "https://opensource.org/licenses/MIT"
+  },
+  "authors": [ "Invenietis" ],
+  "copyright": "Copyright 2010-1017 Invenietis",
+
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1",
+        "System.Reflection.TypeExtensions": "4.3.0" 
+      }
+    },
+    "net451": {
+    }
+  }
+}

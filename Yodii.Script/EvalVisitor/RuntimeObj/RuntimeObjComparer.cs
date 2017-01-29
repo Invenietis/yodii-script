@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Yodii.Script
 {
@@ -52,57 +53,12 @@ namespace Yodii.Script
             }
         }
 
-        public bool AreEqual( GlobalContext c )
-        {
-            if( ReferenceEquals( X, Y ) )
-            {
-                return X != DoubleObj.NaN;
-            }
-            if( ReferenceEquals( X.Type, Y.Type ) )
-            {
-                Debug.Assert( X != RuntimeObj.Undefined && X != RuntimeObj.Null, "This has been handled by the normalization and the above reference test." );
-                if( ReferenceEquals( X.Type, RuntimeObj.TypeNumber ) )
-                {
-                    Debug.Assert( !(((DoubleObj)X).IsNaN && ((DoubleObj)Y).IsNaN) );
-                    return X.ToDouble() == Y.ToDouble();
-                }
-                else if( ReferenceEquals( X.Type, RuntimeObj.TypeString ) )
-                {
-                    return X.ToString() == Y.ToString();
-                }
-                else if( ReferenceEquals( X.Type, RuntimeObj.TypeBoolean ) )
-                {
-                    return X.ToBoolean() == Y.ToBoolean();
-                }
-                else
-                {
-                    IComparable cmp;
-                    if( X.GetType() == Y.GetType() && (cmp = X as IComparable) != null )
-                    {
-                        Debug.Assert( (cmp.CompareTo( Y ) == 0) == X.Equals( Y ), "When IComparable is implemented, it must match Equals behavior." );
-                        return cmp.Equals( Y );
-                    }
-                }
-                return false;
-            }
-            if( ReferenceEquals( X.Type, RuntimeObj.TypeNumber ) && ReferenceEquals( Y.Type, RuntimeObj.TypeString ) )
-            {
-                return X.ToDouble() == Y.ToDouble();
-            }
-            if( ReferenceEquals( X.Type, RuntimeObj.TypeBoolean ) || ReferenceEquals( Y.Type, RuntimeObj.TypeBoolean ) )
-            {
-                return X.ToBoolean() == Y.ToBoolean();
-            }
-            return false;
-        }
-
         public bool Compare( GlobalContext c, out int result )
         {
             result = 0;
             if( Y == RuntimeObj.Undefined ) return X == RuntimeObj.Undefined;
 
-            Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( StringObj ) ), "JSEvalString is Comparable." );
-            Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( JSEvalDate ) ), "JSEvalDate is Comparable." );
+            Debug.Assert( typeof( IComparable ).IsAssignableFrom( typeof( StringObj ) ), "StringObj is Comparable." );
             
             IComparable cmp;
             if( X.GetType() == Y.GetType() && (cmp = X as IComparable) != null )

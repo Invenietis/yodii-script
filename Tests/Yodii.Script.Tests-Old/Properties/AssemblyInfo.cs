@@ -1,6 +1,6 @@
 #region LGPL License
 /*----------------------------------------------------------------------------
-* This file (SharedAssemblyInfo.cs) is part of Yodii-Script. 
+* This file (Tests\Yodii.Script.Tests\Properties\AssemblyInfo.cs) is part of Yodii-Script. 
 *  
 * Yodii-Script is free software: you can redistribute it and/or modify 
 * it under the terms of the GNU Lesser General Public License as published 
@@ -20,17 +20,21 @@
 *-----------------------------------------------------------------------------*/
 #endregion
 
-using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("Yodii.Script")]
-[assembly: AssemblyCompany("Invenietis")]
-[assembly: AssemblyCopyright("Copyright (c) Invenietis, IN'TECH INFO 2013-2015")]
-[assembly: AssemblyTrademark("")]
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyTitle("CK.Javascript.Tests")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCulture("")]
 
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
 
-#if DEBUG
-    [assembly: AssemblyConfiguration("Debug")]
-#else
-    [assembly: AssemblyConfiguration("Release")]
-#endif
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("5a5c2eee-57d6-4f76-9052-064e93e6fc24")]

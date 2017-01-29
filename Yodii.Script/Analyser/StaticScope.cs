@@ -141,8 +141,9 @@ namespace Yodii.Script
         /// False to forbid masking (to work like in C#). By default declaration in a subordinated scope masks any declaration from upper levels (Javascript).
         /// </param>
         /// <param name="allowLocalRedefinition">
-        /// True to allow redifinition of a name in the same scope (masking but in the currenly opened scope).
-        /// This is allowed in javascript even with "use strict" but here it defaults to false.
+        /// True to allow redefinition of a name in the same scope (masking but in the currenly opened scope).
+        /// This is allowed in javascript even with "use strict" for 'var' (but not for 'let' or 'const').
+        /// It defaults to false: this a dangerous and useless "feature".
         /// </param>
         public StaticScope( bool globalScope = false, bool allowMasking = true, bool allowLocalRedefinition = false )
         {

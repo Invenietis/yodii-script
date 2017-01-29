@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace Yodii.Script
 {
@@ -32,14 +33,12 @@ namespace Yodii.Script
     {
         readonly static char[] _invalidNameChars = new char[] { ' ', '\t', '\r', '\n', '{', '}', '(', ')', '[', ']', ',', ':', ';' };
 
-        JSEvalDate _epoch;
         readonly Dictionary<Type, ExternalTypeHandler> _types;
         readonly Dictionary<string, RuntimeObj> _objects;
         readonly HashSet<string> _namespaces;
 
         public GlobalContext()
         {
-            _epoch = new JSEvalDate( JSSupport.JSEpoch );
             _types = new Dictionary<Type, ExternalTypeHandler>();
             _objects = new Dictionary<string, RuntimeObj>();
             _namespaces = new HashSet<string>();
@@ -112,47 +111,86 @@ namespace Yodii.Script
             return _objects.Remove( name );
         }
 
-        [Obsolete]
-        public RuntimeObj CreateBoolean( bool value )
+        #region WithObject scope
+
+        internal WithObjectScope InternalWithObjectScope;
+
+        /// <summary>
+        /// Implements IWithObjectScope that is internally accessible and
+        /// "stable": once obtained, the objects chain is always valid and remains the same 
+        /// regardless of the dispose/open scope that may occur later.
+        /// The AccessorMemberFrame that exploits it can capture the current scope and keeps
+        /// working with it as long as it needs to.
+        /// </summary>
+        internal class WithObjectScope : IWithObjectScope
         {
-            return value ? BooleanObj.True : BooleanObj.False;
+            public readonly WithObjectScope Parent;
+            public readonly RuntimeObj Object;
+            GlobalContext _ctx;
+
+            /// <summary>
+            /// Used as a marker to distinguish null and initialized bnut void scope.
+            /// </summary>
+            static public readonly WithObjectScope None = new WithObjectScope(); 
+
+            WithObjectScope() { }
+
+            public WithObjectScope( GlobalContext ctx, RuntimeObj o )
+            {
+                Debug.Assert( ctx != null && o != null );
+                Object = o;
+                Parent = ctx.InternalWithObjectScope;
+                ctx.InternalWithObjectScope = this;
+                _ctx = ctx;
+            }
+
+            IWithObjectScope IWithObjectScope.Parent
+            {
+                get
+                {
+                    if( _ctx == null ) throw new ObjectDisposedException( nameof( IWithObjectScope ) );
+                    return Parent;
+                }
+            }
+
+            RuntimeObj IWithObjectScope.Object
+            {
+                get
+                {
+                    if( _ctx == null ) throw new ObjectDisposedException( nameof( IWithObjectScope ) );
+                    return Object;
+                }
+            }
+
+            public void Dispose()
+            {
+                if( _ctx != null )
+                {
+                    if( _ctx.InternalWithObjectScope != this ) throw new InvalidOperationException( "With object scope dispose mispatch" );
+                    _ctx.InternalWithObjectScope = Parent;
+                    _ctx = null;
+                }
+            }
+
         }
 
-        [Obsolete]
-        public RuntimeObj CreateBoolean( RuntimeObj o )
+        /// <summary>
+        /// Opens a scope on a object.
+        /// </summary>
+        /// <param name="o">The scope object.</param>
+        /// <returns></returns>
+        public IWithObjectScope OpenWithScope( RuntimeObj o )
         {
-            if( o == null ) return BooleanObj.False;
-            if( o is BooleanObj ) return o;
-            return CreateBoolean( o.ToBoolean() );
+            return new WithObjectScope( this, o );
         }
 
-        [Obsolete]
-        public RuntimeObj CreateNumber( double value )
-        {
-            return DoubleObj.Create( value );
-        }
+        /// <summary>
+        /// Gets the currently opened 'with object' scope.
+        /// </summary>
+        public IWithObjectScope CurrentWithObjectScope => InternalWithObjectScope;
 
-        [Obsolete]
-        public RuntimeObj CreateNumber( RuntimeObj o )
-        {
-            if( o == null ) return DoubleObj.Zero;
-            if( o is DoubleObj ) return o;
-            return CreateNumber( o.ToDouble() );
-        }
+        #endregion
 
-        [Obsolete]
-        public RuntimeObj CreateString( string value )
-        {
-            if( value == null ) return RuntimeObj.Null;
-            return StringObj.Create( value );
-        }
-
-        [Obsolete]
-        public RuntimeObj CreateDateTime( DateTime value )
-        {
-            if( value == JSSupport.JSEpoch ) return _epoch;
-            return new JSEvalDate( value );
-        }
 
         public RuntimeObj Create( object o )
         {
@@ -163,7 +201,7 @@ namespace Yodii.Script
                 if( o is double ) return DoubleObj.Create( (double)o );
                 if( o is float ) return DoubleObj.Create( (float)o );
                 if( o is bool ) return (bool)o ? BooleanObj.True : BooleanObj.False;
-                if( o is DateTime ) return CreateDateTime( (DateTime)o );
+                return new ExternalObjectObj( this, o );
             }
             string s = o as string;
             if( s != null ) return StringObj.Create( s );
@@ -185,18 +223,25 @@ namespace Yodii.Script
 
         /// <summary>
         /// Default implementation of <see cref="IAccessorVisitor.Visit"/> that supports evaluation of intrinsic 
-        /// functions Number(), String(), Boolean() and Date().
+        /// functions Number(), String(), Boolean().
         /// By overriding this any binding to to external objects can be achieved (recall to call this base
         /// method when overriding).
         /// </summary>
         /// <param name="frame">The current frame (gives access to the next frame if any).</param>
         public virtual PExpr Visit( IAccessorFrame frame )
         {
+           IAccessorMemberFrame head = frame as IAccessorMemberFrame;
+            // We can only handle member access at the root level:
+            if( head == null ) return frame.SetError();
+
+            // Lookup from the longest path to the head in registered objects:
+            // more "precise" objects mask root ones.
             var deepestMemberFrame = frame.NextAccessors( true )
                                             .Select( f => f as IAccessorMemberFrame )
                                             .TakeWhile( f => f != null )
                                             .LastOrDefault();
-            while( deepestMemberFrame != null )
+            // We obtain at least the head, hence the do...while.
+            do
             {
                 RuntimeObj obj;
                 if( _objects.TryGetValue( deepestMemberFrame.Expr.MemberFullName, out obj ) )
@@ -205,11 +250,12 @@ namespace Yodii.Script
                 }
                 deepestMemberFrame = deepestMemberFrame.PrevMemberAccessor;
             }
+            while( deepestMemberFrame != null );
             var s = frame.GetImplementationState( c =>
                 c.On( "Number" ).OnCall( ( f, args ) =>
                 {
                     if( args.Count == 0 ) return f.SetResult( DoubleObj.Zero );
-                    return f.SetResult( CreateNumber( args[0] ) );
+                    return f.SetResult( args[0] as DoubleObj ?? DoubleObj.Create( args[0].ToDouble() ) );
                 }
                 )
                 .On( "String" ).OnCall( ( f, args ) =>
@@ -221,29 +267,6 @@ namespace Yodii.Script
                 .On( "Boolean" ).OnCall( ( f, args ) =>
                 {
                     return f.SetResult( args.Count == 1 && args[0].ToBoolean() ? BooleanObj.True : BooleanObj.False );
-                } )
-                .On( "Date" ).OnCall( ( f, args ) =>
-                {
-                    try
-                    {
-                        int[] p = new int[7];
-                        for( int i = 0; i < args.Count; ++i )
-                        {
-                            p[i] = (int)args[i].ToDouble();
-                            if( p[i] < 0 ) p[i] = 0;
-                        }
-                        if( p[0] > 9999 ) p[0] = 9999;
-                        if( p[1] < 1 ) p[1] = 1;
-                        else if( p[1] > 12 ) p[1] = 12;
-                        if( p[2] < 1 ) p[2] = 1;
-                        else if( p[2] > 31 ) p[2] = 31;
-                        DateTime d = new DateTime( p[0], p[1], p[2], p[3], p[4], p[5], p[6], DateTimeKind.Utc );
-                        return f.SetResult( CreateDateTime( d ) );
-                    }
-                    catch( Exception ex )
-                    {
-                        return f.SetError( ex.Message );
-                    }
                 } )
             );
             return s != null ? s.Visit() : frame.SetError();

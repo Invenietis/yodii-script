@@ -27,7 +27,7 @@ using System.Text;
 
 namespace Yodii.Script
 {
-    public enum JSTokenizerError
+    public enum TokenizerError
     {
         None = 0,
 

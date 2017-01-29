@@ -48,7 +48,7 @@ namespace Yodii.Script
                     RuntimeError e = _expression.AsErrorResult;
                     if( e != null 
                         && e.IsReferenceError 
-                        && ((int)Expr.TokenType & 15) == ((int)JSTokenizerToken.TypeOf & 15) )
+                        && ((int)Expr.TokenType & 15) == ((int)TokenizerToken.TypeOf & 15) )
                     {
                         return SetResult( StringObj.Create( RuntimeObj.TypeUndefined ) );
                     }
@@ -57,11 +57,11 @@ namespace Yodii.Script
                 RuntimeObj result = _expression.Result;
                 // Minus and Plus are classified as a binary operator.
                 // Handle those special cases here.
-                if( Expr.TokenType == JSTokenizerToken.Minus )
+                if( Expr.TokenType == TokenizerToken.Minus )
                 {
                     result = DoubleObj.Create( -result.ToDouble() );
                 }
-                else if( Expr.TokenType == JSTokenizerToken.Plus )
+                else if( Expr.TokenType == TokenizerToken.Plus )
                 {
                     result = DoubleObj.Create( result.ToDouble() );
                 }
@@ -69,31 +69,31 @@ namespace Yodii.Script
                 {
                     switch( (int)Expr.TokenType & 15 )
                     {
-                        case (int)JSTokenizerToken.Not & 15:
+                        case (int)TokenizerToken.Not & 15:
                             {
                                 result = result.ToBoolean() ? BooleanObj.False : BooleanObj.True;
                                 break;
                             }
-                        case (int)JSTokenizerToken.BitwiseNot & 15:
+                        case (int)TokenizerToken.BitwiseNot & 15:
                             {
                                 result = DoubleObj.Create( ~JSSupport.ToInt64( result.ToDouble() ) );
                                 break;
                             }
-                        case (int)JSTokenizerToken.TypeOf & 15:
+                        case (int)TokenizerToken.TypeOf & 15:
                             {
                                 // Well known Javascript bug: typeof null === "object".
                                 if( result == RuntimeObj.Null ) result = StringObj.Create( RuntimeObj.TypeObject );
                                 else result = StringObj.Create( result.Type );
                                 break;
                             }
-                        case (int)JSTokenizerToken.IndexOf & 15:
+                        case (int)TokenizerToken.IndexOf & 15:
                             {
                                 RefRuntimeIndexedObj iO = result as RefRuntimeIndexedObj;
                                 if( iO == null ) result = new RuntimeError( Expr, "No associated index. indexof must be used on a foreach variable." );
                                 else result = iO.Index;
                                 break;
                             }
-                        case (int)JSTokenizerToken.Void & 15:
+                        case (int)TokenizerToken.Void & 15:
                             {
                                 result = RuntimeObj.Undefined;
                                 break;
@@ -106,7 +106,7 @@ namespace Yodii.Script
 
             NotSupportedException UnsupportedOperatorException()
             {
-                string msg = String.Format( "Unsupported unary operator: '{0}' ({1}).", JSTokenizer.Explain( Expr.TokenType ), (int)Expr.TokenType );
+                string msg = String.Format( "Unsupported unary operator: '{0}' ({1}).", Expr.TokenType.Explain(), (int)Expr.TokenType );
                 return new NotSupportedException( msg );
             }
 

@@ -24,27 +24,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Yodii.Script;
-using CK.Core;
+using System.Globalization;
+using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
-    public class TokenizerTests
+    
+    public class JSTokenizerTests
     {
-        [Test]
-        public void RoundtripParsing()
+        [Fact]
+        public void round_trip_parsing()
         {
-            JSTokenizer p = new JSTokenizer();
-            Assert.That( JSTokenizer.Explain( JSTokenizerToken.Integer ), Is.EqualTo( "42" ) );
+            Tokenizer p = new Tokenizer();
+            TokenizerToken.Integer.Explain().Should().Be( "42" );
 
-            string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x === z !== x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
+            string s = " function ( x , z ) ++ -- { if ( x != z || x && z % x - x >>> z >> z << x | z & x ^ z -- = x ++ ) return x + ( z * 42 ) / 42 ; } void == typeof += new -= delete >>= instanceof >>>= x % z %= x == z != x ! z ~ = x |= z &= x <<= z ^= x /= z *= x %=";
             p.Reset( s );
             string recompose = "";
             while( !p.IsEndOfInput )
             {
-                recompose += " " + JSTokenizer.Explain( p.CurrentToken );
+                recompose += " " + p.CurrentToken.Explain();
                 p.Forward();
             }
             s = s.Replace( "if", "identifier" )
@@ -53,35 +54,53 @@ namespace Yodii.Script.Tests
                 .Replace( "z", "identifier" )
                 .Replace( "return", "identifier" );
 
-            Assert.That( recompose, Is.EqualTo( s ) );
+            recompose.Should().Be( s );
         }
 
-        [TestCase( "45DD" )]
-        [TestCase( "45.member" )]
-        [TestCase( ".45.member" )]
-        [TestCase( "45.01member" )]
-        [TestCase( ".45.member" )]
-        [TestCase( ".45.01member" )]
-        [TestCase( "45.01e23member" )]
+        [Theory]
+        [InlineData( "45DD" )]
+        [InlineData( "45.member" )]
+        [InlineData( ".45.member" )]
+        [InlineData( "45.01member" )]
+        [InlineData( ".45.member" )]
+        [InlineData( ".45.01member" )]
+        [InlineData( "45.01e23member" )]
         public void bad_literal_numbers_are_ErrorNumberIdentifierStartsImmediately( string num )
         {
-            JSTokenizer p = new JSTokenizer( num );
-            Assert.That( p.IsErrorOrEndOfInput, Is.True );
-            Assert.That( p.ErrorCode, Is.EqualTo( JSTokenizerError.ErrorNumberIdentifierStartsImmediately ) );
+            Tokenizer p = new Tokenizer( num );
+            p.IsErrorOrEndOfInput.Should().Be( true );
+            p.ErrorCode.Should().Be( TokenizerError.ErrorNumberIdentifierStartsImmediately );
         }
 
-        [TestCase( @"""a""", "a" )]
-        [TestCase( @"""a""""b""", @"a""b" )]
-        [TestCase( @"'a'", "a" )]
-        [TestCase( @"'a''b'", @"a'b" )]
-        [TestCase( @"'\u3713'", "\u3713" )]
-        [TestCase( @"'a\u3712b'", "a\u3712b" )]
+
+        [Theory]
+        [InlineData( "45.98" )]
+        [InlineData( ".0" )]
+        [InlineData( ".0e4" )]
+        [InlineData( "876.098E-3" )]
+        public void parsing_floats( string num )
+        {
+            Tokenizer p = new Tokenizer( num );
+            p.CurrentToken.Should().Be( TokenizerToken.Float );
+            p.ReadDouble().Should().Be( double.Parse( num, NumberStyles.Float, CultureInfo.InvariantCulture ) );
+            p.Forward().Should().Be( false );
+            p.IsEndOfInput.Should().Be( true );
+        }
+
+
+        [Theory]
+        [InlineData( @"""a""", "a" )]
+        [InlineData( @"""a""""b""", @"a""b" )]
+        [InlineData( @"'a'", "a" )]
+        [InlineData( @"'a''b'", @"a'b" )]
+        [InlineData( @"'\u3713'", "\u3713" )]
+        [InlineData( @"'a\u3712b'", "a\u3712b" )]
         public void successful_string_parsing( string s, string expected )
         {
-            JSTokenizer p = new JSTokenizer( s );
+            Tokenizer p = new Tokenizer( s );
             string r = p.ReadString();
-            Assert.That( p.IsEndOfInput );
-            Assert.That( r, Is.EqualTo( expected ) );
+            p.IsEndOfInput.Should().Be( true );
+            r.Should().Be( expected );
         }
 
     }
