@@ -25,16 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class TemplateTests
     {
-        [Test]
+        [Fact]
         public void foreach_with_one_write_statement()
         {
             var c = new GlobalContext();
@@ -46,7 +45,7 @@ namespace Yodii.Script.Tests
             r.Text.Should().Be( "*1*2*7*10*16" );
         }
 
-        [Test]
+        [Fact]
         public void empty_tags_are_ignored()
         {
             var e = new TemplateEngine( new GlobalContext() );
@@ -64,7 +63,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void when_there_is_no_tag_there_is_no_script()
         {
             var e = new TemplateEngine( new GlobalContext() );
@@ -91,7 +90,7 @@ namespace Yodii.Script.Tests
             public string TableName { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void simple_template_from_Model_object()
         {
             var t = new Table()

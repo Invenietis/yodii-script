@@ -25,16 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class ForeachTests
     {
-        [Test]
+        [Fact]
         public void iterating_on_an_array_of_integers()
         {
             var c = new GlobalContext();
@@ -49,7 +48,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void iterating_on_an_array_of_strings()
         {
             var c = new GlobalContext();
@@ -64,7 +63,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void nested_iterations()
         {
             var c = new GlobalContext();
@@ -86,7 +85,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void nested_iterations_with_indexof()
         {
             var c = new GlobalContext();

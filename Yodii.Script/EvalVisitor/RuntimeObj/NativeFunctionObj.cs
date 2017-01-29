@@ -38,7 +38,7 @@ namespace Yodii.Script
         {
             if( function == null ) throw new ArgumentNullException( nameof( function ) );
             _function = function;
-            _parameters = _function.Method.GetParameters();
+            _parameters = _function.GetMethodInfo().GetParameters();
         }
 
         public IReadOnlyList<ParameterInfo> Parameters => _parameters;
@@ -70,7 +70,7 @@ namespace Yodii.Script
             {
                 object[] p = MapCallParameters( frame.Global, parameters, _parameters );
                 object result = _function.DynamicInvoke( p );
-                return _function.Method.ReturnType == typeof( void )
+                return _function.GetMethodInfo().ReturnType == typeof( void )
                         ? frame.SetResult( RuntimeObj.Undefined )
                         : frame.SetResult( frame.Global.Create( result ) );
             }

@@ -25,16 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class NativeFunctionTests
     {
-        [Test]
+        [Fact]
         public void calling_a_void_delegate()
         {
             var c = new GlobalContext();
@@ -48,7 +47,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void calling_a_static_function_requires_an_explicit_cast_to_resolve_method_among_method_group()
         {
             var c = new GlobalContext();
@@ -68,7 +67,7 @@ namespace Yodii.Script.Tests
             public string InstanceMethod( string c ) => Text + c;
         }
 
-        [Test]
+        [Fact]
         public void calling_an_instance_method_requires_an_explicit_cast_to_resolve_method_among_method_group()
         {
             var obj = new O() { Text = "Oh My... " };

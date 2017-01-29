@@ -1,12 +1,12 @@
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class ExprAnalyzerTests
     {
-        [Test]
+        [Fact]
         public void an_empty_string_is_a_syntax_error()
         {
             Analyzer a = new Analyzer();
@@ -25,7 +25,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SimpleExpression()
         {
             Analyzer a = new Analyzer();
@@ -116,7 +116,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void array_indexing_is_an_accessor_call_expr()
         {
             Analyzer a = new Analyzer();
@@ -140,7 +140,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void array_indexing_with_AllowSemiColonAsActualParameterSeparator()
         {
             Analyzer a = new Analyzer( new AnalyzerOptions() { AllowSemiColonAsActualParameterSeparator = true } );

@@ -31,7 +31,7 @@ namespace Yodii.Script
 {
     static public class JSSupport
     {
-        public static readonly object Undefined = DBNull.Value;
+        public static readonly object Undefined = new object();
 
         public static readonly DateTime JSEpoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
         public static readonly long TicksPerMillisecond = 10000;

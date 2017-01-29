@@ -25,17 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class ObjectSupportTests
     {
 
-        [Test]
+        [Fact]
         public void accessing_properties_on_anonymous_class()
         {
             var c = new GlobalContext();
@@ -86,7 +85,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void accessing_property_and_field()
         {
             var c = new GlobalContext();
@@ -98,7 +97,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void setting_property_and_field()
         {
             var c = new GlobalContext();
@@ -113,7 +112,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void accessing_property_of_sub_property()
         {
             var c = new GlobalContext();
@@ -125,7 +124,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void postincrementing_integer_field()
         {
             var c = new GlobalContext();
@@ -142,7 +141,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Test]
+        [Fact]
         public void calling_methods()
         {
             var c = new GlobalContext();

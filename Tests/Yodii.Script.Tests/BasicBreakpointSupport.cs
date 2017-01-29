@@ -25,19 +25,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class BasicBreakpointSupport
     {
-
-        [TestCase( "3" )]
-        [TestCase( "3+7" )]
-        [TestCase( "5 < 8" )]
-        [TestCase( "(5&2) <= (7-(4<<2)*5+69)" )]
+        [Theory]
+        [InlineData( "3" )]
+        [InlineData( "3+7" )]
+        [InlineData( "5 < 8" )]
+        [InlineData( "(5&2) <= (7-(4<<2)*5+69)" )]
         public void breaking_and_restarting_an_evaluation( string s )
         {
             ScriptEngine engine = new ScriptEngine();

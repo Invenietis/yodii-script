@@ -24,16 +24,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Yodii.Script;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class StaticScopeTests
     {
-        [Test]
+        [Fact]
         public void closing_a_non_opened_scope_is_a_programming_error()
         {
             StaticScope s = new StaticScope();
@@ -50,7 +50,7 @@ namespace Yodii.Script.Tests
             act.ShouldThrow<InvalidOperationException>();
         }
 
-        [Test]
+        [Fact]
         public void declaring_while_no_scope_is_opened_is_a_syntax_error()
         {
             StaticScope s = new StaticScope();
@@ -66,7 +66,7 @@ namespace Yodii.Script.Tests
             s.Declare( v ).Should().BeOfType<SyntaxErrorExpr>();
         }
 
-        [Test]
+        [Fact]
         public void redefinition_in_the_same_scope_is_not_allowed_by_default()
         {
             StaticScope s = new StaticScope();
@@ -91,7 +91,7 @@ namespace Yodii.Script.Tests
             CheckClose( s.CloseScope(), v, v1, v2 );
         }
 
-        [Test]
+        [Fact]
         public void declaring_in_subordinated_scopes_masks_declarations_from_upper_scope()
         {
             StaticScope s = new StaticScope();

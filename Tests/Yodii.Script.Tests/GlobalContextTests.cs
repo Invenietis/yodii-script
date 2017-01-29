@@ -25,16 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CK.Core;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class GlobalContextTests
     {
-        [Test]
+        [Fact]
         public void successful_namespace_registration()
         {
             GlobalContext c = new GlobalContext();
@@ -48,7 +47,7 @@ namespace Yodii.Script.Tests
             ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString().Should().Be( "3" );
         }
 
-        [Test]
+        [Fact]
         public void namespace_can_not_be_registered_on_or_below_a_registered_object()
         {
             GlobalContext c = new GlobalContext();
@@ -70,7 +69,7 @@ namespace Yodii.Script.Tests
             ScriptEngine.Evaluate( "X.Numbers", c ).ToString().Should().Be( "1" );
         }
 
-        [Test]
+        [Fact]
         public void namespace_and_function_simple_demo()
         {
             var c = new GlobalContext();
@@ -80,7 +79,7 @@ namespace Yodii.Script.Tests
                 .ToString().Should().Be( "hop = N'Aujourd''hui'" );
         }
 
-        [Test]
+        [Fact]
         public void object_can_not_be_regitered_on_or_below_a_registered_namespace()
         {
             GlobalContext c = new GlobalContext();
@@ -116,7 +115,7 @@ namespace Yodii.Script.Tests
                     } )
                     .On( "array" ).OnIndex( ( f, idx ) =>
                     {
-                        throw new CKException( "Accessing XXX.array other than 'An.Array' must not be found." );
+                        throw new Exception( "Accessing XXX.array other than 'An.Array' must not be found." );
                     } )
                     .On( "Ghost" ).On( "M" ).OnCall( ( f, args ) =>
                     {
@@ -135,7 +134,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void access_to_a_non_existing_object_on_the_Context_is_a_runtime_error()
         {
             string s = "AnIntrinsicArray[0]";
@@ -146,7 +145,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void access_to_members_via_On_does_not_fallback()
         {
             var ctx = new Context();
@@ -170,7 +169,7 @@ namespace Yodii.Script.Tests
             }, ctx );
         }
 
-        [Test]
+        [Fact]
         public void access_to_AnIntrinsicArray_exposed_by_the_Context()
         {
             string s;
@@ -212,8 +211,9 @@ namespace Yodii.Script.Tests
             }, ctx );
         }
 
-        [TestCase( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
-        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], 'a string' ) == 'number'" )]
+        [Theory]
+        [InlineData( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
+        [InlineData( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], 'a string' ) == 'number'" )]
         public void access_to_a_ghost_object_step_by_step( string s )
         {
             var ctx = new Context();

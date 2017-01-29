@@ -73,7 +73,7 @@ namespace Yodii.Script
 
             public override bool Equals( object obj )
             {
-                return obj == null || obj == Null || obj == DBNull.Value;
+                return obj == null || obj == Null;
             }
         }
 

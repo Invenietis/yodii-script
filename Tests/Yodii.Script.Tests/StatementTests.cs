@@ -24,17 +24,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    [TestFixture]
+    
     public class StatementTests
     {
-        [TestCase( "6;7+3", 10.0 )]
-        [TestCase( "1+2*(3+1);", 9.0 )]
-        [TestCase( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", 2173.0 )]
+        [Theory]
+        [InlineData( "6;7+3", 10.0 )]
+        [InlineData( "1+2*(3+1);", 9.0 )]
+        [InlineData( "6;7+3;typeof 6 == 'number' ? 2173 : 3712", 2173.0 )]
         public void evaluating_basic_numbers_expressions( string expr, double result )
         {
             TestHelper.RunNormalAndStepByStep( expr, o =>
@@ -44,7 +45,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void local_variables_definition_and_assignments()
         {
             string s = @"let i;
@@ -58,7 +59,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void declaring_a_local_variables_do_not_evaluate_to_undefined_like_in_javascript()
         {
             string s = @"let i = 37;
@@ -70,7 +71,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void variables_evaluate_to_RefRuntimeObj_objects()
         {
             string s = @"let i = 37;
@@ -84,7 +85,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void number_assignment_operators_are_supported()
         {
             string s = @"   let i = 0;
@@ -138,7 +139,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void simple_if_block()
         {
             string s = @"let i = 37;
@@ -157,7 +158,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void comparing_to_undefined_keyword_works()
         {
             string s = @"let ResultAsRefRuntimeObject = 8;
@@ -170,7 +171,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void typeof_reference_error_is_undefined()
         {
             string s = @"typeof unexisting";
@@ -181,7 +182,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void post_incrementation_works()
         {
             string s = @"let i = 0;
@@ -193,7 +194,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void pre_incrementation_works()
         {
             string s = @"let i = 0;
@@ -206,7 +207,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void while_loop_works()
         {
             string s = @"let i = 0;
@@ -218,7 +219,7 @@ namespace Yodii.Script.Tests
                 o.ToDouble().Should().Be( 10.0 );
             } );
         }
-        [Test]
+        [Fact]
         public void while_loop_with_empty_block_works()
         {
             string s = @"let i = 0;
@@ -231,7 +232,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_with_block_works()
         {
             string s = @"let i = 0;
@@ -248,7 +249,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_with_block_works()
         {
             string s = @"let i = 0;
@@ -267,7 +268,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_expects_a_block()
         {
             string s = @"let i = 0;
@@ -279,7 +280,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_support_break_statement()
         {
             string s = @"
@@ -297,7 +298,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void while_loop_support_continue_statement()
         {
             string s = @"
@@ -315,7 +316,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void do_while_loop_support_break_statement()
         {
             string s = @"
@@ -334,7 +335,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void multiple_variables_declaration_is_supported_and_they_can_reference_previous_ones()
         {
             string s = @"let i = 1, j = 2, k = 'a', sScope;
@@ -350,7 +351,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Test]
+        [Fact]
         public void lexical_scope_is_enough_with_curly()
         {
             string s = @"
@@ -366,9 +367,10 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [TestCase( "a+++b", "r=0, a=1, b=0" )]
-        [TestCase( "a+++b+++a++", "r=1, a=2, b=1" )]
-        [TestCase( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
+        [Theory]
+        [InlineData( "a+++b", "r=0, a=1, b=0" )]
+        [InlineData( "a+++b+++a++", "r=1, a=2, b=1" )]
+        [InlineData( "a+++b+++a+b+++a", "r=3, a=1, b=2" )]
         public void ambiguous_postfix_increment_and_addition_works_like_in_javascript( string add, string result )
         {
             string s = $@"let a = 0, b = 0;
