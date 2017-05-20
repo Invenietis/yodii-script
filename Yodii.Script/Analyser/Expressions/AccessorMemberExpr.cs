@@ -30,13 +30,18 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Member accessor.
+    /// </summary>
     public class AccessorMemberExpr : AccessorExpr
     {
         /// <summary>
         /// Creates a new <see cref="AccessorMemberExpr"/> for a field or a variable.
         /// </summary>
+        /// <param name="location">Source location.</param>
         /// <param name="left">Left scope. Can be null for unbound reference.</param>
         /// <param name="fieldOrVariableName">Field, variable or function name.</param>
+        /// <param name="isStatement">True for statement, false for expression.</param>
         public AccessorMemberExpr( SourceLocation location, Expr left, string fieldOrVariableName, bool isStatement )
             : base( location, left, isStatement, false )
         {

@@ -29,6 +29,9 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Binary expression.
+    /// </summary>
     public class BinaryExpr : Expr
     {
         public BinaryExpr( SourceLocation location, Expr left, TokenizerToken binaryOperatorToken, Expr right )

@@ -29,6 +29,9 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Constant expression is a <see cref="Value"/>.
+    /// </summary>
     public class ConstantExpr : Expr
     {
         public static readonly ConstantExpr UndefinedExpr = new ConstantExpr( SourceLocation.Empty, JSSupport.Undefined, false );
@@ -39,6 +42,9 @@ namespace Yodii.Script
             Value = value;
         }
 
+        /// <summary>
+        /// Gets the constant value.
+        /// </summary>
         public object Value { get; private set; }
 
         /// <summary>
@@ -53,6 +59,10 @@ namespace Yodii.Script
             return visitor.Visit( this );
         }
 
+        /// <summary>
+        /// This is just to ease debugging.
+        /// </summary>
+        /// <returns>the value as a string or "(null)".</returns>
         public override string ToString()
         {
             return Value != null ? Value.ToString() : "(null)";

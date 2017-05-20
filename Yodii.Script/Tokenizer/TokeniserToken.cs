@@ -47,7 +47,7 @@ namespace Yodii.Script
     ///  5  &amp;&amp;                              Logical AND
     ///  4  ||                                      Logical OR
     ///  3  ?                                       Conditional (?:)
-    ///  2  = OP=                                   Assignment, assignment with operation (such as += and &=)
+    ///  2  = OP=                                   Assignment, assignment with operation (such as += and &amp;=)
     ///  1  ,                                       Multiple evaluation
     /// </remarks>
     [Flags]
@@ -169,7 +169,7 @@ namespace Yodii.Script
         /// </summary>
         BitwiseOr = IsBinaryOperator | OpLevel06 | 2,
         /// <summary>
-        /// Single ampersand (&) binary And operator.
+        /// Single ampersand (&amp;) binary And operator.
         /// </summary>
         BitwiseAnd = IsBinaryOperator | OpLevel08 | 3,
         /// <summary>
@@ -224,7 +224,7 @@ namespace Yodii.Script
         BitwiseOrAssign = IsAssignOperator | OpLevel02 | 2,
 
         /// <summary>
-        /// Bitwise And assignment (&=).
+        /// Bitwise And assignment (&amp;=).
         /// </summary>
         BitwiseAndAssign = IsAssignOperator | OpLevel02 | 3,
 
