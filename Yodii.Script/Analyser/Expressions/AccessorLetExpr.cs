@@ -30,7 +30,9 @@ using System.Threading.Tasks;
 
 namespace Yodii.Script
 {
-
+    /// <summary>
+    /// Declaration of a variable.
+    /// </summary>
     public class AccessorLetExpr : AccessorExpr
     {
         /// <summary>
@@ -38,6 +40,11 @@ namespace Yodii.Script
         /// </summary>
         public new static readonly AccessorLetExpr[] EmptyArray = new AccessorLetExpr[0];
 
+        /// <summary>
+        /// Initializes a new <see cref="AccessorLetExpr"/>.
+        /// </summary>
+        /// <param name="location">Source location.</param>
+        /// <param name="name">Variable name.</param>
         public AccessorLetExpr( SourceLocation location, string name )
             : base( location, null, false, false )
         {

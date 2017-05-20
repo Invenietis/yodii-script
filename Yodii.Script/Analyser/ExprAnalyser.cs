@@ -29,6 +29,9 @@ using System.Diagnostics;
 
 namespace Yodii.Script
 {
+    /// <summary>
+    /// Abstract Syntax Tree generator.
+    /// </summary>
     public class Analyzer
     {
         Tokenizer _parser;

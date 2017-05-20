@@ -1,29 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0453B444-D4D8-402E-A2CB-B5E0821B071C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BF04424-0B74-43A0-A324-9BB83E5197D6}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		NuGet.config = NuGet.config
 		README.md = README.md
 		RepositoryInfo.xml = RepositoryInfo.xml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4BFD09D0-AAD1-4343-B7E2-89A891379139}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
+		Common\Shared.props = Common\Shared.props
+		Common\SharedKey.snk = Common\SharedKey.snk
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Yodii.Script", "Yodii.Script\Yodii.Script.xproj", "{8703DD56-9C0C-4387-AF1D-3E28ED2F0B17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yodii.Script", "Yodii.Script\Yodii.Script.csproj", "{8703DD56-9C0C-4387-AF1D-3E28ED2F0B17}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Yodii.Script.Tests", "Tests\Yodii.Script.Tests\Yodii.Script.Tests.xproj", "{AFFD0ABF-57AC-49E3-8C02-5C34D580D3FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yodii.Script.Tests", "Tests\Yodii.Script.Tests\Yodii.Script.Tests.csproj", "{AFFD0ABF-57AC-49E3-8C02-5C34D580D3FC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleConsole", "Tests\SimpleConsole\SimpleConsole.xproj", "{5176A775-B968-4522-A1A2-7DC7772684F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleConsole", "Tests\SimpleConsole\SimpleConsole.csproj", "{5176A775-B968-4522-A1A2-7DC7772684F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

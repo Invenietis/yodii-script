@@ -30,9 +30,17 @@ using System.Diagnostics;
 
 namespace Yodii.Script
 {
-
+    /// <summary>
+    /// Assing expression.
+    /// </summary>
     public class AssignExpr : Expr
     {
+        /// <summary>
+        /// Initializes a new <see cref="AssignExpr"/>.
+        /// </summary>
+        /// <param name="location">Source location.</param>
+        /// <param name="left">Left expression is an accessor.</param>
+        /// <param name="right">Right expression is a value.</param>
         public AssignExpr( SourceLocation location, AccessorExpr left, Expr right )
             : base( location, right.IsStatement, true )
         {
@@ -42,8 +50,14 @@ namespace Yodii.Script
             Right = right;
         }
 
+        /// <summary>
+        /// Left accessor.
+        /// </summary>
         public AccessorExpr Left { get; private set; }
 
+        /// <summary>
+        /// Right value.
+        /// </summary>
         public Expr Right { get; private set; }
 
         /// <summary>

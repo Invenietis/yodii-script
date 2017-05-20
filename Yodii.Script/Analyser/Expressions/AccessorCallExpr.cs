@@ -38,8 +38,12 @@ namespace Yodii.Script
         /// <summary>
         /// Creates a new <see cref="AccessorCallExpr"/>: 0 or n arguments can be provided.
         /// </summary>
+        /// <param name="location">Source location.</param>
         /// <param name="left">Left scope. Must not be null.</param>
         /// <param name="arguments">When null, it is normalized to <see cref="Expr.EmptyArray"/>.</param>
+        /// <param name="declaredFunctions">Declared functions in the call itself (ie. named callback functions). Can be null.</param>
+        /// <param name="isIndexer">True if this is an indexer[] instead of a regular call().</param>
+        /// <param name="isStatement">True for statement, false for expression.</param>
         public AccessorCallExpr( SourceLocation location, Expr left, IReadOnlyList<Expr> arguments, IReadOnlyList<AccessorLetExpr> declaredFunctions, bool isStatement, bool isIndexer )
             : base( location, left, isStatement, true )
         {
@@ -48,6 +52,9 @@ namespace Yodii.Script
             IsIndexer = isIndexer;
         }
 
+        /// <summary>
+        /// Gets the list of arguments.
+        /// </summary>
         public override IReadOnlyList<Expr> Arguments => _args;
 
         /// <summary>
