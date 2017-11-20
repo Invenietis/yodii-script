@@ -30,7 +30,7 @@ using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    
+
     public class TemplateTests
     {
         [Fact]
@@ -118,6 +118,17 @@ Name varchar(40)
 );" );
         }
 
-
+        [Fact]
+        public void write_to_template_can_be_transformed_thanks_to_SetWriteTransform()
+        {
+            var c = new GlobalContext();
+            c.Register( "Model", new[] { "This", "will", "be", "in uppercase" } );
+            var e = new TemplateEngine( c );
+            e.SetWriteTransform( ( s, sb ) => sb.Append( s.ToUpperInvariant() ) );
+            var r = e.Process( "<%foreach txt in Model {%> - <%=txt%><%}%> like '<% $writer.Write( 'this' ) %>' but not <% $writer.WriteRaw( 'using WriteRaw' ) %>." );
+            r.ErrorMessage.Should().BeNull();
+            r.Script.Should().NotBeNull();
+            r.Text.Should().Be( " - THIS - WILL - BE - IN UPPERCASE like 'THIS'  but not using WriteRaw." );
+        }
     }
 }
