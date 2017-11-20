@@ -11,8 +11,12 @@ It is under developpement and any contributions are welcome.
 - Primary goal is full thread safety and API security. *Not performance!*
 - Safe scripting language implemented as a a *state machine* (no thread at all but nevertheless interuptible: breakpoints, step in, step over, etc.).
 - *Easy binding* (two-way for writable properties and fields for instance) to any external .Net object (uses reflection) that relies on a rather original way to publish an API to the script.
-- *No dependency* (currently released only on .Net 4.5.1) and *still less than 100KB* dll.
+- *No dependency* (currently released only on .Net 4.5.1 and netstandard1.3) and *still less than 100KB* dll.
 - Inspired from javascript but with important differences to be more *.Net compliant*.
+- No more === and !==
+  - Current == and != operators act as strict operators.
+- With object support (the awful with: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with). 
+  - Because this "feature" can be useful to adapt existing DSL.
 
 ## To Do list
 - Enable API securization (currently any properties or methods of external objects are callable).
@@ -29,8 +33,3 @@ It is under developpement and any contributions are welcome.
 - Transparently support async/await (actually any awaitable return) with the defined 
   but not implemented PExpr.DeferredKind.AsyncCall.
 
-## vNext
-- No more === and !==
-  - Current == and != operators act as strict operators.
-- With object support. 
-  - This (awful) feature can be useful to adapt existing DSL.

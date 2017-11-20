@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,12 +17,22 @@ namespace Yodii.Script
         {
             readonly StringBuilder _builder;
             readonly List<KeyValuePair<int, int>> _texts;
+            readonly static Action<string, StringBuilder> _emptyWriteTransformer = (s,sb) => sb.Append( s );
+
             string _template;
+            Action<string, StringBuilder> _writeTransformer;
 
             public Writer()
             {
                 _builder = new StringBuilder();
                 _texts = new List<KeyValuePair<int, int>>();
+                _writeTransformer = _emptyWriteTransformer;
+            }
+
+            public Action<string,StringBuilder> WriteTransform
+            {
+                get => _writeTransformer;
+                set => _writeTransformer = value ?? _emptyWriteTransformer;
             }
 
             public void Init( string template )
@@ -53,6 +63,12 @@ namespace Yodii.Script
                     )
                     .On( "Write" ).OnCall( ( f, args ) =>
                     {
+                        foreach( var a in args ) _writeTransformer( a.ToString(), _builder );
+                        return f.SetResult( RuntimeObj.Undefined );
+
+                    } )
+                    .On( "WriteRaw" ).OnCall( ( f, args ) =>
+                    {
                         foreach( var a in args ) _builder.Append( a.ToString() );
                         return f.SetResult( RuntimeObj.Undefined );
 
@@ -72,6 +88,16 @@ namespace Yodii.Script
         /// Gets the global context.
         /// </summary>
         public GlobalContext Global => _ctx;
+
+        /// <summary>
+        /// Sets a text formatter. Writes will use this formatter.
+        /// Setting it to null clears the current formatter: text is generated as-is.
+        /// </summary>
+        /// <param name="formatter">The formatter to use. Null to reset it.</param>
+        public void SetWriteTransform( Action<string, StringBuilder> formatter )
+        {
+            _writer.WriteTransform = formatter;
+        }
 
         /// <summary>
         /// Captures the <see cref="Process(string)"/> result.
