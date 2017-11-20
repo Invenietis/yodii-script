@@ -128,7 +128,7 @@ Name varchar(40)
             var r = e.Process( "<%foreach txt in Model {%> - <%=txt%><%}%> like '<% $writer.Write( 'this' ) %>' but not <% $writer.WriteRaw( 'using WriteRaw' ) %>." );
             r.ErrorMessage.Should().BeNull();
             r.Script.Should().NotBeNull();
-            r.Text.Should().Be( " - THIS - WILL - BE - IN UPPERCASE like 'THIS'  but not using WriteRaw." );
+            r.Text.Should().Be( " - THIS - WILL - BE - IN UPPERCASE like 'THIS' but not using WriteRaw." );
         }
     }
 }
