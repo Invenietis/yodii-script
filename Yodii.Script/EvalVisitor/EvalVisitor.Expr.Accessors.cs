@@ -52,11 +52,13 @@ namespace Yodii.Script
 
             public PExpr VisitArguments()
             {
+                Frame.CloseForNext( true );
                 while( _rpCount < _args.Length )
                 {
                     if( Frame.IsPendingOrSignal( ref _args[_rpCount], _arguments[_rpCount] ) ) return Frame.PendingOrSignal( _args[_rpCount] );
                     ++_rpCount;
                 }
+                Frame.CloseForNext( false );
                 return new PExpr( RuntimeObj.Undefined );
             }
 

@@ -130,5 +130,20 @@ Name varchar(40)
             r.Script.Should().NotBeNull();
             r.Text.Should().Be( " - THIS - WILL - BE - IN UPPERCASE like 'THIS' but not using WriteRaw." );
         }
+
+
+        [Fact]
+        public void template_with_WriteRaw()
+        {
+            var c = new GlobalContext();
+            c.Register( "Model", new[] { "This", "will", "be", "in uppercase" } );
+            var e = new TemplateEngine( c );
+            e.SetWriteTransform( ( s, sb ) => sb.Append( s.ToUpperInvariant() ) );
+            var r = e.Process( "<%= 'a' + Model.Length %>|<% $writer.WriteRaw( 'a' + Model.Length ) %>." );
+            r.ErrorMessage.Should().BeNull();
+            r.Script.Should().NotBeNull();
+            r.Text.Should().Be( "A4|a4." );
+        }
+
     }
 }

@@ -42,6 +42,7 @@ namespace Yodii.Script
             Frame _prev;
             Frame _next;
             RuntimeObj _result;
+            bool _isClosedForNext;
 
             protected Frame( EvalVisitor visitor, Expr e )
             {
@@ -51,6 +52,11 @@ namespace Yodii.Script
                 else visitor._firstFrame = this;
                 visitor._currentFrame = this;
                 _expr = e;
+            }
+
+            internal void CloseForNext( bool close )
+            {
+                _isClosedForNext = close;
             }
 
             public Expr Expr => _expr; 
@@ -113,7 +119,7 @@ namespace Yodii.Script
 
             public Frame NextFrame => _next; 
 
-            public Frame PrevFrame => _prev; 
+            public Frame PrevFrame => _prev == null || _prev._isClosedForNext  ? null : _prev; 
 
             public GlobalContext Global => Visitor.Global; 
             

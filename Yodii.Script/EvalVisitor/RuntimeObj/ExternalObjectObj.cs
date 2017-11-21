@@ -166,14 +166,14 @@ namespace Yodii.Script
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            AccessorMemberExpr mE = frame.Expr as AccessorMemberExpr;
+            var mE = frame.Expr as AccessorMemberExpr;
             if( mE != null )
             {
                 bool funcRequired = frame.NextAccessor != null && frame.NextAccessor.Expr is AccessorCallExpr;
                 if( funcRequired )
                 {
                     ExternalTypeHandler.IHandler handler;
-                    PExpr m = FindOrCreateMethod( frame, mE, out handler );
+                    PExpr m = FindOrCreateMethod( frame, mE.Name, out handler );
                     if( m.IsUnknown )
                         m = frame.SetError( $"Member {mE.Name} on '{_o.GetType().FullName}' is not a function." );
                     return m;
@@ -185,7 +185,7 @@ namespace Yodii.Script
                         if( p.Name == mE.Name ) return p.Read( frame );
                     }
                     ExternalTypeHandler.IHandler handler;
-                    PExpr m = FindOrCreateMethod( frame, mE, out handler );
+                    PExpr m = FindOrCreateMethod( frame, mE.Name, out handler );
                     if( m.IsUnknown )
                     {
                         Debug.Assert( handler != null && handler.PropertyGetter != null );
@@ -199,17 +199,17 @@ namespace Yodii.Script
             return frame.SetError();
         }
 
-        private PExpr FindOrCreateMethod( IAccessorFrame frame, AccessorMemberExpr mE, out ExternalTypeHandler.IHandler handler )
+        private PExpr FindOrCreateMethod( IAccessorFrame frame, string name, out ExternalTypeHandler.IHandler handler )
         {
             handler = null;
             foreach( var m in _methods )
             {
-                if( m.Name == mE.Name ) return frame.SetResult( m );
+                if( m.Name == name ) return frame.SetResult( m );
             }
             ExternalTypeHandler type = _context.FindType( _o.GetType() );
             if( type == null ) return frame.SetError( $"Unhandled type '{_o.GetType().FullName}'." );
-            handler = type.GetHandler( mE.Name );
-            if( handler == null ) return frame.SetError( $"Missing member {mE.Name} on '{_o.GetType().FullName}'." );
+            handler = type.GetHandler( name );
+            if( handler == null ) return frame.SetError( $"Missing member {name} on '{_o.GetType().FullName}'." );
             if( handler.PropertyGetter == null )
             {
                 var meth = new Method( this, handler );
