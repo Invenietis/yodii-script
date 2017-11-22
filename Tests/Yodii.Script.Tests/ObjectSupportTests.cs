@@ -194,32 +194,5 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        public class ModelWithMethod
-        {
-            public string TheVariable { get; set; }
-
-            public string Reverse( string variable )
-            {
-                return String.Join( "", variable.Reverse() );
-            }
-        }
-
-        [Fact]
-        public void Model_with_property_and_helper_method()
-        {
-            var model = new ModelWithMethod()
-            {
-                TheVariable = "azerty"
-            };
-
-            var c = new GlobalContext();
-            c.Register( "Model", model );
-
-            var e = new TemplateEngine( c );
-            var result = e.Process( "Hello, <%= Model.Reverse( Model.TheVariable ) %>" );
-
-            result.Text.Should().Be( $"Hello, {model.Reverse( model.TheVariable )}" );
-        }
-
     }
 }

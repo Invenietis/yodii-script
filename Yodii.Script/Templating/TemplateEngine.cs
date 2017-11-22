@@ -11,7 +11,7 @@ namespace Yodii.Script
     {
         readonly GlobalContext _ctx;
         readonly Writer _writer;
-        readonly static Regex _rTag = new Regex( "<%=?.*?%>", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
+        readonly static Regex _rTag = new Regex( "<%=?.*?%>", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture );
 
         class Writer : IAccessorVisitor
         {
