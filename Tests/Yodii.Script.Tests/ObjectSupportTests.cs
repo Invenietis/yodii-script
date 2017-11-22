@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using System.Text.RegularExpressions;
 
 namespace Yodii.Script.Tests
 {
@@ -202,6 +203,65 @@ namespace Yodii.Script.Tests
             var result = e.Process( "Hello, <%= Model.Reverse( Model.TheVariable ) %>" );
 
             result.Text.Should().Be( $"Hello, {model.Reverse( model.TheVariable )}" );
+        }
+
+        [Fact]
+        public void Model_with_property_and_helper_method_contains_in_a_foreach()
+        {
+            var model = new List<ModelWithMethod>()
+            {
+                new ModelWithMethod() {  TheVariable = "First" },
+                new ModelWithMethod() {  TheVariable = "Seacond" },
+            };
+
+            var c = new GlobalContext();
+            c.Register( "Model", model );
+             
+            var e = new TemplateEngine( c );
+            var result = e.Process( @"Hello,
+                <%
+                    foreach( m in Model ) {
+                %>
+                    <%= m.Reverse( m.TheVariable ) %>
+                <%
+                    }
+                %>" );
+
+            result.ErrorMessage.Should().BeNullOrEmpty();
+
+            string content = Regex.Replace( result.Text, @"\s+", string.Empty );
+
+            content.Should().Be( $"Hello,{model[0].Reverse(model[0].TheVariable)}{model[1].Reverse( model[1].TheVariable )}" );
+        }
+
+        [Fact]
+        public void Model_with_property_and_helper_method_contains_in_a_foreach_with_temp_variable()
+        {
+            var model = new List<ModelWithMethod>()
+            {
+                new ModelWithMethod() {  TheVariable = "First" },
+                new ModelWithMethod() {  TheVariable = "Seacond" },
+            };
+
+            var c = new GlobalContext();
+            c.Register( "Model", model );
+
+            var e = new TemplateEngine( c );
+            var result = e.Process( @"Hello,
+                <%
+                    foreach( m in Model ) {
+                        let tmp = m.TheVariable;
+                %>
+                    <%= m.Reverse( tmp ) %>
+                <%
+                    }
+                %>" );
+
+            result.ErrorMessage.Should().BeNullOrEmpty();
+
+            string content = Regex.Replace( result.Text, @"\s+", string.Empty );
+
+            content.Should().Be( $"Hello,{model[0].Reverse( model[0].TheVariable )}{model[1].Reverse( model[1].TheVariable )}" );
         }
 
     }
