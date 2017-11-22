@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using System.Reflection;
 
 namespace Yodii.Script.Tests
 {
@@ -83,6 +84,22 @@ namespace Yodii.Script.Tests
             {
                 return TotalMethodCallCount += boost;
             }
+
+            int _v;
+
+            public int this[int i] => _v;
+            public int this[string i, int j]
+            {
+                get => _v + j;
+                set => _v = i.Length + j; 
+            }
+        }
+
+        [Fact]
+        public void accessing_indexers()
+        {
+            var o = new AnotherObject();
+            MemberInfo[] members = o.GetType().GetMember( "Item" );
         }
 
         [Fact]
