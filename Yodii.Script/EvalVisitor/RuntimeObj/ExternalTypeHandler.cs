@@ -75,12 +75,12 @@ namespace Yodii.Script
             /// <summary>
             /// Non null getter function for a property or a field.
             /// </summary>
-            Func<object, object> PropertyGetter { get; }
+            Func<object, object[], object> PropertyGetter { get; }
 
             /// <summary>
             /// Optional setter for writable field or property.
             /// </summary>
-            Action<object, object> PropertySetter { get; }
+            Action<object, object[], object> PropertySetter { get; }
 
             /// <summary>
             /// Finds the best method based on the parameters.
@@ -98,10 +98,10 @@ namespace Yodii.Script
                 Holder = h;
                 Name = name;
                 PropertyOrFieldType = p.PropertyType;
-                PropertyGetter = o => p.GetValue( o );
+                PropertyGetter = (o,args) => p.GetValue( o, args );
                 if( p.CanWrite )
                 {
-                    PropertySetter = ( o, value ) => p.SetValue( o, value );
+                    PropertySetter = ( o, args, value ) => p.SetValue( o, value, args );
                 }
             }
 
@@ -110,17 +110,17 @@ namespace Yodii.Script
                 Holder = h;
                 Name = name;
                 PropertyOrFieldType = f.FieldType;
-                PropertyGetter = o => f.GetValue( o );
+                PropertyGetter = (o,args) => f.GetValue( o );
                 if( !f.IsInitOnly )
                 {
-                    PropertySetter = ( o, value ) => f.SetValue( o, value );
+                    PropertySetter = ( o, args, value ) => f.SetValue( o, value );
                 }
             }
             public ExternalTypeHandler Holder { get; }
             public string Name { get; }
             public Type PropertyOrFieldType { get; }
-            public Func<object, object> PropertyGetter { get; }
-            public Action<object, object> PropertySetter { get; }
+            public Func<object, object[], object> PropertyGetter { get; }
+            public Action<object, object[], object> PropertySetter { get; }
             public MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters) => new MethodCallInfo();
             public override string ToString() => Holder._type.FullName + '.' + Name;
         }
@@ -158,8 +158,8 @@ namespace Yodii.Script
             public ExternalTypeHandler Holder { get; }
             public string Name { get; }
             public Type PropertyOrFieldType => null;
-            Func<object, object> IHandler.PropertyGetter => null;
-            Action<object, object> IHandler.PropertySetter => null;
+            Func<object, object[], object> IHandler.PropertyGetter => null;
+            Action<object, object[], object> IHandler.PropertySetter => null;
             public MethodCallInfo FindMethod( GlobalContext ctx, IReadOnlyList<RuntimeObj> parameters )
             {
                 var m = _methods.FirstOrDefault( candidate => candidate.MinParameterCount == parameters.Count );

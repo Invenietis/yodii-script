@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using System.Reflection;
 
 namespace Yodii.Script.Tests
 {
@@ -83,6 +84,22 @@ namespace Yodii.Script.Tests
             {
                 return TotalMethodCallCount += boost;
             }
+
+            int _v;
+
+            public int this[int i] => _v;
+            public int this[string i, int j]
+            {
+                get => _v + j;
+                set => _v = i.Length + j; 
+            }
+        }
+
+        [Fact]
+        public void accessing_indexers()
+        {
+            var o = new AnotherObject();
+            MemberInfo[] members = o.GetType().GetMember( "Item" );
         }
 
         [Fact]
@@ -175,33 +192,6 @@ namespace Yodii.Script.Tests
                 o.Should().BeOfType<StringObj>();
                 o.ToString().Should().Be( "TheValue" );
             }, c );
-        }
-
-        public class ModelWithMethod
-        {
-            public string TheVariable { get; set; }
-
-            public string Reverse( string variable )
-            {
-                return String.Join( "", variable.Reverse() );
-            }
-        }
-
-        [Fact]
-        public void Model_with_property_and_helper_method()
-        {
-            var model = new ModelWithMethod()
-            {
-                TheVariable = "azerty"
-            };
-
-            var c = new GlobalContext();
-            c.Register( "Model", model );
-
-            var e = new TemplateEngine( c );
-            var result = e.Process( "Hello, <%= Model.Reverse( Model.TheVariable ) %>" );
-
-            result.Text.Should().Be( $"Hello, {model.Reverse( model.TheVariable )}" );
         }
 
     }

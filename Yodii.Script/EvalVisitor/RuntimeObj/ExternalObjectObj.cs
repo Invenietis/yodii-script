@@ -55,7 +55,8 @@ namespace Yodii.Script
             {
                 try
                 {
-                    object val = _handler.PropertyGetter( _eo._o );
+                    object[] index = null;
+                    object val = _handler.PropertyGetter( _eo._o, index );
                     RuntimeObj obj = val == _eo ? _eo : frame.Global.Create( val );
                     if( _handler.PropertySetter != null )
                     {
@@ -76,7 +77,7 @@ namespace Yodii.Script
                 try
                 {
                     object v = Convert.ChangeType( value.ToNative( _eo._context ), _handler.PropertyOrFieldType ); 
-                    _handler.PropertySetter( _eo._o, v );
+                    _handler.PropertySetter( _eo._o, null, v );
                 }
                 catch( Exception ex )
                 {
@@ -166,8 +167,11 @@ namespace Yodii.Script
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            var mE = frame.Expr as AccessorMemberExpr;
-            if( mE != null )
+            if( frame.Expr is AccessorCallExpr cE )
+            {
+                
+            }
+            else if( frame.Expr is AccessorMemberExpr mE )
             {
                 bool funcRequired = frame.NextAccessor != null && frame.NextAccessor.Expr is AccessorCallExpr;
                 if( funcRequired )
@@ -180,23 +184,28 @@ namespace Yodii.Script
                 }
                 else
                 {
-                    foreach( var p in _properties )
-                    {
-                        if( p.Name == mE.Name ) return p.Read( frame );
-                    }
-                    ExternalTypeHandler.IHandler handler;
-                    PExpr m = FindOrCreateMethod( frame, mE.Name, out handler );
-                    if( m.IsUnknown )
-                    {
-                        Debug.Assert( handler != null && handler.PropertyGetter != null );
-                        var prop = new Property( this, handler );
-                        _properties.Add( prop );
-                        m = prop.Read( frame );
-                    }
-                    return m;
+                    return FindOrCreatePropertyOrMethod( frame, mE.Name );
                 }
             }
             return frame.SetError();
+        }
+
+        PExpr FindOrCreatePropertyOrMethod( IAccessorFrame frame, string name )
+        {
+            foreach( var p in _properties )
+            {
+                if( p.Name == name ) return p.Read( frame );
+            }
+            ExternalTypeHandler.IHandler handler;
+            PExpr m = FindOrCreateMethod( frame, name, out handler );
+            if( m.IsUnknown )
+            {
+                Debug.Assert( handler != null && handler.PropertyGetter != null );
+                var prop = new Property( this, handler );
+                _properties.Add( prop );
+                m = prop.Read( frame );
+            }
+            return m;
         }
 
         private PExpr FindOrCreateMethod( IAccessorFrame frame, string name, out ExternalTypeHandler.IHandler handler )
