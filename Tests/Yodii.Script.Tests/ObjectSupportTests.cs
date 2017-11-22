@@ -103,6 +103,17 @@ namespace Yodii.Script.Tests
         }
 
         [Fact]
+        public void referencing_a_property_does_not_keep_a_ref()
+        {
+            var obj = new AnObject() { Name = "Initial" };
+            var c = new GlobalContext();
+            c.Register( "o", obj );
+            ScriptEngine.Evaluate( "let n = o.Name; n = 'This is not a ref!'; n;", c )
+                .ToString().Should().Be( "This is not a ref!" );
+            obj.Name.Should().Be( "Initial" );
+        }
+
+        [Fact]
         public void accessing_property_and_field()
         {
             var c = new GlobalContext();

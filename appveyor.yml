@@ -1,6 +1,7 @@
 # Basic appveyor configuration : CodeCakeBuilder does the job.
 version: build{build}
 image: Visual Studio 2017
+clone_folder: C:\CK-World\Yodii-Projects\Yodii-Script
 branches:
   only:
   - master

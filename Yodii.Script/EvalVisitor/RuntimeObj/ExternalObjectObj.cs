@@ -38,6 +38,17 @@ namespace Yodii.Script
         readonly List<Property> _properties;
         readonly List<Method> _methods;
 
+
+        /// <summary>
+        /// Indexed properties are not cached.
+        /// </summary>
+        public class IndexedProperty : RefRuntimeObj
+        {
+        }
+
+        /// <summary>
+        /// Properties are cached.
+        /// </summary>
         public class Property : RefRuntimeObj
         {
             readonly ExternalObjectObj _eo;
@@ -55,8 +66,7 @@ namespace Yodii.Script
             {
                 try
                 {
-                    object[] index = null;
-                    object val = _handler.PropertyGetter( _eo._o, index );
+                    object val = _handler.PropertyGetter( _eo._o );
                     RuntimeObj obj = val == _eo ? _eo : frame.Global.Create( val );
                     if( _handler.PropertySetter != null )
                     {
@@ -77,7 +87,7 @@ namespace Yodii.Script
                 try
                 {
                     object v = Convert.ChangeType( value.ToNative( _eo._context ), _handler.PropertyOrFieldType ); 
-                    _handler.PropertySetter( _eo._o, null, v );
+                    _handler.PropertySetter( _eo._o, v );
                 }
                 catch( Exception ex )
                 {
@@ -167,13 +177,13 @@ namespace Yodii.Script
 
         public override PExpr Visit( IAccessorFrame frame )
         {
-            if( frame.Expr is AccessorCallExpr cE )
+            if( frame.Expr is AccessorCallExpr cE && cE.IsIndexer )
             {
-                
+                return frame.SetError( $"Indexer is not yet supported. Use get_Item() and set_Item() for the moment." );
             }
             else if( frame.Expr is AccessorMemberExpr mE )
             {
-                bool funcRequired = frame.NextAccessor != null && frame.NextAccessor.Expr is AccessorCallExpr;
+                bool funcRequired = frame.NextAccessor?.Expr is AccessorCallExpr a && !a.IsIndexer;
                 if( funcRequired )
                 {
                     ExternalTypeHandler.IHandler handler;
