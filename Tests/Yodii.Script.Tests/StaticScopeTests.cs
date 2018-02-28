@@ -41,13 +41,13 @@ namespace Yodii.Script.Tests
             s.CloseScope();
 
             Action act = () => s.CloseScope();
-            act.ShouldThrow<InvalidOperationException>();
+            act.Should().Throw<InvalidOperationException>();
 
             StaticScope sWithGlobal = new StaticScope( true );
             sWithGlobal.OpenScope();
             sWithGlobal.CloseScope();
 
-            act.ShouldThrow<InvalidOperationException>();
+            act.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]

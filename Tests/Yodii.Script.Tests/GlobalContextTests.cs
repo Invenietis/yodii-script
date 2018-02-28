@@ -41,7 +41,7 @@ namespace Yodii.Script.Tests
             ScriptEngine.Evaluate( "Numbers.One", c ).ToString().Should().Be( "1" );
 
             Action a = () => c.Register( "Numbers.One", 1 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             c.Register( "Numbers.Two", 2 );
             ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString().Should().Be( "3" );
@@ -54,17 +54,17 @@ namespace Yodii.Script.Tests
             c.Register( "Numbers", 1 );
 
             Action a = () => c.Register( "Numbers", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             a = () => c.Register( "Numbers.One", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             c.Register( "X.Numbers", 1 );
             a = () => c.Register( "X.Numbers", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             a = () => c.Register( "X.Numbers.One", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             ScriptEngine.Evaluate( "X.Numbers", c ).ToString().Should().Be( "1" );
         }
@@ -85,13 +85,13 @@ namespace Yodii.Script.Tests
             GlobalContext c = new GlobalContext();
             c.Register( "NS.Sub.NS.Obj", 1 );
             Action a = () => c.Register( "NS", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub.NS", 4 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub.NS.Obj", 5 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             ScriptEngine.Evaluate( "NS.Sub.NS.Obj", c ).ToString().Should().Be( "1" );
         }
 

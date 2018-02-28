@@ -62,7 +62,6 @@ namespace Yodii.Script.Tests
         [InlineData( "45.member" )]
         [InlineData( ".45.member" )]
         [InlineData( "45.01member" )]
-        [InlineData( ".45.member" )]
         [InlineData( ".45.01member" )]
         [InlineData( "45.01e23member" )]
         public void bad_literal_numbers_are_ErrorNumberIdentifierStartsImmediately( string num )
