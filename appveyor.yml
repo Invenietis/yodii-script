@@ -1,12 +1,11 @@
 version: build{build}
 image: Visual Studio 2017
+clone_folder: C:\CK-World\Yodii-Projects\Yodii-Script
 branches:
   only:
     - master
     - develop
 environment:
-  NUGET_API_KEY:
-    secure: Cx0q/gQZQpP3eDf6H9lzIDpYYki+sGCpruxgDcFUJRoYdpH7l5aDh7afloH3uNLD
   MYGET_PREVIEW_API_KEY:
     secure: CfEqNYjhrGX9DyalZ4jcadzJ/x8q25GulMCbZQDRRs+XetfHn2AEP79OJXE1wSJ8
   MYGET_CI_API_KEY:
@@ -16,4 +15,3 @@ environment:
 build_script:
   - dotnet run --project CodeCakeBuilder -nointeraction
 test: off
-clone_folder: C:\CK-World\Yodii-Projects\Yodii-Script
