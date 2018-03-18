@@ -24,15 +24,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
+using NUnit.Framework;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class FunctionTests
     {
-        [Fact]
+        [Test]
         public void functions_are_runtime_objects()
         {
             string s = @"function yo(a) { return 'yo' + a; }";
@@ -44,7 +45,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void functions_are_callable()
         {
             string s = @"function yo(a) { return 'yo' + a; }
@@ -56,7 +57,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void functions_have_multiple_parameters_and_superfluous_actual_parameters_are_ignored()
         {
             string s = @"function F(a,b,c,d,e,f,g) { return a+b+c+d+e+f+g; }
@@ -69,7 +70,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void functions_are_first_class_objects()
         {
             string s = @" 
@@ -87,7 +88,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void closure_is_supported()
         {
             string s = @"
@@ -106,7 +107,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void parameters_hide_closure_variables()
         {
             string s = @"let _seed = 0;
@@ -123,7 +124,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void intializing_a_masking_variable_from_the_one_it_masks()
         {
             string s = @"let x = 10;
@@ -143,7 +144,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void closure_with_two_levels()
         {
             string s = @"
@@ -167,7 +168,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void closure_and_immediately_invoked_function_expression_IIFE()
         {
             string script = @"
@@ -185,7 +186,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Fact]
+        [Test]
         public void recursive_function()
         {
             string s = @"function fib(n)
@@ -201,7 +202,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Fact]
+        [Test]
         public void returning_a_closed_variable_does_not_return_the_reference()
         {
             string s = @"   function f()
@@ -227,7 +228,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void checking_complex_closure_and_evaluations()
         {
             // Code has been tested on Chrome & Firefox (with firebug).
@@ -252,7 +253,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void named_functions_defined_in_parameters()
         {
             string s = @"   let x = 0;

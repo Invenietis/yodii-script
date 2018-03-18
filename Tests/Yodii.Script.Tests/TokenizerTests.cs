@@ -24,17 +24,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
+using NUnit.Framework;
 using Yodii.Script;
 using System.Globalization;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class JSTokenizerTests
     {
-        [Fact]
+        [Test]
         public void round_trip_parsing()
         {
             Tokenizer p = new Tokenizer();
@@ -58,12 +59,12 @@ namespace Yodii.Script.Tests
         }
 
         [Theory]
-        [InlineData( "45DD" )]
-        [InlineData( "45.member" )]
-        [InlineData( ".45.member" )]
-        [InlineData( "45.01member" )]
-        [InlineData( ".45.01member" )]
-        [InlineData( "45.01e23member" )]
+        [TestCase( "45DD" )]
+        [TestCase( "45.member" )]
+        [TestCase( ".45.member" )]
+        [TestCase( "45.01member" )]
+        [TestCase( ".45.01member" )]
+        [TestCase( "45.01e23member" )]
         public void bad_literal_numbers_are_ErrorNumberIdentifierStartsImmediately( string num )
         {
             Tokenizer p = new Tokenizer( num );
@@ -73,10 +74,10 @@ namespace Yodii.Script.Tests
 
 
         [Theory]
-        [InlineData( "45.98" )]
-        [InlineData( ".0" )]
-        [InlineData( ".0e4" )]
-        [InlineData( "876.098E-3" )]
+        [TestCase( "45.98" )]
+        [TestCase( ".0" )]
+        [TestCase( ".0e4" )]
+        [TestCase( "876.098E-3" )]
         public void parsing_floats( string num )
         {
             Tokenizer p = new Tokenizer( num );
@@ -88,12 +89,12 @@ namespace Yodii.Script.Tests
 
 
         [Theory]
-        [InlineData( @"""a""", "a" )]
-        [InlineData( @"""a""""b""", @"a""b" )]
-        [InlineData( @"'a'", "a" )]
-        [InlineData( @"'a''b'", @"a'b" )]
-        [InlineData( @"'\u3713'", "\u3713" )]
-        [InlineData( @"'a\u3712b'", "a\u3712b" )]
+        [TestCase( @"""a""", "a" )]
+        [TestCase( @"""a""""b""", @"a""b" )]
+        [TestCase( @"'a'", "a" )]
+        [TestCase( @"'a''b'", @"a'b" )]
+        [TestCase( @"'\u3713'", "\u3713" )]
+        [TestCase( @"'a\u3712b'", "a\u3712b" )]
         public void successful_string_parsing( string s, string expected )
         {
             Tokenizer p = new Tokenizer( s );
