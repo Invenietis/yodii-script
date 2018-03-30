@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Code.Cake" Version="0.21.1" />
+    <PackageReference Include="Code.Cake" Version="0.25.0" />
     <PackageReference Include="SimpleGitVersion.Cake" Version="0.30.0" />
     <PackageReference Include="CK.Text" Version="6.2.1" />
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
