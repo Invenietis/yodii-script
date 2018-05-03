@@ -24,15 +24,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
+using NUnit.Framework;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class TryCatchTests
     {
-        [Fact]
+        [Test]
         public void simple_try_throw_catch()
         {
             string s = @"   let r = 0;
@@ -46,7 +47,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void first_chance_error()
         {
             string s = @"   function t( n ) { throw n; }
@@ -64,7 +65,7 @@ namespace Yodii.Script.Tests
             expectedFirstChanceError: 3 );
         }
 
-        [Fact]
+        [Test]
         public void throw_from_function()
         {
             string s = @"   let no = 0;
@@ -82,7 +83,7 @@ namespace Yodii.Script.Tests
             } );
         }
 
-        [Fact]
+        [Test]
         public void catching_reference_error_is_not_possible()
         {
             string s = @" let msg; try { ++notFound } catch( e ) { msg = 'ref catched'; }; msg;";

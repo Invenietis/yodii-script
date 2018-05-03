@@ -1,14 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Xunit;
+using NUnit.Framework;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class WithObjectSupportTests
     {
         class NamedObject
@@ -16,7 +17,7 @@ namespace Yodii.Script.Tests
             public string Name { get; set; } = "Name";
         }
 
-        [Fact]
+        [Test]
         public void with_syntax_support_on_member()
         {
             var c = new GlobalContext();
@@ -36,7 +37,7 @@ namespace Yodii.Script.Tests
             public NamedObject Obj { get; } = new NamedObject();
         }
 
-        [Fact]
+        [Test]
         public void with_syntax_support_on_subordinate_members()
         {
             var c = new GlobalContext();
@@ -52,7 +53,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void with_closing()
         {
             var c = new GlobalContext();
@@ -72,7 +73,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void with_property_hiding()
         {
             object AtoF = new { Name = "a1", A = 

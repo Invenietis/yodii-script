@@ -25,17 +25,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 using FluentAssertions;
 using System.Reflection;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class ObjectSupportTests
     {
 
-        [Fact]
+        [Test]
         public void accessing_properties_on_anonymous_class()
         {
             var c = new GlobalContext();
@@ -95,14 +96,14 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public void accessing_indexers()
         {
             var o = new AnotherObject();
             MemberInfo[] members = o.GetType().GetMember( "Item" );
         }
 
-        [Fact]
+        [Test]
         public void accessing_property_and_field()
         {
             var c = new GlobalContext();
@@ -114,7 +115,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void setting_property_and_field()
         {
             var c = new GlobalContext();
@@ -129,7 +130,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void accessing_property_of_sub_property()
         {
             var c = new GlobalContext();
@@ -141,7 +142,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void postincrementing_integer_field()
         {
             var c = new GlobalContext();
@@ -158,7 +159,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void calling_methods()
         {
             var c = new GlobalContext();
@@ -178,7 +179,7 @@ namespace Yodii.Script.Tests
             }, c );
         }
 
-        [Fact]
+        [Test]
         public void calling_dictionnary_indexer()
         {
             var c = new GlobalContext();

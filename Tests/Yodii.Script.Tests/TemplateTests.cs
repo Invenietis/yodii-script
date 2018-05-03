@@ -25,16 +25,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 using FluentAssertions;
 using System.Text.RegularExpressions;
 
 namespace Yodii.Script.Tests
 {
 
+    [TestFixture]
     public class TemplateTests
     {
-        [Fact]
+        [Test]
         public void foreach_with_one_write_statement()
         {
             var c = new GlobalContext();
@@ -46,7 +47,7 @@ namespace Yodii.Script.Tests
             r.Text.Should().Be( "*1*2*7*10*16" );
         }
 
-        [Fact]
+        [Test]
         public void empty_tags_are_ignored()
         {
             var e = new TemplateEngine( new GlobalContext() );
@@ -64,7 +65,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public void when_there_is_no_tag_there_is_no_script()
         {
             var e = new TemplateEngine( new GlobalContext() );
@@ -91,7 +92,7 @@ namespace Yodii.Script.Tests
             public string TableName { get; set; }
         }
 
-        [Fact]
+        [Test]
         public void simple_template_from_Model_object()
         {
             var t = new Table()
@@ -119,7 +120,7 @@ Name varchar(40)
 );" );
         }
 
-        [Fact]
+        [Test]
         public void write_to_template_can_be_transformed_thanks_to_SetWriteTransform()
         {
             var c = new GlobalContext();
@@ -133,7 +134,7 @@ Name varchar(40)
         }
 
 
-        [Fact]
+        [Test]
         public void template_with_WriteRaw()
         {
             var c = new GlobalContext();
@@ -156,7 +157,7 @@ Name varchar(40)
             }
         }
 
-        [Fact]
+        [Test]
         public void Model_with_property_and_helper_method()
         {
             var model = new ModelWithMethod()
@@ -173,7 +174,7 @@ Name varchar(40)
             result.Text.Should().Be( $"Hello, {model.Reverse( model.TheVariable )}" );
         }
 
-        [Fact]
+        [Test]
         public void Model_with_property_and_helper_method_contains_in_a_foreach()
         {
             var model = new List<ModelWithMethod>()
@@ -202,7 +203,7 @@ Name varchar(40)
             content.Should().Be( $"Hello,{model[0].Reverse( model[0].TheVariable )}{model[1].Reverse( model[1].TheVariable )}" );
         }
 
-        [Fact]
+        [Test]
         public void Model_with_property_and_helper_method_contains_in_a_foreach_with_temp_variable()
         {
             var model = new List<ModelWithMethod>()

@@ -25,15 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 using FluentAssertions;
 
 namespace Yodii.Script.Tests
 {
-    
+
+    [TestFixture]
     public class GlobalContextTests
     {
-        [Fact]
+        [Test]
         public void successful_namespace_registration()
         {
             GlobalContext c = new GlobalContext();
@@ -41,35 +42,35 @@ namespace Yodii.Script.Tests
             ScriptEngine.Evaluate( "Numbers.One", c ).ToString().Should().Be( "1" );
 
             Action a = () => c.Register( "Numbers.One", 1 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             c.Register( "Numbers.Two", 2 );
             ScriptEngine.Evaluate( "Numbers.One + Numbers.Two", c ).ToString().Should().Be( "3" );
         }
 
-        [Fact]
+        [Test]
         public void namespace_can_not_be_registered_on_or_below_a_registered_object()
         {
             GlobalContext c = new GlobalContext();
             c.Register( "Numbers", 1 );
 
             Action a = () => c.Register( "Numbers", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             a = () => c.Register( "Numbers.One", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             c.Register( "X.Numbers", 1 );
             a = () => c.Register( "X.Numbers", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             a = () => c.Register( "X.Numbers.One", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             ScriptEngine.Evaluate( "X.Numbers", c ).ToString().Should().Be( "1" );
         }
 
-        [Fact]
+        [Test]
         public void namespace_and_function_simple_demo()
         {
             var c = new GlobalContext();
@@ -79,19 +80,19 @@ namespace Yodii.Script.Tests
                 .ToString().Should().Be( "hop = N'Aujourd''hui'" );
         }
 
-        [Fact]
+        [Test]
         public void object_can_not_be_regitered_on_or_below_a_registered_namespace()
         {
             GlobalContext c = new GlobalContext();
             c.Register( "NS.Sub.NS.Obj", 1 );
             Action a = () => c.Register( "NS", 2 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub", 3 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub.NS", 4 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             a = () => c.Register( "NS.Sub.NS.Obj", 5 );
-            a.ShouldThrow<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
             ScriptEngine.Evaluate( "NS.Sub.NS.Obj", c ).ToString().Should().Be( "1" );
         }
 
@@ -134,7 +135,7 @@ namespace Yodii.Script.Tests
             }
         }
 
-        [Fact]
+        [Test]
         public void access_to_a_non_existing_object_on_the_Context_is_a_runtime_error()
         {
             string s = "AnIntrinsicArray[0]";
@@ -145,7 +146,7 @@ namespace Yodii.Script.Tests
         }
 
 
-        [Fact]
+        [Test]
         public void access_to_members_via_On_does_not_fallback()
         {
             var ctx = new Context();
@@ -169,7 +170,7 @@ namespace Yodii.Script.Tests
             }, ctx );
         }
 
-        [Fact]
+        [Test]
         public void access_to_AnIntrinsicArray_exposed_by_the_Context()
         {
             string s;
@@ -212,8 +213,8 @@ namespace Yodii.Script.Tests
         }
 
         [Theory]
-        [InlineData( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
-        [InlineData( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], 'a string' ) == 'number'" )]
+        [TestCase( "typeof Ghost.M( 'any', Ghost.M[5+8], 'args' ) == 'number'" )]
+        [TestCase( "typeof Ghost.M( Ghost.M[((3+2)*1)+(2*(1+1))*(1+1)], 'a string' ) == 'number'" )]
         public void access_to_a_ghost_object_step_by_step( string s )
         {
             var ctx = new Context();
