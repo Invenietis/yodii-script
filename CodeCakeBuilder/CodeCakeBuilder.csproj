@@ -4,9 +4,9 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Code.Cake" Version="0.0.0-0" />
-    <PackageReference Include="SimpleGitVersion.Cake" Version="0.0.0-0" />
-    <PackageReference Include="CK.Text" Version="0.0.0-0" />
+    <PackageReference Include="Code.Cake" Version="0.26.1-C0030-develop" />
+    <PackageReference Include="SimpleGitVersion.Cake" Version="0.34.1-C0030-develop" />
+    <PackageReference Include="CK.Text" Version="7.0.1-C0031-develop" />
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
   </ItemGroup>
 </Project>
