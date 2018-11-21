@@ -12,7 +12,7 @@
     <PackageReference Include="NuGet.Credentials" Version="4.8.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Code.Cake" Version="0.28.1--0022-develop" />
+    <PackageReference Include="Code.Cake" Version="0.28.1--0023-develop" />
     <PackageReference Include="SimpleGitVersion.Cake" Version="0.0.0-0" />
     <PackageReference Include="CK.Text" Version="0.0.0-0" />
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
