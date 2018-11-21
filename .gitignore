@@ -252,3 +252,8 @@ paket-files/
 .idea/
 *.sln.iml
 CodeCakeBuilder/Tools/
+
+Tests/**/TestResult*.xml
+CodeCakeBuilder/UnitTestsDone.*.txt
+Tests/**/Logs/
+Tests/**/CKSetup-WorkingDir/
