@@ -12,9 +12,9 @@
     <PackageReference Include="NuGet.Credentials" Version="4.9.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Code.Cake" Version="0.0.0--023uqon-local" />
-    <PackageReference Include="SimpleGitVersion.Cake" Version="0.0.0--0240eun-local" />
-    <PackageReference Include="CK.Text" Version="0.0.0--023zw18-local" />
+    <PackageReference Include="Code.Cake" Version="0.0.0--027nyjy-local" />
+    <PackageReference Include="SimpleGitVersion.Cake" Version="0.0.0--027nykl-local" />
+    <PackageReference Include="CK.Text" Version="0.0.0--027nykk-local" />
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
   </ItemGroup>
 </Project>
