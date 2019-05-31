@@ -7,8 +7,8 @@
     <ProjectReference Include="..\..\Yodii.Script\Yodii.Script.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="2.6.4" />
-    <PackageReference Include="FluentAssertions" Version="5.4.1" />
+    <PackageReference Include="NUnit" Version="[2.6.4]" />
+    <PackageReference Include="FluentAssertions" Version="5.6.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
