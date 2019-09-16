@@ -1,1 +1,0 @@
-C:/Dev/CK/Yodii-Projects/Yodii-Script/Tests/Yodii.Script.Tests/bin/Debug/net461/Yodii.Script.Tests.dll
