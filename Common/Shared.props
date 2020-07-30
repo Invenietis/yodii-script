@@ -33,7 +33,7 @@
 
   <!--<StandardProperties>-->
   <PropertyGroup>
-    <RepositoryUrl>https://github.com/Invenietis/yodii-script.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Invenietis/yodii-script</RepositoryUrl>
     <ProductName>CK</ProductName>
     <Company>Signature Code</Company>
     <Authors>Signature Code</Authors>
