@@ -1,8 +1,8 @@
 ﻿<RepositoryInfo>
-
-  <SimpleGitVersion>
+  <SimpleGitVersion StartingVersion="0.9.0-alpha">
     <Branches>
       <Branch Name="develop" CIVersionMode="LastReleaseBased" VersionName="develop" />
+      <Branch Name="develop-local" CIVersionMode="ZeroTimed" VersionName="local" />
     </Branches>
   </SimpleGitVersion>
 </RepositoryInfo>
